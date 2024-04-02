@@ -1,0 +1,185 @@
+{
+  "name": "vardot/varbase-patches",
+  "description": "List of needed patches for Varbase ~9.1.0 used packages with Composer Patches.",
+  "keywords": ["composer", "patches", "composer patches", "varbase", "varbase patches", "drupal", "drupal patches"],
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Vardot",
+      "homepage": "https://www.drupal.org/vardot",
+      "role": "Maintainer"
+    }
+  ],
+  "require": {
+    "drupal/core": "~10",
+    "cweagans/composer-patches": "~1 || ~2"
+  },
+  "patches": {
+    "drupal/core": {
+      "Issue #3426062: Add the local patch from Drupal Distributions Recipes patch for Drupal core in Varbase Core to have Recipes functionality": 
+      "vendor/vardot/varbase-patches/drupal-core--recipe-10.2.x.patch",
+      "Issue #2869592: Disabled update module shouldn't produce a status report warning":
+      "https://www.drupal.org/files/issues/2869592-remove-update-warning-7.patch",
+      "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal":
+      "https://www.drupal.org/files/issues/2018-12-10/core--getDerivatives-Invalid-argument-foreach--2893892-11-d8.patch",
+      "Issue #3044656: Add a helper method to strip subdirectories from URL paths":
+      "https://www.drupal.org/files/issues/2019-03-31/3044656-2.patch",
+      "Issue #3101231: Fix multilingual site's layout edit context issue with TypeError: Argument 1 passed to UrlHelper::buildQuery() must be of the type array, null given":
+      "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
+      "Issue #2741877: Nested modals don't work: opening a modal from a modal closes the original":
+      "https://www.drupal.org/files/issues/2021-04-29/2741877-77.patch",
+      "Issue #3165435: Fix tour <front> route as route name when a selected node had been set as the front page for the site":
+      "https://www.drupal.org/files/issues/2020-08-16/3165435-2.patch",
+      "Issue #3226791: Fix Validation error saving untranslatable Media reference field":
+      "https://www.drupal.org/files/issues/2021-08-04/media_required_validation-3226791-2.patch",
+      "Issue #3272720: Fix PHP8.1+ Deprecated function: hash(): Passing null to parameter #2 ($data) of type string is deprecated in generateFieldTableName":
+      "https://www.drupal.org/files/issues/2022-07-21/3272720-6.patch",
+      "Issue #3326684: Fix PHP8.1+ Deprecated function: mb_strtolower(): Passing null to parameter #1 ($string) of type string is deprecated":
+      "https://www.drupal.org/files/issues/2023-11-21/3199.patch",
+      "Issue #3302838: Fix PHP8.1+ Querying with NULL values results in warning mb_strtolower(): Passing null to parameter is deprecated":
+      "https://www.drupal.org/files/issues/2023-07-05/3302838-38.patch",
+      "Issue #3049332: Fix PHP message: Error: Call to a member function getEntityTypeId() on null (Layout Builder)":
+      "https://www.drupal.org/files/issues/2024-01-09/drupal-core--2024-01-09--3049332-85.patch",
+      "Issue #3046152: Video media needs playsinline & muted options":
+      "https://www.drupal.org/files/issues/2023-12-16/drupal-core--10-2-x--3046152-49.patch",
+      "Issue #3080606: Reorder Layout Builder sections":
+      "https://www.drupal.org/files/issues/2023-05-30/3080606-100.patch",
+      "Issue #3272629: Media Library widget display doesn't return to first page on applying filters":
+      "https://www.drupal.org/files/issues/2022-03-30/media_library_pager_fix.patch",
+      "Issue #3413079: Cannot read properties of null (reading 'nodeType') on node.page.body":
+      "https://www.drupal.org/files/issues/2024-01-08/3413079-9.patch"
+    },
+    "drupal/default_content": {
+      "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
+      "https://www.drupal.org/files/issues/2021-04-07/3160146-37.patch"
+    },
+    "drupal/persistent_login": {
+      "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles":
+      "https://www.drupal.org/files/issues/persistent_login-user_task_permission-2899530-6.patch"
+    },
+    "drupal/update_helper": {
+      "Issue #3024165: [PATCH] Enhancements, Better messages for the unable to apply updates, drush command and removed the Mark all updates as successful on install":
+      "https://www.drupal.org/files/issues/2022-06-05/3024165-55.patch"
+    },
+    "drupal/admin_toolbar": {
+      "Issue #3338408: Resolve access check errors for D10 compatibility":
+      "https://www.drupal.org/files/issues/2023-05-30/3338408-fix-access-check-error.patch"
+    },
+    "drupal/diff": {
+      "Issue #3348096: Fix Entity queries must explicitly set whether the query should be access checked or not in Diff":
+      "https://www.drupal.org/files/issues/2023-03-15/3348096-2.patch"
+    },
+    "drupal/password_policy": {
+      "Issue #3348548: Fix Entity queries must explicitly set whether the query should be access checked or not in Password Policy":
+      "https://www.drupal.org/files/issues/2023-03-16/3348548-3.patch"
+    },
+    "drupal/content_lock": {
+      "Issue #3343964: Fix PHP 8.2 Content locking (anti-concurrent editing) deprecation notices":
+      "https://www.drupal.org/files/issues/2023-05-22/3343964-5.patch"
+    },
+    "drupal/inline_entity_form": {
+      "Issue #3143422: Allow to hide the Edit button in Complex widget":
+      "https://www.drupal.org/files/issues/2023-03-13/optional_edit-3143422-16.patch",
+      "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated":
+      "https://www.drupal.org/files/issues/2021-04-13/inline_entity_form-order-by-weight-inline-entities-3136514-02.patch"
+    },
+    "drupal/webform_views": {
+      "Issue #3386492: Fix Fatal error on Drupal 9/10 : ArgumentCountError: Too few arguments to function EntityViewsData::__construct(), 6 passed":
+      "https://www.drupal.org/files/issues/2023-09-11/3386492-2.patch"
+    },
+    "drupal/entity_clone": {
+      "Issue #3388460: Fatal error on cloning a menu link (D10 site)":
+      "https://www.drupal.org/files/issues/2023-10-17/3388460-7.patch"
+    },
+    "drupal/views_bulk_operations": {
+      "Issue #3334229: Update existing node entity while changing the ID is not supported when using delete action":
+      "https://www.drupal.org/files/issues/2023-10-24/entity-delete-translation-3334229-7.patch"
+    },
+    "drupal/rabbit_hole": {
+      "Issue #3419073: Fix Return value must be of type bool fatal error":
+      "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch"
+    },
+    "drupal/cl_block": {
+      "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration":
+      "https://www.drupal.org/files/issues/2023-06-08/3365591-3.patch",
+      "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()":
+      "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
+    },
+    "drupal/ui_patterns_settings": {
+      "Issue #3414084: Fix UI Patterns Settings issue of TypeError: array_unshift(): Argument #1 ($array) must be of type array, null given in array_unshift() Caused by Deprecated Hooks in Drupal ~10.2.0":
+      "https://www.drupal.org/files/issues/2024-01-11/ui_patterns_settings--2023-12-17--3409221-3--mr-21--39e896da.patch"
+    },
+    "drupal/openapi": {
+      "Issue #3412276: Fix OpenAPI with PHP 8.2+ of Deprecated function: Creation of dynamic property":
+      "https://www.drupal.org/files/issues/2024-01-04/openapi--3362322-9--2023-05-26--mr10--bd284519.patch"
+    },
+    "drupal/openapi_jsonapi": {
+      "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined":
+      "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch",
+      "Issue #3079209: Hide POST, PUT, and DELETE endpoints when JSON:API is configured to be read-only":
+      "https://www.drupal.org/files/issues/2020-12-21/only_add_read_route-methods_when_read_only_is_enabled_in_jsonapi_8.x_2.x-3079209-11.patch"
+    },
+    "drupal/entity_embed": {
+      "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
+      "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
+      "Issue #2679875: Inline Entity Form integration":
+      "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
+    },
+    "drupal/ckeditor": {
+      "Issue #3392765: Add the textmatch vendor plugin":
+      "https://www.drupal.org/files/issues/2023-10-09/3392765-3.patch"
+    },
+    "drupal/ckeditor_media_embed": {
+      "Issue #2900313: Add ability to embed tweets and other rich content in WYSIWYG":
+      "https://www.drupal.org/files/issues/embed_rich_content_in_WYSIWYG-2900313-2.patch",
+      "Issue #3393693: Add Drush 12 compatibility for custom CKEditor Media Embed Plugin commands":
+      "https://www.drupal.org/files/issues/2023-10-12/ckeditor_media_embed-1-x-3393693-5.patch",
+      "Issue #3366524: Fix Creation of dynamic property $embed_provider is deprecated":
+      "https://www.drupal.org/files/issues/2023-12-13/3366524-5.patch"
+    },
+    "drupal/linkit": {
+      "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
+      "https://www.drupal.org/files/issues/2023-04-25/3158783-24.patch",
+      "Issue #3201405: Edit internal link and remove the URL breaks layout builder":
+      "https://www.drupal.org/files/issues/2021-03-03/3201405-2.patch"
+    },
+    "drupal/lb_ux": {
+      "Issue #3173730: Remove the change of default for auto-submit controller on the existing route to have a better behavior when adding a new section":
+      "https://www.drupal.org/files/issues/2020-09-29/3173730-2.patch",
+      "Issue #3150012: Fix RuntimeException: Callable LayoutBuilderAccessCheck::access requires a value for the $section_storage argument":
+      "https://www.drupal.org/files/issues/2020-10-11/3150012-12_0.patch"
+    },
+    "drupal/layout_library": {
+      "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'":
+      "https://www.drupal.org/files/issues/2023-01-05/3075067-19.patch",
+      "Issue #3273160: Support inline blocks in layout":
+      "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch"
+    },
+    "drupal/paragraphs": {
+      "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]":
+      "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
+      "Issue #3138609: Fixe Field group support broken":
+      "https://www.drupal.org/files/issues/2020-06-03/3138609-24.patch",
+      "Issue #3090200: Paragraph access check using incorrect revision of its parent, leading to issues editing and viewing paragraphs when content moderation is involved.":
+      "https://www.drupal.org/files/issues/2023-01-31/3084934-13_combine_3090200-22-update_0.patch"
+    },
+    "drupal/paragraphs_previewer": {
+      "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch":
+      "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch"
+    },
+    "drupal/redirect": {
+      "Issue #2879648: Redirects from aliased paths aren't triggered":
+      "https://www.drupal.org/files/issues/2023-08-31/2879648-149.patch",
+      "Issue #3057250: Validation issue on adding url redirect":
+      "https://www.drupal.org/files/issues/2023-08-09/3057250-65.patch"
+    },
+    "drupal/yoast_seo": {
+      "Issue #3362165: Fix Deprecated function: Creation of dynamic property":
+      "https://www.drupal.org/files/issues/2023-11-01/yoast_seo-php8_2-3362165-19.patch"
+    },
+    "drupal/content_moderation_notifications": {
+      "Issue #3347958: Fix Entity queries must explicitly set whether the query should be access checked or not in Content Moderation Notifications":
+      "https://www.drupal.org/files/issues/2023-03-14/3347958-2.patch"
+    }
+  }
+}
