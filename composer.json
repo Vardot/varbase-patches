@@ -1,6 +1,6 @@
 {
   "name": "vardot/varbase-patches",
-  "description": "List of needed patches for Varbase ~9.1.0 used packages with Composer Patches.",
+  "description": "List of needed patches for Varbase ~10.0.0 used modules with Composer Patches.",
   "keywords": ["composer", "patches", "composer patches", "varbase", "varbase patches", "drupal", "drupal patches"],
   "license": "GPL-2.0-or-later",
   "authors": [
@@ -52,6 +52,12 @@
     "drupal/default_content": {
       "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
       "https://www.drupal.org/files/issues/2021-04-07/3160146-37.patch"
+    },
+    "drupal/gin": {
+      "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme":
+      "https://www.drupal.org/files/issues/2023-10-22/3325263-24.patch",
+      "Issue #3398040: Fix issue with changing between responsive views and Gin Toolbar over menus":
+      "https://www.drupal.org/files/issues/2023-10-31/3398040-8.patch"
     },
     "drupal/persistent_login": {
       "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles":
@@ -109,51 +115,29 @@
       "Issue #3414084: Fix UI Patterns Settings issue of TypeError: array_unshift(): Argument #1 ($array) must be of type array, null given in array_unshift() Caused by Deprecated Hooks in Drupal ~10.2.0":
       "https://www.drupal.org/files/issues/2024-01-11/ui_patterns_settings--2023-12-17--3409221-3--mr-21--39e896da.patch"
     },
-    "drupal/openapi": {
-      "Issue #3412276: Fix OpenAPI with PHP 8.2+ of Deprecated function: Creation of dynamic property":
-      "https://www.drupal.org/files/issues/2024-01-04/openapi--3362322-9--2023-05-26--mr10--bd284519.patch"
-    },
-    "drupal/openapi_jsonapi": {
-      "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined":
-      "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch",
-      "Issue #3079209: Hide POST, PUT, and DELETE endpoints when JSON:API is configured to be read-only":
-      "https://www.drupal.org/files/issues/2020-12-21/only_add_read_route-methods_when_read_only_is_enabled_in_jsonapi_8.x_2.x-3079209-11.patch"
-    },
     "drupal/entity_embed": {
       "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
       "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
       "Issue #2679875: Inline Entity Form integration":
       "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
     },
-    "drupal/ckeditor": {
-      "Issue #3392765: Add the textmatch vendor plugin":
-      "https://www.drupal.org/files/issues/2023-10-09/3392765-3.patch"
+    "drupal/focal_point": {
+      "Issue #2906631: After changing focal point, image doesn't change until you click preview":
+      "https://www.drupal.org/files/issues/2024-02-21/2906631-27.patch"
     },
-    "drupal/ckeditor_media_embed": {
-      "Issue #2900313: Add ability to embed tweets and other rich content in WYSIWYG":
-      "https://www.drupal.org/files/issues/embed_rich_content_in_WYSIWYG-2900313-2.patch",
-      "Issue #3393693: Add Drush 12 compatibility for custom CKEditor Media Embed Plugin commands":
-      "https://www.drupal.org/files/issues/2023-10-12/ckeditor_media_embed-1-x-3393693-5.patch",
-      "Issue #3366524: Fix Creation of dynamic property $embed_provider is deprecated":
-      "https://www.drupal.org/files/issues/2023-12-13/3366524-5.patch"
-    },
-    "drupal/linkit": {
-      "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
-      "https://www.drupal.org/files/issues/2023-04-25/3158783-24.patch",
-      "Issue #3201405: Edit internal link and remove the URL breaks layout builder":
-      "https://www.drupal.org/files/issues/2021-03-03/3201405-2.patch"
-    },
-    "drupal/lb_ux": {
-      "Issue #3173730: Remove the change of default for auto-submit controller on the existing route to have a better behavior when adding a new section":
-      "https://www.drupal.org/files/issues/2020-09-29/3173730-2.patch",
-      "Issue #3150012: Fix RuntimeException: Callable LayoutBuilderAccessCheck::access requires a value for the $section_storage argument":
-      "https://www.drupal.org/files/issues/2020-10-11/3150012-12_0.patch"
+    "drupal/bootstrap_styles": {
+      "Issue #3282082: Support Bootstrap 5 on bootstrap_styles module":
+      "https://www.drupal.org/files/issues/2022-06-14/Fix-support-bootstrap-5-on-bootstrap-styles-3282082-%233.patch"
     },
     "drupal/layout_library": {
       "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'":
       "https://www.drupal.org/files/issues/2023-01-05/3075067-19.patch",
       "Issue #3273160: Support inline blocks in layout":
       "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch"
+    },
+    "drupal/layout_builder_blocks": {
+      "Issue #3349066: Limit Layout Builder Blocks to the front-end theme":
+      "https://www.drupal.org/files/issues/2023-11-20/3349066-14.patch"
     },
     "drupal/paragraphs": {
       "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]":
