@@ -1,39 +1,34 @@
-# Varbase Patches
+# Storage of Local Patches Branch
 
-List of needed patches for Varbase used packages with Composer Patches.
+This branch is a storage for the list of needed local patches.
 
----
+One a patch is added, never to be deleted
+New patches should follow the following in the name of the patch file
 
-Use `"Vardot/varbase-patches": "~10.0.0"` 
-> with **Varbase `~10.0.0`** **CKEditor `5`** and **Drupal `10`**
+`[package name]--[Date]--[issue number]-[comment number]--[MR number/commit number].patch`
 
----
+Branch name for the package could be added too.
 
-Use `"Vardot/varbase-patches": "~9.1.0"`
-> with **Varbase `~9.1.0`** **CKEditor `4`**  and **Drupal `10`**
-
----
-
-Use `"Vardot/varbase-patches": "~9.2.0"`
-> with **Varbase `~9.1.0`** **CKEditor `5`** and **Drupal `10`**
-
----
-
-In case of needing to manage project's local patches
+This will be a copy of Merge Request (MR), as it is important not to add `.diff` or `.patch` link to an MR as the code could change in anytime.
 
 
-No patches **for Varbase ~10.0.0**
-> With **CKEditor 5** and **Drupal 10** :
-> Use the `"Vardot/varbase-patches": "10.0.0.0"` static version to have no patches and manage local patches in the project with a copy of patches from https://github.com/Vardot/varbase-patches/blob/10.0.x/composer.json
+## Examples:
 
----
+`drupal-core--2024-01-09--3049332-85.patch`
 
-No patches **For Varbase ~9.1.0**
-> With **CKEditor 4** and **Drupal 10** :
-> Use the `"Vardot/varbase-patches": "9.1.0.0"` static version to have no patches and manage local patches in the project with a copy of patches from https://github.com/Vardot/varbase-patches/blob/9.1.x/composer.json
+`drupal-core--10-2-x--3046152-49.patch`
 
----
+`rabbit_hole--2024-02-04--3419073-3.patch`
 
-No patches **For Varbase ~9.2.0**
-> With **CKEditor 5** and **Drupal 10** :
-> Use the `"Vardot/varbase-patches": "9.2.0.0"` static version to have no patches and manage local patches in the project with a copy of patches from https://github.com/Vardot/varbase-patches/blob/9.2.x/composer.json
+`ui_patterns_settings--2023-12-17--3409221-3--mr-21--39e896da.patch`
+
+
+## Reasons
+
+Adding a direct MR as a patch is not the best option, for keeping a stable solution.
+
+As Drupal is switching for patching to MRs
+
+> While you are making the above changes, we recommend that you convert this patch to a merge request. Merge requests are preferred over patches. Be sure to hide the old patch files as well. (Converting an issue to a merge request without other contributions to the issue will not receive credit.)
+
+Because of that needed patches from MRs will be hosted in this storage branch.
