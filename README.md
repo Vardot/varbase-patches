@@ -4,18 +4,18 @@ List of needed patches for Varbase used packages with Composer Patches.
 
 ---
 
-Use `"Vardot/varbase-patches": "~10.0.0"` with **Varbase `~10.0.0`** 
-> **CKEditor `5`** and **Drupal `10`**
+Use `"Vardot/varbase-patches": "~10.0.0"` 
+> with **Varbase `~10.0.0`** **CKEditor `5`** and **Drupal `10`**
 
 ---
 
-Use `"Vardot/varbase-patches": "~9.1.0"` with **Varbase `~9.1.0`**
-> **CKEditor `4`**  and **Drupal `10`**
+Use `"Vardot/varbase-patches": "~9.1.0"`
+> with **Varbase `~9.1.0`** **CKEditor `4`**  and **Drupal `10`**
 
 ---
 
-Use `"Vardot/varbase-patches": "~9.2.0"` with **Varbase `~9.1.0`**
-> **CKEditor `5`** and **Drupal `10`**
+Use `"Vardot/varbase-patches": "~9.2.0"`
+> with **Varbase `~9.1.0`** **CKEditor `5`** and **Drupal `10`**
 
 ---
 
