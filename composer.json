@@ -83,10 +83,6 @@
         "Issue #3348096: Fix Entity queries must explicitly set whether the query should be access checked or not in Diff":
         "https://www.drupal.org/files/issues/2023-03-15/3348096-2.patch"
       },
-      "drupal/password_policy": {
-        "Issue #3348548: Fix Entity queries must explicitly set whether the query should be access checked or not in Password Policy":
-        "https://www.drupal.org/files/issues/2023-03-16/3348548-3.patch"
-      },
       "drupal/content_lock": {
         "Issue #3343964: Fix PHP 8.2 Content locking (anti-concurrent editing) deprecation notices":
         "https://www.drupal.org/files/issues/2023-05-22/3343964-5.patch"
