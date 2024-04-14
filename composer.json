@@ -177,6 +177,10 @@
       "drupal/content_moderation_notifications": {
         "Issue #3347958: Fix Entity queries must explicitly set whether the query should be access checked or not in Content Moderation Notifications":
         "https://www.drupal.org/files/issues/2023-03-14/3347958-2.patch"
+      },
+      "drupal/page_manager": {
+        "Issue #3438993: Some mandatory parameters are missing (machine_name, step) to generate a URL for route entity.page.devel_load":
+        "https://www.drupal.org/files/issues/2024-04-12/3438993-5.patch"
       }
     }
   }
