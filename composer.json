@@ -132,9 +132,7 @@
       },
       "drupal/ckeditor_media_embed": {
         "Issue #2900313: Add ability to embed tweets and other rich content in WYSIWYG":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/ckeditor_media_embed--2024-04-18--2900313.patch",
-        "Issue #3366524: Fix Creation of dynamic property $embed_provider is deprecated":
-        "https://www.drupal.org/files/issues/2023-12-13/3366524-5.patch"
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/ckeditor_media_embed--2024-04-18--2900313.patch"
       },
       "drupal/linkit": {
         "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
