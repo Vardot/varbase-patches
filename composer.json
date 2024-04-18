@@ -133,8 +133,6 @@
       "drupal/ckeditor_media_embed": {
         "Issue #2900313: Add ability to embed tweets and other rich content in WYSIWYG":
         "https://www.drupal.org/files/issues/embed_rich_content_in_WYSIWYG-2900313-2.patch",
-        "Issue #3393693: Add Drush 12 compatibility for custom CKEditor Media Embed Plugin commands":
-        "https://www.drupal.org/files/issues/2023-10-12/ckeditor_media_embed-1-x-3393693-5.patch",
         "Issue #3366524: Fix Creation of dynamic property $embed_provider is deprecated":
         "https://www.drupal.org/files/issues/2023-12-13/3366524-5.patch"
       },
