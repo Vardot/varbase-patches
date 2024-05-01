@@ -1,0 +1,27 @@
+From 779f37bd0b01e0217a079071b7d8ff883db7e7a5 Mon Sep 17 00:00:00 2001
+From: Rajab Natshah <33889-RajabNatshah@users.noreply.drupalcode.org>
+Date: Wed, 1 May 2024 10:27:33 +0000
+Subject: [PATCH] Issue #3444588: Switch from base_path to origin_url to fix
+ issues when retrieving the path of the CKEditor plugins for use in a URL
+
+---
+ src/AssetManager.php | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/AssetManager.php b/src/AssetManager.php
+index 6672a2c..1949cf2 100644
+--- a/src/AssetManager.php
++++ b/src/AssetManager.php
+@@ -229,7 +229,8 @@ class AssetManager {
+    */
+   // @codingStandardsIgnoreLine
+   public static function getCKEditorLibraryPluginPath() {
+-    return base_path() . 'libraries/' . self::$ckeditorName . '/plugins/';
++    $origin_url = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getBaseUrl();
++    return $origin_url . '/libraries/' . self::$ckeditorName . '/plugins/';
+   }
+ 
+   /**
+-- 
+GitLab
+
