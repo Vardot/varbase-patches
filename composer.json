@@ -130,6 +130,10 @@
         "Issue #3392765: Add the textmatch vendor plugin":
         "https://www.drupal.org/files/issues/2023-10-09/3392765-3.patch"
       },
+      "drupal/ckeditor_media_embed": {
+        "Issue #3444588: Switch from base_path to origin_url to fix issues when retrieving the path of the CKEditor plugins for use in a URL":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/ckeditor_media_embed--2024-05-01--3444588--mr-15.patch"
+      },
       "drupal/linkit": {
         "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
         "https://www.drupal.org/files/issues/2023-04-25/3158783-24.patch",
