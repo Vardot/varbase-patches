@@ -131,8 +131,8 @@
         "https://www.drupal.org/files/issues/2023-10-09/3392765-3.patch"
       },
       "drupal/ckeditor_media_embed": {
-        "Issue #2900313: Add ability to embed tweets and other rich content in WYSIWYG":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/ckeditor_media_embed--2024-04-18--2900313.patch"
+        "Issue #3444588: Switch from base_path to origin_url to fix issues when retrieving the path of the CKEditor plugins for use in a URL - (Issue #2900313) in Varbase":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/ckeditor_media_embed--2024-05-01--2900313.patch"
       },
       "drupal/linkit": {
         "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
