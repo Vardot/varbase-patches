@@ -126,10 +126,6 @@
         "Issue #2679875: Inline Entity Form integration":
         "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
       },
-      "drupal/ckeditor": {
-        "Issue #3392765: Add the textmatch vendor plugin":
-        "https://www.drupal.org/files/issues/2023-10-09/3392765-3.patch"
-      },
       "drupal/ckeditor_media_embed": {
         "Issue #3444588: Switch from base_path to origin_url to fix issues when retrieving the path of the CKEditor plugins for use in a URL":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/ckeditor_media_embed--2024-05-01--3444588--mr-15.patch"
