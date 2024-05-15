@@ -74,10 +74,6 @@
         "Issue #3348096: Fix Entity queries must explicitly set whether the query should be access checked or not in Diff":
         "https://www.drupal.org/files/issues/2023-03-15/3348096-2.patch"
       },
-      "drupal/content_lock": {
-        "Issue #3343964: Fix PHP 8.2 Content locking (anti-concurrent editing) deprecation notices":
-        "https://www.drupal.org/files/issues/2023-05-22/3343964-5.patch"
-      },
       "drupal/inline_entity_form": {
         "Issue #3143422: Allow to hide the Edit button in Complex widget":
         "https://www.drupal.org/files/issues/2023-03-13/optional_edit-3143422-16.patch",
