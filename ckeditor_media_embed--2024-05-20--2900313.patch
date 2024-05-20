@@ -1,0 +1,23 @@
+diff --git a/src/AssetManager.php b/src/AssetManager.php
+index 5e3ea11..df9ea54 100644
+--- a/src/AssetManager.php
++++ b/src/AssetManager.php
+@@ -225,7 +225,8 @@ class AssetManager {
+    */
+   // @codingStandardsIgnoreLine
+   public static function getCKEditorLibraryPluginPath() {
+-    return 'libraries/ckeditor/plugins/';
++    $origin_url = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getBaseUrl();
++    return $origin_url . '/profiles/varbase/libraries/ckeditor/plugins/';
+   }
+ 
+   /**
+@@ -239,7 +240,7 @@ class AssetManager {
+    */
+   // @codingStandardsIgnoreLine
+   public static function getCKEditorLibraryPluginDirectory() {
+-    return \Drupal::root() . '/libraries/ckeditor/plugins/';
++    return \Drupal::root() . '/profiles/varbase/libraries/ckeditor/plugins/';
+   }
+ 
+   /**
