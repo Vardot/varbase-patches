@@ -182,6 +182,7 @@
       "drupal/gin_type_tray": {
         "Issue #3448075: Fix the padding for filter form wrapper div":
         "https://www.drupal.org/files/issues/2024-05-19/gin_type_tray--2024-05-19--3448075-2.patch"
+      },
       "drupal/keysave": {
         "Issue #3449903: Add Permissions to the module" :
         "https://www.drupal.org/files/issues/2024-05-26/keysave--2024-05-26--3449903-3.patch" 
