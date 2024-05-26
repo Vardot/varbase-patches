@@ -178,6 +178,10 @@
       "drupal/gin_everywhere": {
         "Issue #3436449: The status tab is showing out in the Are you sure you want to delete the content item page":
         "https://www.drupal.org/files/issues/2024-05-15/gin_everywhere--2024-05-15--3436449-5.patch"
+      },
+      "drupal/keysave": {
+        "Issue #3449903: Add Permissions to the module" :
+        "https://www.drupal.org/files/issues/2024-05-26/keysave--2024-05-26--3449903-3.patch" 
       }
     }
   }
