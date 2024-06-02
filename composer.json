@@ -181,7 +181,9 @@
       },
       "drupal/gin_type_tray": {
         "Issue #3448075: Fix the padding for filter form wrapper div":
-        "https://www.drupal.org/files/issues/2024-05-19/gin_type_tray--2024-05-19--3448075-2.patch"
+        "https://www.drupal.org/files/issues/2024-05-19/gin_type_tray--2024-05-19--3448075-2.patch",
+        "Issue #3450665: Fix: Twig Error Loader Error when attempting to add new content.":
+        "https://www.drupal.org/files/issues/2024-06-02/gin_type_tray--2024-06-02--3450665-7.patch"
       }
     }
   }
