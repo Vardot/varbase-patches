@@ -184,6 +184,10 @@
         "https://www.drupal.org/files/issues/2024-05-19/gin_type_tray--2024-05-19--3448075-2.patch",
         "Issue #3450665: Fix: Twig Error Loader Error when attempting to add new content.":
         "https://www.drupal.org/files/issues/2024-06-02/gin_type_tray--2024-06-02--3450665-7.patch"
+      },
+      "drupal/layout_builder_perms": {
+        "Issue #3392780: Fix not valid context for entity context when editing the default layout entity types or bundles":
+        "https://www.drupal.org/files/issues/2023-12-15/not_valid_context-3392780-reroll_patch_from_4-7_0.patch"
       }
     }
   }
