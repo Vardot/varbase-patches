@@ -113,10 +113,6 @@
         "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()":
         "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
       },
-      "drupal/ui_patterns_settings": {
-        "Issue #3414084: Fix UI Patterns Settings issue of TypeError: array_unshift(): Argument #1 ($array) must be of type array, null given in array_unshift() Caused by Deprecated Hooks in Drupal ~10.2.0":
-        "https://www.drupal.org/files/issues/2024-01-11/ui_patterns_settings--2023-12-17--3409221-3--mr-21--39e896da.patch"
-      },
       "drupal/entity_embed": {
         "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
         "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
