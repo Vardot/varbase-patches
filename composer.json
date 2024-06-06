@@ -88,10 +88,6 @@
         "Issue #3388460: Fatal error on cloning a menu link (D10 site)":
         "https://www.drupal.org/files/issues/2023-10-17/3388460-7.patch"
       },
-      "drupal/views_bulk_operations": {
-        "Issue #3334229: Update existing node entity while changing the ID is not supported when using delete action":
-        "https://www.drupal.org/files/issues/2023-10-24/entity-delete-translation-3334229-7.patch"
-      },
       "drupal/rabbit_hole": {
         "Issue #3419073: Fix Return value must be of type bool fatal error":
         "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch"
