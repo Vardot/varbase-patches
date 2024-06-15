@@ -65,7 +65,7 @@
       },
       "drupal/gin": {
         "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme":
-        "https://www.drupal.org/files/issues/2023-10-22/3325263-24.patch",
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/gin--2024-06-16--3325263.patch",
         "Issue #3398040: Fix issue with changing between responsive views and Gin Toolbar over menus":
         "https://www.drupal.org/files/issues/2023-10-31/3398040-8.patch"
       },
