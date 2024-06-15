@@ -1,0 +1,80 @@
+diff --git a/includes/html.theme b/includes/html.theme
+index cfe4911..8cc4f80 100644
+--- a/includes/html.theme
++++ b/includes/html.theme
+@@ -16,10 +16,9 @@ function gin_preprocess_html(&$variables) {
+   // Are we relevant?
+   $gin_activated = _gin_is_active();
+ 
+-  if ($gin_activated) {
++  if ($gin_activated && !empty(\Drupal::hasService('user.data'))) {
+     // Get theme settings.
+-    /** @var \Drupal\gin\GinSettings $settings */
+-    $settings = \Drupal::classResolver(GinSettings::class);
++    $settings = \Drupal::service('class_resolver')->getInstanceFromDefinition(GinSettings::class);
+     $toolbar = $settings->get('classic_toolbar');
+ 
+     // Set accent color.
+diff --git a/includes/theme.theme b/includes/theme.theme
+index 6ee88b5..e980a01 100644
+--- a/includes/theme.theme
++++ b/includes/theme.theme
+@@ -12,6 +12,11 @@ use Drupal\gin\GinSettings;
+  * Implements hook_theme().
+  */
+ function gin_theme() {
++
++  if (empty(\Drupal::hasService('user.data'))) {
++    return [];
++  }
++
+   // Check if Navigation module is active.
+   if (_gin_module_is_active('navigation')) {
+     $items['navigation_menu'] = [
+diff --git a/src/GinDescriptionToggle.php b/src/GinDescriptionToggle.php
+index 14271c1..acdd84c 100644
+--- a/src/GinDescriptionToggle.php
++++ b/src/GinDescriptionToggle.php
+@@ -28,13 +28,16 @@ class GinDescriptionToggle implements ContainerInjectionInterface {
+   /**
+    * GinDescriptionToggle constructor.
+    *
+-   * @param \Drupal\gin\GinSettings $ginSettings
+-   *   The gin theme settings class.
+    * @param \Drupal\gin\GinContentFormHelper $contentFormHelper
+    *   The content form helper class.
+    */
+-  public function __construct(GinSettings $ginSettings, GinContentFormHelper $contentFormHelper) {
+-    $this->ginSettings = $ginSettings;
++  public function __construct(GinContentFormHelper $contentFormHelper) {
++    $this->ginSettings = NULL;
++
++    if (!empty(\Drupal::hasService('user.data'))) {
++      $this->ginSettings = \Drupal::service('class_resolver')->getInstanceFromDefinition(GinSettings::class);
++    }
++
+     $this->contentFormHelper = $contentFormHelper;
+   }
+ 
+@@ -45,8 +48,7 @@ class GinDescriptionToggle implements ContainerInjectionInterface {
+     $classResolver = $container->get('class_resolver');
+ 
+     return new static(
+-      $classResolver->getInstanceFromDefinition(GinSettings::class),
+-      $classResolver->getInstanceFromDefinition(GinContentFormHelper::class),
++      $classResolver->getInstanceFromDefinition(GinContentFormHelper::class)
+     );
+   }
+ 
+@@ -76,6 +78,11 @@ class GinDescriptionToggle implements ContainerInjectionInterface {
+    *   Wether feature is enabled or not.
+    */
+   public function isEnabled() {
++
++    if (empty($this->ginSettings)) {
++      return FALSE;
++    }
++
+     return $this->ginSettings->get('show_description_toggle') && $this->contentFormHelper->isContentForm();
+   }
+ 
