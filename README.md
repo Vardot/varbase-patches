@@ -34,6 +34,6 @@ No patches **For Varbase ~9.1.0**
 
 ---
 
-No patches **For Varbase ~9.2.0**
+No patches **For Varbase ~9.1.0**
 > With **CKEditor 5** and **Drupal 10** :
 > Use the `"Vardot/varbase-patches": "9.2.0.0"` static version to have no patches and manage local patches in the project with a copy of patches from https://github.com/Vardot/varbase-patches/blob/9.2.x/composer.json
