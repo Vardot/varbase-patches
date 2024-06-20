@@ -10,10 +10,5 @@
       "role": "Maintainer"
     }
   ],
-  "require": {
-    "drupal/core": "~10",
-    "composer/installers": "~2",
-    "oomphinc/composer-installers-extender": "~2",
-    "cweagans/composer-patches": "~1 || ~2"
-  }
+  "require": {  }
 }
