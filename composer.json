@@ -11,7 +11,7 @@
     }
   ],
   "require": {
-    "drupal/core": "~10.2.0",
+    "drupal/core": "~10.3.0",
     "composer/installers": "~2",
     "oomphinc/composer-installers-extender": "~2",
     "cweagans/composer-patches": "~1 || ~2"
@@ -24,12 +24,8 @@
     },
     "patches": {
       "drupal/core": {
-        "Issue #3426062: Add the local patch from Drupal Distributions Recipes patch for Drupal core in Varbase Core to have Recipes functionality":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/patches/drupal-core--distributions_recipes--2024-03-06--4683c884--recipe-10.2.x.patch",
-        "Issue #3431330: Add Action Method to Add a button plugin and settings into the Active toolbar in editor":
-        "https://www.drupal.org/files/issues/2024-03-18/distributions_recipes--3431330-2.patch",
         "Issue #2869592: Disabled update module shouldn't produce a status report warning":
-        "https://www.drupal.org/files/issues/2869592-remove-update-warning-7.patch",
+        "https://www.drupal.org/files/issues/2024-06-14/2869592-disabled-update-module-63.patch",
         "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal":
         "https://www.drupal.org/files/issues/2018-12-10/core--getDerivatives-Invalid-argument-foreach--2893892-11-d8.patch",
         "Issue #3044656: Add a helper method to strip subdirectories from URL paths":
@@ -51,9 +47,9 @@
         "Issue #3049332: Fix PHP message: Error: Call to a member function getEntityTypeId() on null (Layout Builder)":
         "https://www.drupal.org/files/issues/2024-01-09/drupal-core--2024-01-09--3049332-85.patch",
         "Issue #3046152: Video media needs playsinline & muted options":
-        "https://www.drupal.org/files/issues/2023-12-16/drupal-core--10-2-x--3046152-49.patch",
+        "https://www.drupal.org/files/issues/2024-06-20/drupal-core--2024-06-20--10-3-x--3046152-54--mr-8471.patch",
         "Issue #3080606: Reorder Layout Builder sections":
-        "https://www.drupal.org/files/issues/2023-05-30/3080606-100.patch",
+        "https://www.drupal.org/files/issues/2024-06-13/3080606-121.patch",
         "Issue #3272629: Media Library widget display doesn't return to first page on applying filters":
         "https://www.drupal.org/files/issues/2022-03-30/media_library_pager_fix.patch",
         "Issue #3413079: Cannot read properties of null (reading 'nodeType') on node.page.body":
