@@ -182,6 +182,10 @@
       "drupal/drimage_improved": {
         "Issue #3456065: Fix Drupal 10.3 compatibility for Too few arguments to function deliver() 3 passed in Drimage Improved":
         "https://www.drupal.org/files/issues/2024-06-21/drimage_improved--2024-06-21--3456065--mr-2.patch"
+      },
+      "drupal/cl_server": {
+        "Issue #3456661: Update Drupal core to ^10.3 and ^11 and drop the use of the SDC experimental module":
+        "https://www.drupal.org/files/issues/2024-06-24/cl_server--2024-06-24--3456661--mr-32.patch"
       }
     }
   }
