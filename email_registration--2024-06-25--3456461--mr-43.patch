@@ -1,0 +1,344 @@
+From fa2d0363fa685e2599ea507e1b627fd2158d7cf5 Mon Sep 17 00:00:00 2001
+From: Aaron Ferris <aaron@zoocha.com>
+Date: Sun, 23 Jun 2024 16:14:25 +0100
+Subject: [PATCH 1/8] Issue #3456461: initial userauth structural changes
+
+---
+ src/EmailRegistrationServiceProvider.php     |  2 +-
+ src/{UserAuth.php => UserAuthentication.php} | 28 +++++++-------------
+ 2 files changed, 10 insertions(+), 20 deletions(-)
+ rename src/{UserAuth.php => UserAuthentication.php} (52%)
+
+diff --git a/src/EmailRegistrationServiceProvider.php b/src/EmailRegistrationServiceProvider.php
+index bfd082e..14081a5 100755
+--- a/src/EmailRegistrationServiceProvider.php
++++ b/src/EmailRegistrationServiceProvider.php
+@@ -19,7 +19,7 @@ class EmailRegistrationServiceProvider extends ServiceProviderBase {
+     // Replace the core authentication service with our version
+     // which supports authorization through email.
+     $definition = $container->getDefinition('user.auth');
+-    $definition->setClass(UserAuth::class);
++    $definition->setClass(UserAuthentication::class);
+   }
+ 
+ }
+diff --git a/src/UserAuth.php b/src/UserAuthentication.php
+similarity index 52%
+rename from src/UserAuth.php
+rename to src/UserAuthentication.php
+index dc8ce93..a5be0be 100755
+--- a/src/UserAuth.php
++++ b/src/UserAuthentication.php
+@@ -4,7 +4,8 @@ declare(strict_types=1);
+ 
+ namespace Drupal\email_registration;
+ 
+-use Drupal\user\UserAuth as CoreUserAuth;
++use Drupal\user\UserAuthentication as CoreUserAuthentication;
++use Drupal\user\UserInterface;
+ 
+ /**
+  * Extends the core authentication to check email or username, and password.
+@@ -12,15 +13,14 @@ use Drupal\user\UserAuth as CoreUserAuth;
+  * Core authentication only checks username and password, but not email, so
+  * we need to adapt the query to cater for both.
+  */
+-class UserAuth extends CoreUserAuth {
++class UserAuthentication extends CoreUserAuthentication {
+ 
+   /**
+    * {@inheritdoc}
+    */
+-  public function authenticate($username, $password) {
+-    $uid = FALSE;
++  public function lookupAccount($identifier): UserInterface|false {
++    if (!empty($identifier)) {
+ 
+-    if (!empty($username) && strlen($password) > 0) {
+       /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+       $storage = $this->entityTypeManager->getStorage('user');
+ 
+@@ -28,8 +28,8 @@ class UserAuth extends CoreUserAuth {
+       $query->accessCheck(TRUE);
+ 
+       $or = $query->orConditionGroup();
+-      $or->condition('name', $username);
+-      $or->condition('mail', $username);
++      $or->condition('name', $identifier);
++      $or->condition('mail', $identifier);
+ 
+       $query->condition($or);
+ 
+@@ -37,20 +37,10 @@ class UserAuth extends CoreUserAuth {
+ 
+       $account_search = $storage->loadMultiple($result);
+       if ($account = reset($account_search)) {
+-        if ($this->passwordChecker->check($password, $account->getPassword())) {
+-          // Successful authentication.
+-          $uid = $account->id();
+-
+-          // Update user to new password scheme if needed.
+-          if ($this->passwordChecker->needsRehash($account->getPassword())) {
+-            $account->setPassword($password);
+-            $account->save();
+-          }
+-        }
++        return $account;
+       }
+     }
+-
+-    return $uid;
++    return FALSE;
+   }
+ 
+ }
+-- 
+GitLab
+
+
+From 8e40479950616630d1399e5abebef8b2629c57d6 Mon Sep 17 00:00:00 2001
+From: Ted Cooper <elc@784944.no-reply.drupal.org>
+Date: Mon, 24 Jun 2024 12:32:53 +1000
+Subject: [PATCH 2/8] Add UserAuth back in.
+
+---
+ src/UserAuth.php | 56 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
+ create mode 100644 src/UserAuth.php
+
+diff --git a/src/UserAuth.php b/src/UserAuth.php
+new file mode 100644
+index 0000000..dc8ce93
+--- /dev/null
++++ b/src/UserAuth.php
+@@ -0,0 +1,56 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\email_registration;
++
++use Drupal\user\UserAuth as CoreUserAuth;
++
++/**
++ * Extends the core authentication to check email or username, and password.
++ *
++ * Core authentication only checks username and password, but not email, so
++ * we need to adapt the query to cater for both.
++ */
++class UserAuth extends CoreUserAuth {
++
++  /**
++   * {@inheritdoc}
++   */
++  public function authenticate($username, $password) {
++    $uid = FALSE;
++
++    if (!empty($username) && strlen($password) > 0) {
++      /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
++      $storage = $this->entityTypeManager->getStorage('user');
++
++      $query = $storage->getQuery();
++      $query->accessCheck(TRUE);
++
++      $or = $query->orConditionGroup();
++      $or->condition('name', $username);
++      $or->condition('mail', $username);
++
++      $query->condition($or);
++
++      $result = $query->execute();
++
++      $account_search = $storage->loadMultiple($result);
++      if ($account = reset($account_search)) {
++        if ($this->passwordChecker->check($password, $account->getPassword())) {
++          // Successful authentication.
++          $uid = $account->id();
++
++          // Update user to new password scheme if needed.
++          if ($this->passwordChecker->needsRehash($account->getPassword())) {
++            $account->setPassword($password);
++            $account->save();
++          }
++        }
++      }
++    }
++
++    return $uid;
++  }
++
++}
+-- 
+GitLab
+
+
+From e73e9c99f149c3c88007f5ee22a128e02d9e4bd7 Mon Sep 17 00:00:00 2001
+From: Aaron Ferris <aaron@zoocha.com>
+Date: Mon, 24 Jun 2024 12:34:38 +1000
+Subject: [PATCH 3/8] Use different class for D10.3 plus.
+
+---
+ src/EmailRegistrationServiceProvider.php | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/EmailRegistrationServiceProvider.php b/src/EmailRegistrationServiceProvider.php
+index 14081a5..cb6f7ff 100755
+--- a/src/EmailRegistrationServiceProvider.php
++++ b/src/EmailRegistrationServiceProvider.php
+@@ -19,7 +19,13 @@ class EmailRegistrationServiceProvider extends ServiceProviderBase {
+     // Replace the core authentication service with our version
+     // which supports authorization through email.
+     $definition = $container->getDefinition('user.auth');
+-    $definition->setClass(UserAuthentication::class);
++
++    if (floatval(\Drupal::VERSION) >= 10.3) {
++      $definition->setClass(UserAuthentication::class);
++    }
++    else {
++      $definition->setClass(UserAuth::class);
++    }
+   }
+ 
+ }
+-- 
+GitLab
+
+
+From 3fad8d3b2c5d4e3045a1b4fef01b60f62a97e43e Mon Sep 17 00:00:00 2001
+From: Ted Cooper <elc@784944.no-reply.drupal.org>
+Date: Mon, 24 Jun 2024 12:34:51 +1000
+Subject: [PATCH 4/8] Expand testing.
+
+---
+ .gitlab-ci.yml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 5a58b2d..c504af2 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -51,7 +51,15 @@ include:
+ variables:
+   _CSPELL_WORDS: 'Andrey, andypost, greggles, Grevil, Herberte, herberte, Knaddison, logintoboggan, Moshe, moshe, Postnikov, Pustkuchen, Sedler, Unsynced, unsynced, Weitzman, weitzman'
+ 
++  # Set to '1' to opt in testing against various additional Drupal core versions relative to the current stable version of Drupal.
++  OPT_IN_TEST_CURRENT: '1'
++  OPT_IN_TEST_PREVIOUS_MINOR: '1'
++  OPT_IN_TEST_NEXT_MINOR: '1'
++  OPT_IN_TEST_PREVIOUS_MAJOR: '1'
++  OPT_IN_TEST_NEXT_MAJOR: '1'
+ 
++  # Set to 1 to opt in testing against the maximum/latest supported version of PHP for the current stable version of Drupal.
++  OPT_IN_TEST_MAX_PHP: '1'
+ ###################################################################################
+ #
+ #                                        *
+-- 
+GitLab
+
+
+From 4457b3d3d83d8423d359ec8214b20ccc52f23b7b Mon Sep 17 00:00:00 2001
+From: Ted Cooper <elc@784944.no-reply.drupal.org>
+Date: Mon, 24 Jun 2024 12:36:53 +1000
+Subject: [PATCH 5/8] Module does not support D11 yet.
+
+---
+ .gitlab-ci.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index c504af2..8e9c06d 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -56,7 +56,7 @@ variables:
+   OPT_IN_TEST_PREVIOUS_MINOR: '1'
+   OPT_IN_TEST_NEXT_MINOR: '1'
+   OPT_IN_TEST_PREVIOUS_MAJOR: '1'
+-  OPT_IN_TEST_NEXT_MAJOR: '1'
++  OPT_IN_TEST_NEXT_MAJOR: '0'
+ 
+   # Set to 1 to opt in testing against the maximum/latest supported version of PHP for the current stable version of Drupal.
+   OPT_IN_TEST_MAX_PHP: '1'
+-- 
+GitLab
+
+
+From b3c7fa9647e96c507c3fdd93482bf74ada8f4121 Mon Sep 17 00:00:00 2001
+From: Ted Cooper <elc@784944.no-reply.drupal.org>
+Date: Mon, 24 Jun 2024 15:01:18 +1000
+Subject: [PATCH 6/8] Remove double up (inaccurate) core require in composer.
+
+---
+ composer.json | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/composer.json b/composer.json
+index c673bff..27ab04e 100644
+--- a/composer.json
++++ b/composer.json
+@@ -31,9 +31,6 @@
+         "issues": "http://drupal.org/project/issues/email_registration",
+         "source": "https://git.drupalcode.org/project/email_registration"
+     },
+-    "require": {
+-        "drupal/core": "^9.1 || ^10"
+-    },
+     "conflict": {
+         "drupal/commerce": "<2.12"
+     },
+-- 
+GitLab
+
+
+From 67f91ff28e3aa0e8acbf0223f033accdc547ffb5 Mon Sep 17 00:00:00 2001
+From: Ted Cooper <elc@784944.no-reply.drupal.org>
+Date: Mon, 24 Jun 2024 15:14:20 +1000
+Subject: [PATCH 7/8] Trial removing conflicting require-devs.
+
+---
+ composer.json | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/composer.json b/composer.json
+index 27ab04e..80bfb20 100644
+--- a/composer.json
++++ b/composer.json
+@@ -40,8 +40,6 @@
+         }
+     },
+     "require-dev": {
+-        "drupal/commerce": "^2.0",
+-        "drupal/drupal-extension": "^5.0",
+-        "friends-of-behat/service-container-extension": "^1.0"
++        "drupal/commerce": "^2.0"
+     }
+ }
+-- 
+GitLab
+
+
+From e35239dcae89999ea3475c3865626b3d15e70d7f Mon Sep 17 00:00:00 2001
+From: Ted Cooper <elc@784944.no-reply.drupal.org>
+Date: Mon, 24 Jun 2024 15:43:49 +1000
+Subject: [PATCH 8/8] Do not test Drupal 9 as Commerce not working.
+
+---
+ .gitlab-ci.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 8e9c06d..8ef729f 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -55,7 +55,7 @@ variables:
+   OPT_IN_TEST_CURRENT: '1'
+   OPT_IN_TEST_PREVIOUS_MINOR: '1'
+   OPT_IN_TEST_NEXT_MINOR: '1'
+-  OPT_IN_TEST_PREVIOUS_MAJOR: '1'
++  OPT_IN_TEST_PREVIOUS_MAJOR: '0'
+   OPT_IN_TEST_NEXT_MAJOR: '0'
+ 
+   # Set to 1 to opt in testing against the maximum/latest supported version of PHP for the current stable version of Drupal.
+-- 
+GitLab
+
