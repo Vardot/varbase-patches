@@ -167,6 +167,10 @@
       "drupal/page_manager": {
         "Issue #3438993: Some mandatory parameters are missing (machine_name, step) to generate a URL for route entity.page.devel_load":
         "https://www.drupal.org/files/issues/2024-04-12/3438993-5.patch"
+      },
+      "drupal/email_registration": {
+        "Issue #3456461: [2.x] Login fails with Drupal 10.3":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/email_registration--2024-06-25--3456461--mr-43.patch"
       }
     }
   }
