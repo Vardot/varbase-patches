@@ -190,6 +190,10 @@
       "drupal/cl_devel": {
         "Issue #3456669: Update Drupal core to ^10.3 and ^11 and drop the use of the SDC experimental module":
         "https://www.drupal.org/files/issues/2024-06-24/cl_devel--2024-06-24--3456669--mr-8.patch"
+      },
+      "drupal/email_registration": {
+        "Issue #3456461: [2.x] Login fails with Drupal 10.3":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/email_registration--2024-06-25--3456461--mr-43.patch"
       }
     }
   }
