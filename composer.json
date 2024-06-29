@@ -46,7 +46,9 @@
         "Issue #3080606: Reorder Layout Builder sections":
         "https://www.drupal.org/files/issues/2024-06-13/3080606-121.patch",
         "Issue #3413079: Cannot read properties of null (reading 'nodeType') on node.page.body":
-        "https://www.drupal.org/files/issues/2024-01-08/3413079-9.patch"
+        "https://www.drupal.org/files/issues/2024-01-08/3413079-9.patch",
+        "Issue #3456176: 10.3 upgrade now missing status-message theme suggestions":
+        "https://www.drupal.org/files/issues/2024-06-28/3456176-45-missing-status-messages-theme-suggestions.patch"
       },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
