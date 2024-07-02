@@ -55,7 +55,9 @@
         "Issue #3456176: 10.3 upgrade now missing status-message theme suggestions":
         "https://www.drupal.org/files/issues/2024-06-28/3456176-45-missing-status-messages-theme-suggestions.patch",
         "Issue #3458067: Fix contextual links disappear intermittently leading to console errors":
-        "https://www.drupal.org/files/issues/2024-06-30/contextual_links_disappear_intermittently_leading_to_console_errors-3458067-8_0.patch"
+        "https://www.drupal.org/files/issues/2024-06-30/contextual_links_disappear_intermittently_leading_to_console_errors-3458067-8_0.patch",
+        "Issue #3457431: Saving text format generates validation warnings":
+        "https://www.drupal.org/files/issues/2024-07-01/drupal-core--2024-07-01--3457431--mr-8608.patch"
       },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
