@@ -200,6 +200,10 @@
       "drupal/email_registration": {
         "Issue #3456461: [2.x] Login fails with Drupal 10.3":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/email_registration--2024-06-25--3456461--mr-43.patch"
+      },
+      "drupal/openai": {
+        "Issue #3452184: OpenAI CKEditor integration compatibility issue with Drupal 10.3":
+        "https://www.drupal.org/files/issues/2024-06-27/openai-drupal_10_3-3452184-8.patch"
       }
     }
   }
