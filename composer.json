@@ -177,6 +177,10 @@
       "drupal/email_registration": {
         "Issue #3456461: [2.x] Login fails with Drupal 10.3":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/email_registration--2024-06-25--3456461--mr-43.patch"
+      },
+      "drupal/node_edit_protection": {
+        "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
+        "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
       }
     }
   }
