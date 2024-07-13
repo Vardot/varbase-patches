@@ -104,10 +104,6 @@
         "Issue #3414084: Fix UI Patterns Settings issue of TypeError: array_unshift(): Argument #1 ($array) must be of type array, null given in array_unshift() Caused by Deprecated Hooks in Drupal ~10.2.0":
         "https://www.drupal.org/files/issues/2024-01-11/ui_patterns_settings--2023-12-17--3409221-3--mr-21--39e896da.patch"
       },
-      "drupal/openapi": {
-        "Issue #3412276: Fix OpenAPI with PHP 8.2+ of Deprecated function: Creation of dynamic property":
-        "https://www.drupal.org/files/issues/2024-01-04/openapi--3362322-9--2023-05-26--mr10--bd284519.patch"
-      },
       "drupal/openapi_jsonapi": {
         "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined":
         "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch",
