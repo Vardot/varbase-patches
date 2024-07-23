@@ -202,6 +202,10 @@
       "drupal/node_edit_protection": {
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
+      },
+      "drupal/ckeditor_media_resize": {
+        "Issue #3458385 : Drupal core 10.3 breaks compatibility with CKEditor5 API" : 
+        "https://www.drupal.org/files/issues/2024-07-23/ckeditor_media_resize--2024-07-23-6.patch"
       }
     }
   }
