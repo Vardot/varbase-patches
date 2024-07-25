@@ -1,0 +1,28 @@
+From ce04175bc32b6fbe2eac121465bdce7ba54d6cc4 Mon Sep 17 00:00:00 2001
+From: Rajab Natshah <33889-RajabNatshah@users.noreply.drupalcode.org>
+Date: Thu, 25 Jul 2024 09:14:14 +0000
+Subject: [PATCH] Issue #3463712: Fix fatal error when pressing Run checklist
+ button
+
+---
+ src/SecurityReview.php | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/SecurityReview.php b/src/SecurityReview.php
+index cd3c88b..45301e4 100644
+--- a/src/SecurityReview.php
++++ b/src/SecurityReview.php
+@@ -200,7 +200,9 @@ class SecurityReview {
+    */
+   public function isCheckSkipped(string $check_name): array {
+     $skipped_array = $this->config->get('skipped');
+-    if (array_key_exists($check_name, $skipped_array)) {
++    if (isset($skipped_array)
++      && is_array($skipped_array)
++      && array_key_exists($check_name, $skipped_array)) {
+       return $skipped_array[$check_name];
+     }
+     return [];
+-- 
+GitLab
+
