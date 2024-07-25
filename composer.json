@@ -179,6 +179,10 @@
       "drupal/node_edit_protection": {
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
+      },
+      "drupal/security_review": {
+        "Issue #3463712: Fix fatal error when pressing Run checklist button":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/security_review--2024-07-25--3463712--mr-76.patch"
       }
     }
   }
