@@ -1,0 +1,39 @@
+diff --git a/ckeditor5_premium_features.libraries.yml b/ckeditor5_premium_features.libraries.yml
+index 14326180b48d7112991a5a6368903bb37e48d147..1af768c273ffcc719081f3af7dc4e8ffe8c26ba7 100644
+--- a/ckeditor5_premium_features.libraries.yml
++++ b/ckeditor5_premium_features.libraries.yml
+@@ -1,6 +1,6 @@
+ 
+ collaboration-integration-base:
+-  version: 20240220
++  version: 20240625
+   license:
+     name: GNU-GPL-2.0-or-later
+     url: https://raw.githubusercontent.com/ckeditor/ckeditor5/master/LICENSE.md
+diff --git a/js/build/drupalMediaTrackChangesIntegration.js b/js/build/drupalMediaTrackChangesIntegration.js
+index dbad03dc947892a78009ee941f6f9caa1f9ce9b5..114da105e4de28f7f0f0eca15b5ea5db23355345 100644
+--- a/js/build/drupalMediaTrackChangesIntegration.js
++++ b/js/build/drupalMediaTrackChangesIntegration.js
+@@ -2,4 +2,4 @@
+  * Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
+  * For licensing, see https://ckeditor.com/legal/ckeditor-oss-license
+  */
+-!function(e,r){"object"==typeof exports&&"object"==typeof module?module.exports=r():"function"==typeof define&&define.amd?define([],r):"object"==typeof exports?exports.CKEditor5=r():(e.CKEditor5=e.CKEditor5||{},e.CKEditor5.drupalMediaTrackChangesIntegration=r())}(self,(()=>(()=>{var e={"ckeditor5/src/core.js":(e,r,t)=>{e.exports=t("dll-reference CKEditor5.dll")("./src/core.js")},"dll-reference CKEditor5.dll":e=>{"use strict";e.exports=CKEditor5.dll}},r={};function t(o){var a=r[o];if(void 0!==a)return a.exports;var i=r[o]={exports:{}};return e[o](i,i.exports,t),i.exports}t.d=(e,r)=>{for(var o in r)t.o(r,o)&&!t.o(e,o)&&Object.defineProperty(e,o,{enumerable:!0,get:r[o]})},t.o=(e,r)=>Object.prototype.hasOwnProperty.call(e,r);var o={};return(()=>{"use strict";t.d(o,{default:()=>a});var e=t("ckeditor5/src/core.js");class r extends e.Plugin{static get pluginName(){return"DrupalMediaTrackChangesIntegration"}afterInit(){const e=this.editor,r=e.plugins.get("TrackChangesEditing");r.enableCommand("insertDrupalMedia");const t=e.t;r._descriptionFactory.registerElementLabel("drupalMedia",(e=>t({string:"drupal media",plural:"%0 drupal medias",id:"ELEMENT_DRUPAL_MEDIA"},e)))}}const a={DrupalMediaTrackChangesIntegration:r}})(),o=o.default})()));
+\ No newline at end of file
++!function(e,r){"object"==typeof exports&&"object"==typeof module?module.exports=r():"function"==typeof define&&define.amd?define([],r):"object"==typeof exports?exports.CKEditor5=r():(e.CKEditor5=e.CKEditor5||{},e.CKEditor5.drupalMediaTrackChangesIntegration=r())}(self,(()=>(()=>{var e={"ckeditor5/src/core.js":(e,r,t)=>{e.exports=t("dll-reference CKEditor5.dll")("./src/core.js")},"dll-reference CKEditor5.dll":e=>{"use strict";e.exports=CKEditor5.dll}},r={};function t(o){var i=r[o];if(void 0!==i)return i.exports;var a=r[o]={exports:{}};return e[o](a,a.exports,t),a.exports}t.d=(e,r)=>{for(var o in r)t.o(r,o)&&!t.o(e,o)&&Object.defineProperty(e,o,{enumerable:!0,get:r[o]})},t.o=(e,r)=>Object.prototype.hasOwnProperty.call(e,r);var o={};return(()=>{"use strict";t.d(o,{default:()=>i});var e=t("ckeditor5/src/core.js");class r extends e.Plugin{static get pluginName(){return"DrupalMediaTrackChangesIntegration"}afterInit(){const e=this.editor;if(!e.plugins.has("TrackChangesEditing"))return;const r=e.plugins.get("TrackChangesEditing");r.enableCommand("insertDrupalMedia");const t=e.t;r._descriptionFactory.registerElementLabel("drupalMedia",(e=>t({string:"drupal media",plural:"%0 drupal medias",id:"ELEMENT_DRUPAL_MEDIA"},e)))}}const i={DrupalMediaTrackChangesIntegration:r}})(),o=o.default})()));
+\ No newline at end of file
+diff --git a/js/ckeditor5_plugins/drupalMediaTrackChangesIntegration/src/drupalMediaTrackChangesIntegration.js b/js/ckeditor5_plugins/drupalMediaTrackChangesIntegration/src/drupalMediaTrackChangesIntegration.js
+index 170ec2f7ad0618aa02d925908e90a83ab6f1dd4a..94219fa5c5da6b6eb357a5d3bc8ebdf9cb9d0e53 100644
+--- a/js/ckeditor5_plugins/drupalMediaTrackChangesIntegration/src/drupalMediaTrackChangesIntegration.js
++++ b/js/ckeditor5_plugins/drupalMediaTrackChangesIntegration/src/drupalMediaTrackChangesIntegration.js
+@@ -14,6 +14,10 @@ class DrupalMediaTrackChangesIntegration extends Plugin {
+   afterInit() {
+     const editor = this.editor;
+ 
++    if (!editor.plugins.has( 'TrackChangesEditing' )) {
++      return;
++    }
++
+     const trackChangesEditing = editor.plugins.get( 'TrackChangesEditing' );
+ 
+     trackChangesEditing.enableCommand( 'insertDrupalMedia' );
