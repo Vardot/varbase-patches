@@ -202,10 +202,6 @@
       "drupal/security_review": {
         "Issue #3463712: Fix fatal error when pressing Run checklist button":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/security_review--2024-07-25--3463712--mr-76.patch"
-      },
-      "drupal/ckeditor5_premium_features": {
-        "Issue #3455574: Fix plugincollection-plugin-not-loaded when upgraded to 1.2.9":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/ckeditor5_premium_features--2024-07-30--3455574--mr-6.patch"
       }
     }
   }
