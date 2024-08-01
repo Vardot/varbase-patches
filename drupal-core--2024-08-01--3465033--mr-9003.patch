@@ -1,0 +1,19 @@
+diff --git a/core/modules/ckeditor5/src/Plugin/ConfigAction/AddItemToToolbar.php b/core/modules/ckeditor5/src/Plugin/ConfigAction/AddItemToToolbar.php
+index f239e226bc2654792a88c8f9d0be37e284030659..1fd79a9e67a52c41c1709bebf7e4342eb8035fa7 100644
+--- a/core/modules/ckeditor5/src/Plugin/ConfigAction/AddItemToToolbar.php
++++ b/core/modules/ckeditor5/src/Plugin/ConfigAction/AddItemToToolbar.php
+@@ -74,6 +74,14 @@ public function apply(string $configName, mixed $value): void {
+     // If we're just adding a vertical separator, there's nothing else we need
+     // to do at this point.
+     if ($item_name === '|') {
++      $editor->setSettings($editor_settings)->save();
++      return;
++    }
++
++    // If we're just adding a wrapping, there's nothing else we need
++    // to do at this point.
++    if ($item_name === '-') {
++      $editor->setSettings($editor_settings)->save();
+       return;
+     }
+ 
