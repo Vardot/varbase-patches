@@ -114,7 +114,9 @@
         "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
         "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
         "Issue #2679875: Inline Entity Form integration":
-        "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
+        "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch",
+        "Issue #3466609: Entity Embed fails to install after Embed module update":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/entity_embed--2024-08-07--3466609--mr-44.patch"
       },
       "drupal/ckeditor_media_embed": {
         "Issue #3444588: Switch from base_path to origin_url to fix issues when retrieving the path of the CKEditor plugins for use in a URL":
