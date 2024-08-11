@@ -156,9 +156,9 @@
       },
       "drupal/redirect": {
         "Issue #2879648: Redirects from aliased paths aren't triggered":
-        "https://www.drupal.org/files/issues/2023-08-31/2879648-149.patch",
+        "https://www.drupal.org/files/issues/2024-08-11/redirect--2024-08-11--2879648--mr-109.patch",
         "Issue #3057250: Validation issue on adding url redirect":
-        "https://www.drupal.org/files/issues/2023-08-09/3057250-65.patch"
+        "https://www.drupal.org/files/issues/2024-08-11/redirect--2024-08-11--3057250-79.patch"
       },
       "drupal/yoast_seo": {
         "Issue #3362165: Fix Deprecated function: Creation of dynamic property":
