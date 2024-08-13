@@ -179,6 +179,10 @@
       "drupal/password_policy": {
         "Issue #3465364: Fix Fatal error when changing password when password_policy_history is enabled":
         "https://www.drupal.org/files/issues/2024-08-05/3465364-1.patch"
+      },
+      "drupal/webform_views": {
+        "Issue #3467786: Fix Major error causes WSOD Error: Uncaught TypeError":
+        "https://www.drupal.org/files/issues/2024-08-13/webform_views-issue-3467786.patch"
       }
     }
   }
