@@ -132,8 +132,8 @@
         "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch"
       },
       "drupal/layout_builder_blocks": {
-        "Issue #3349066: Limit Layout Builder Blocks to the front-end theme":
-        "https://www.drupal.org/files/issues/2023-11-20/3349066-14.patch"
+        "Issue #3349066: Limit Layout Builder Blocks not to work in the dashboards route":
+        "https://www.drupal.org/files/issues/2024-08-14/layout_builder_blocks--2024-08-14--3349066--mr-5.patch"
       },
       "drupal/paragraphs": {
         "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]":
