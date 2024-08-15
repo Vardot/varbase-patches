@@ -171,10 +171,6 @@
       "drupal/security_review": {
         "Issue #3463712: Fix fatal error when pressing Run checklist button":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/security_review--2024-07-25--3463712--mr-76.patch"
-      },
-      "drupal/webform_views": {
-        "Issue #3467786: Fix Major error causes WSOD Error: Uncaught TypeError":
-        "https://www.drupal.org/files/issues/2024-08-13/webform_views-issue-3467786.patch"
       }
     }
   }
