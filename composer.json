@@ -191,6 +191,10 @@
         "Issue #3456850: Support Drupal 10.3 SDC deprecation":
         "https://www.drupal.org/files/issues/2024-07-01/3456850-3.patch"
       },
+      "drupal/sdc_display": {
+        "Issue #3458639: The module is not compatible with Drupal 10.3.0":
+        "https://www.drupal.org/files/issues/2024-08-20/sdc_display--2024-08-20--3458639--mr-14_0.patch"
+      },
       "drupal/node_edit_protection": {
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
