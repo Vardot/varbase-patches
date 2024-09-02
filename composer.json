@@ -173,7 +173,9 @@
       },
       "drupal/layout_builder_perms": {
         "Issue #3392780: Fix not valid context for entity context when editing the default layout entity types or bundles":
-        "https://www.drupal.org/files/issues/2023-12-15/not_valid_context-3392780-reroll_patch_from_4-7_0.patch"
+        "https://www.drupal.org/files/issues/2023-12-15/not_valid_context-3392780-reroll_patch_from_4-7_0.patch",
+        "Issue #3471460: Fix users having access to the layout builder on entities regardless of whether the layout is enabled":
+        "https://www.drupal.org/files/issues/2024-09-02/access_layout_builder_entities_regardless_whether_layout_enabled-3471460-9.patch"
       },
       "drupal/drimage": {
         "Issue #3456085: Fix Drupal 10.3 compatibility for Too few arguments to function deliver() 3 passed in Drimage":
