@@ -171,6 +171,10 @@
       "drupal/security_review": {
         "Issue #3463712: Fix fatal error when pressing Run checklist button":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/security_review--2024-07-25--3463712--mr-76.patch"
+      },
+      "drupal/bootstrap_barrio": {
+        "Issue #3471821: Fix The specified library bootstrap_barrio/messages does not exist issue":
+        "https://www.drupal.org/files/issues/2024-09-03/bootstrap_barrio--2024-09-03--3471821--mr-85.patch"
       }
     }
   }
