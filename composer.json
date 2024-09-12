@@ -173,6 +173,10 @@
       "drupal/security_review": {
         "Issue #3463712: Fix fatal error when pressing Run checklist button":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/security_review--2024-07-25--3463712--mr-76.patch"
+      },
+      "drupal/jsonapi_extras": {
+        "Issue #3473990: Fix PHP Fatal error on  Declaration of the normalize function must be compatible with normalize function return type after Schemata 8.x-1.0 was released":
+        "https://git.drupalcode.org/project/jsonapi_extras/-/commit/d7ab37658999b5fae74769ade4155ec7310aa468.diff"
       }
     }
   }
