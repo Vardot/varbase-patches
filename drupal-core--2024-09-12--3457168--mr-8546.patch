@@ -1,0 +1,21 @@
+diff --git a/core/lib/Drupal/Core/Template/TwigExtension.php b/core/lib/Drupal/Core/Template/TwigExtension.php
+index 9200d0254177bea46d2eac95c3541517640e6f24..7ed7716208026a54748c119793ba5a8c0b36810a 100644
+--- a/core/lib/Drupal/Core/Template/TwigExtension.php
++++ b/core/lib/Drupal/Core/Template/TwigExtension.php
+@@ -23,6 +23,7 @@
+ use Twig\Node\Node;
+ use Twig\TwigFilter;
+ use Twig\TwigFunction;
++use Twig\Runtime\EscaperRuntime;
+ 
+ /**
+  * A class providing Drupal Twig extensions.
+@@ -461,7 +462,7 @@ public function escapeFilter(Environment $env, $arg, $strategy = 'html', $charse
+       if ($strategy == 'html') {
+         return Html::escape($return);
+       }
+-      return twig_escape_filter($env, $return, $strategy, $charset, $autoescape);
++      return $env->getRuntime(EscaperRuntime::class)->escape($arg, $strategy, $charset, $autoescape);
+     }
+ 
+     // This is a normal render array, which is safe by definition, with
