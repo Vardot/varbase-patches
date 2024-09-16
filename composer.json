@@ -125,7 +125,7 @@
       },
       "drupal/bootstrap_styles": {
         "Issue #3282082: Support Bootstrap 5 on bootstrap_styles module":
-        "https://www.drupal.org/files/issues/2024-09-15/3282082-11.patch"
+        "https://www.drupal.org/files/issues/2022-06-14/Fix-support-bootstrap-5-on-bootstrap-styles-3282082-%233.patch"
       },
       "drupal/layout_library": {
         "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'":
