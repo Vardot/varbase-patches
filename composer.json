@@ -58,7 +58,7 @@
         "Issue #3431330: Add Action Method to Add a button plugin and settings into the Active toolbar in editor":
         "https://www.drupal.org/files/issues/2024-03-18/distributions_recipes--3431330-2.patch",
         "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/drupal-core--2024-08-01--3465033--mr-9003.patch"
       },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
