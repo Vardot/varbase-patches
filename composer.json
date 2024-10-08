@@ -60,6 +60,10 @@
         "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/drupal-core--2024-08-01--3465033--mr-9003.patch"
       },
+      "vardot/varbase": {
+        "Issue #3479338: Fix style for active menu in Admin Toolbar on Claro Theme after updating to Drupal Core 10.3.6":
+        "https://www.drupal.org/files/issues/2024-10-08/varbase--2024-10-08--3479338--mr-32.patch"
+      },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
         "https://www.drupal.org/files/issues/2021-04-07/3160146-37.patch"
