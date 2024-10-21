@@ -200,6 +200,10 @@
       "drupal/security_review": {
         "Issue #3463712: Fix fatal error when pressing Run checklist button":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/security_review--2024-07-25--3463712--mr-76.patch"
+      },
+      "drupal/taxonomy_manager": {
+        "Issue #3474919: Form element taxonomy_manager_tree broken":
+        "https://www.drupal.org/files/issues/2024-10-08/taxonomy_manager-3474919-13.patch"
       }
     }
   }
