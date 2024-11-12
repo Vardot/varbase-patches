@@ -67,7 +67,7 @@
       },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
-        "https://www.drupal.org/files/issues/2021-04-07/3160146-37.patch"
+        "https://www.drupal.org/files/issues/2024-11-13/default_content--2024-11-13--3160146--mr-15.patch"
       },
       "drupal/gin": {
         "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme":
