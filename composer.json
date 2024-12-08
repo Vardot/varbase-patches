@@ -163,10 +163,6 @@
       "drupal/node_edit_protection": {
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
-      },
-      "drupal/editoria11y": {
-        "Issue #3492469: Fix Error: Call to Member Function id() on Null in editoria11y Page Attachments() During Content Type Creation":
-        "https://www.drupal.org/files/issues/2024-12-08/editoria11y--2024-12-08--3492469--mr-17.patch"
       }
     }
   }
