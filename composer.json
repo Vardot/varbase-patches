@@ -157,10 +157,6 @@
         "Issue #3362165: Fix Deprecated function: Creation of dynamic property":
         "https://www.drupal.org/files/issues/2023-11-01/yoast_seo-php8_2-3362165-19.patch"
       },
-      "drupal/content_moderation_notifications": {
-        "Issue #3347958: Fix Entity queries must explicitly set whether the query should be access checked or not in Content Moderation Notifications":
-        "https://www.drupal.org/files/issues/2023-03-14/3347958-2.patch"
-      },
       "drupal/gin_everywhere": {
         "Issue #3436449: The status tab is showing out in the Are you sure you want to delete the content item page":
         "https://www.drupal.org/files/issues/2024-05-15/gin_everywhere--2024-05-15--3436449-5.patch"
