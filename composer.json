@@ -180,10 +180,6 @@
       "drupal/node_edit_protection": {
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
-      },
-      "drupal/field_group": {
-        "Issue #3395375: Fix Duplicated required marks in field tabs with Gin admin theme":
-        "https://www.drupal.org/files/issues/2024-08-06/3395375-6.patch"
       }
     }
   }
