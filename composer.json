@@ -78,7 +78,7 @@
       },
       "drupal/inline_entity_form": {
         "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated":
-        "https://www.drupal.org/files/issues/2021-04-13/inline_entity_form-order-by-weight-inline-entities-3136514-02.patch"
+        "https://www.drupal.org/files/issues/2024-12-27/inline_entity_form--2024-12-27--3136514--mr-126.patch"
       },
       "drupal/entity_clone": {
         "Issue #3388460: Fatal error on cloning a menu link (D10 site)":
