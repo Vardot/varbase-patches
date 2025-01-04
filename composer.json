@@ -82,7 +82,7 @@
         "Issue #2913571: Add a setting to enable/disable inline editing for existing entities":
         "https://www.drupal.org/files/issues/2024-12-27/inline_entity_form--2024-12-27--2913571--mr-127.patch",
         "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated":
-        "https://www.drupal.org/files/issues/2024-12-27/inline_entity_form--2024-12-27--3136514--mr-126.patch"
+        "https://www.drupal.org/files/issues/2025-01-04/inline_entity_form--2025-01-04--mr-126.patch"
       },
       "drupal/entity_clone": {
         "Issue #3388460: Fatal error on cloning a menu link (D10 site)":
