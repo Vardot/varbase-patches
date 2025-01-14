@@ -157,10 +157,6 @@
         "Issue #3362165: Fix Deprecated function: Creation of dynamic property":
         "https://www.drupal.org/files/issues/2023-11-01/yoast_seo-php8_2-3362165-19.patch"
       },
-      "drupal/gin_everywhere": {
-        "Issue #3436449: The status tab is showing out in the Are you sure you want to delete the content item page":
-        "https://www.drupal.org/files/issues/2024-05-15/gin_everywhere--2024-05-15--3436449-5.patch"
-      },
       "drupal/gin_type_tray": {
         "Issue #3448075: Fix the padding for filter form wrapper div":
         "https://www.drupal.org/files/issues/2024-05-19/gin_type_tray--2024-05-19--3448075-2.patch",
