@@ -167,6 +167,10 @@
       "drupal/scheduler": {
         "Issue #3498553: Sheduler upgrade 2.2.0 and content planner 8.x-1.2":
         "https://www.drupal.org/files/issues/2025-01-17/scheduler--2025-01-17--3498553--mr-223.patch"
+      },
+      "drupal/field_group": {
+        "":
+        ""
       }
     }
   }
