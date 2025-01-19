@@ -175,7 +175,9 @@
       },
       "drupal/field_group": {
         "Issue #3395375: Fix Duplicated required marks in field tabs with Gin admin theme":
-        "https://www.drupal.org/files/issues/2024-08-06/3395375-6.patch"
+        "https://www.drupal.org/files/issues/2024-08-06/3395375-6.patch",
+        "Issue #3491233: Fix Drupal 10.4 RC1 error with field_ui.js":
+        "https://www.drupal.org/files/issues/2025-01-16/field_group-drupal-10.4-rc1-error-with-field_ui.js--3491233--14.patch"
       },
       "drupal/project_browser": {
         "Issue #3499406: Fix fallback logic for empty $source in browse() method to ensure config validation with improved fallback logic":
