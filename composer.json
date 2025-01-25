@@ -159,10 +159,6 @@
         "Issue #3450665: Fix: Twig Error Loader Error when attempting to add new content.":
         "https://www.drupal.org/files/issues/2024-06-02/gin_type_tray--2024-06-02--3450665-7.patch"
       },
-      "drupal/layout_builder_perms": {
-        "Issue #3471460: Fix users having access to the layout builder on entities regardless of whether the layout is enabled":
-        "https://www.drupal.org/files/issues/2024-09-02/access_layout_builder_entities_regardless_whether_layout_enabled-3471460-9.patch"
-      },
       "drupal/cl_server": {
         "Issue #3456661: Update Drupal core to ^10.3 and ^11 and drop the use of the SDC experimental module":
         "https://www.drupal.org/files/issues/2024-06-25/cl_server--2024-06-25--3456661-9--mr-32.patch"
