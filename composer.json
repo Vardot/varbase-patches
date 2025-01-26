@@ -60,6 +60,8 @@
         "https://www.drupal.org/files/issues/2024-07-08/drupal-core--2024-07-08--3459881--mr-8697.patch",
         "Issue #3431330: Add Action Method to Add a button plugin and settings into the Active toolbar in editor":
         "https://www.drupal.org/files/issues/2024-03-18/distributions_recipes--3431330-2.patch",
+        "Issue #3497061: Allow recipe input values in array keys":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/drupal-core--2025-01-26--3497061--for-drupal-10-4-x.patch",
         "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
         "Issue #3496329: Fix not loading CKEditor 5 and Tour with BigPipe enabled after Drupal 10.4 update":
