@@ -181,10 +181,6 @@
         "Issue #2969051: Fix HTML5 validation prevents submission in tabs":
         "https://www.drupal.org/files/issues/2024-11-27/2969051-170.patch"
       },
-      "drupal/project_browser": {
-        "Issue #3499406: Fix fallback logic for empty $source in browse() method to ensure config validation with improved fallback logic":
-        "https://www.drupal.org/files/issues/2025-01-13/project_browser--2025-01-13--3499406--mr-672.patch"
-      },
       "drupal/scheduler": {
         "Issue #3498553: Sheduler upgrade 2.2.0 and content planner 8.x-1.2":
         "https://www.drupal.org/files/issues/2025-01-17/scheduler--2025-01-17--3498553--mr-223.patch"
