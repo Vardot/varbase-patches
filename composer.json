@@ -182,6 +182,10 @@
         "https://www.drupal.org/files/issues/2025-01-16/field_group-drupal-10.4-rc1-error-with-field_ui.js--3491233--14.patch",
         "Issue #2969051: Fix HTML5 validation prevents submission in tabs":
         "https://www.drupal.org/files/issues/2024-11-27/2969051-170.patch"
+      },
+      "drupal/project_browser": {
+        "Issue #3499406: Fix fallback logic for empty $source in browse() method to ensure config validation with improved fallback logic":
+        "https://www.drupal.org/files/issues/2025-01-30/project_browser--2025-01-30--3499406-10.patch"
       }
     }
   }
