@@ -167,6 +167,10 @@
         "https://www.drupal.org/files/issues/2025-01-16/field_group-drupal-10.4-rc1-error-with-field_ui.js--3491233--14.patch",
         "Issue #2969051: Fix HTML5 validation prevents submission in tabs":
         "https://www.drupal.org/files/issues/2024-11-27/2969051-170.patch"
+      },
+      "drupal/tour": {
+        "Issue #3506084: Remove the Tour module does not have integration with Navigation warning when saving any config":
+        "https://www.drupal.org/files/issues/2025-02-12/toure--2025-02-12--3506084--mr-98.patch"
       }
     }
   }
