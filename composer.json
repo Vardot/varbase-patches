@@ -174,7 +174,7 @@
       },
       "drupal/tour": {
         "Issue #3506084: Remove the Tour module does not have integration with Navigation warning when saving any config":
-        "https://www.drupal.org/files/issues/2025-02-12/toure--2025-02-12--3506084--mr-98.patch"
+        "https://www.drupal.org/files/issues/2025-02-12/tour--2025-02-12--3506084--mr-98.patch"
       }
     }
   }
