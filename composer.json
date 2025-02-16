@@ -28,7 +28,7 @@
         "Issue #3101231: Fix multilingual site's layout edit context issue with TypeError: Argument 1 passed to UrlHelper::buildQuery() must be of the type array, null given":
         "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
         "Issue #2741877: Nested modals don't work: opening a modal from a modal closes the original":
-        "https://www.drupal.org/files/issues/2025-02-06/drupal-core--2025-02-06--2741877--mr-11137.patch",
+        "https://www.drupal.org/files/issues/2025-02-16/drupal-core--2025-02-16--2741877--mr-11137.patch",
         "Issue #3226791: Fix Validation error saving untranslatable Media reference field":
         "https://www.drupal.org/files/issues/2021-08-04/media_required_validation-3226791-2.patch",
         "Issue #3272720: Fix PHP8.1+ Deprecated function: hash(): Passing null to parameter #2 ($data) of type string is deprecated in generateFieldTableName":
