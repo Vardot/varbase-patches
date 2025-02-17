@@ -1,0 +1,51 @@
+diff --git a/core/modules/editor/src/Entity/Editor.php b/core/modules/editor/src/Entity/Editor.php
+index 2b55b4c884e..46e425ad617 100644
+--- a/core/modules/editor/src/Entity/Editor.php
++++ b/core/modules/editor/src/Entity/Editor.php
+@@ -9,6 +9,7 @@
+ use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+ use Drupal\editor\EditorAccessControlHandler;
+ use Drupal\editor\EditorInterface;
++use Drupal\Core\Config\Action\Attribute\ActionMethod;
+ 
+ /**
+  * Defines the configured text editor entity.
+@@ -224,4 +225,38 @@ public static function getValidStreamWrappers(): array {
+     return array_keys(\Drupal::service('stream_wrapper_manager')->getNames(StreamWrapperInterface::WRITE_VISIBLE));
+   }
+ 
++  /**
++   * {@inheritdoc}
++   */
++  #[ActionMethod(adminLabel: new TranslatableMarkup('Add a button plugin and settings into the Active toolbar'))]
++  public function addButtonPluginIntoActiveToolbar($button_name , $button_index = -1, $plugin_name = '', $plugin_settings = []) {
++    if (!in_array($button_name, $this->settings['toolbar']['items'])) {
++      if ($button_index == -1) {
++        $this->settings['toolbar']['items'][] = $button_name;
++      }
++      elseif ($button_index == 0) {
++        array_unshift($this->settings['toolbar']['items'], $button_name);
++      }
++      else {
++        array_splice($this->settings['toolbar']['items'], $button_index, 0, $button_name);
++      }
++
++      if ($plugin_name != '') {
++        $this->settings['plugins'][$plugin_name] = $plugin_settings;
++      }
++    }
++    return $this;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  #[ActionMethod(adminLabel: new TranslatableMarkup('Update plugin settings in CKEditor 5 plugin settings'))]
++  public function updatePluginSettings($plugin_name, $plugin_settings = []) {
++    if (array_key_exists($plugin_name, $this->settings['plugins'])) {
++      $this->settings['plugins'][$plugin_name] = $plugin_settings;
++    }
++    return $this;
++  }
++
+ }
