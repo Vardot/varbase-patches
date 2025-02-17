@@ -11,7 +11,7 @@
     }
   ],
   "require": {
-    "drupal/core": "~10.4.0 || ~11.1.0",
+    "drupal/core": ">11.1",
     "composer/installers": "~2",
     "oomphinc/composer-installers-extender": "~2",
     "cweagans/composer-patches": "~1 || ~2"
