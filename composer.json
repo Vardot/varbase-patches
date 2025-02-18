@@ -178,6 +178,10 @@
       "drupal/tour": {
         "Issue #3506084: Remove the Tour module does not have integration with Navigation warning when saving any config":
         "https://www.drupal.org/files/issues/2025-02-12/tour--2025-02-12--3506084--mr-98.patch"
+      },
+      "drupal/ds": {
+        "Issue #3507312: Fix array_unshift() Error in ds_theme_registry_alter() when running Field Group pre-process before ds_entity_view":
+        "https://www.drupal.org/files/issues/2025-02-18/ds--2025-02-18--3507312--mr-43.patch"
       }
     }
   }
