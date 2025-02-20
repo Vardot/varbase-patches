@@ -190,6 +190,10 @@
       "drupal/social_auth_linkedin": {
         "Issue #3507495: Remove leftover reference to social_auth_linkedin.settings_form to fix Route Provider Error":
         "https://www.drupal.org/files/issues/2025-02-18/social_auth_linkedin--2025-02-18--3507495--mr-10.patch"
+      },
+      "drupal/jsonapi_extras": {
+        "Issue #3508142: Fix installation error with JSON:API Extra in custom Drupal 11 profiles due to missing synthetic service `kernel`":
+        "https://www.drupal.org/files/issues/2025-02-21/jsonapi_extras--2025-02-21--3508142--mr-65.patch"
       }
     }
   }
