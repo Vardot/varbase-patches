@@ -201,7 +201,7 @@
       },
       "drupal/sdc_devel": {
         "Issue #3509096: Fix issue LogicException: Attribute name does not exist for Node Twig Node Expression GetAttrExpression":
-        "https://www.drupal.org/files/issues/2025-02-26/3509096-2.patch"
+        "https://www.drupal.org/files/issues/2025-02-26/3509096-4.patch"
       }
     }
   }
