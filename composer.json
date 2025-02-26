@@ -198,6 +198,10 @@
       "drupal/jsonapi_extras": {
         "Issue #3508142: Fix installation error with JSON:API Extra in custom Drupal 11 profiles due to missing synthetic service `kernel`":
         "https://www.drupal.org/files/issues/2025-02-21/jsonapi_extras--2025-02-21--3508142--mr-65.patch"
+      },
+      "drupal/sdc_devel": {
+        "Issue #3509096: Fix issue LogicException: Attribute name does not exist for Node Twig Node Expression GetAttrExpression":
+        "https://www.drupal.org/files/issues/2025-02-26/3509096-2.patch"
       }
     }
   }
