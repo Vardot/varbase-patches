@@ -182,6 +182,10 @@
       "drupal/tour": {
         "Issue #3506084: Remove the Tour module does not have integration with Navigation warning when saving any config":
         "https://www.drupal.org/files/issues/2025-02-12/tour--2025-02-12--3506084--mr-98.patch"
+      },
+      "drupal/block_class": {
+        "Issue #3467450: Failsafe conversion of block_classes_stored":
+        "https://git.drupalcode.org/project/block_class/-/commit/92cb762919e2b87bf6c571ef4349a32fde49f313.diff"
       }
     }
   }
