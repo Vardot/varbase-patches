@@ -174,7 +174,9 @@
       },
       "drupal/block_class": {
         "Issue #3467450: Failsafe conversion of block_classes_stored":
-        "https://git.drupalcode.org/project/block_class/-/commit/92cb762919e2b87bf6c571ef4349a32fde49f313.diff"
+        "https://git.drupalcode.org/project/block_class/-/commit/92cb762919e2b87bf6c571ef4349a32fde49f313.diff",
+        "Issue #3493849: Argument #1 ($array) must be of type array, string given":
+        "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
       }
     }
   }
