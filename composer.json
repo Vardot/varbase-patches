@@ -169,9 +169,7 @@
       },
       "drupal/field_group": {
         "Issue #3395375: Fix Duplicated required marks in field tabs with Gin admin theme":
-        "https://www.drupal.org/files/issues/2024-08-06/3395375-6.patch",
-        "Issue #2969051: Fix HTML5 validation prevents submission in tabs":
-        "https://www.drupal.org/files/issues/2024-11-27/2969051-170.patch"
+        "https://www.drupal.org/files/issues/2024-08-06/3395375-6.patch"
       },
       "drupal/project_browser": {
         "Issue #3499406: Fix fallback logic for empty $source in browse() method to ensure config validation with improved fallback logic":
