@@ -167,10 +167,6 @@
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
       },
-      "drupal/field_group": {
-        "Issue #3395375: Fix Duplicated required marks in field tabs with Gin admin theme":
-        "https://www.drupal.org/files/issues/2024-08-06/3395375-6.patch"
-      },
       "drupal/project_browser": {
         "Issue #3499406: Fix fallback logic for empty $source in browse() method to ensure config validation with improved fallback logic":
         "https://www.drupal.org/files/issues/2025-01-30/project_browser--2025-01-30--3499406-10.patch"
