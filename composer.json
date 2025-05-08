@@ -52,8 +52,6 @@
         "https://www.drupal.org/files/issues/2024-01-08/3413079-9.patch",
         "Issue #3456176: 10.3 upgrade now missing status-message theme suggestions":
         "https://www.drupal.org/files/issues/2024-06-28/3456176-45-missing-status-messages-theme-suggestions.patch",
-        "Issue #3458067: Fix contextual links disappear intermittently leading to console errors":
-        "https://www.drupal.org/files/issues/2024-06-30/contextual_links_disappear_intermittently_leading_to_console_errors-3458067-8_0.patch",
         "Issue #3457431: Saving text format generates validation warnings":
         "https://www.drupal.org/files/issues/2024-07-01/drupal-core--2024-07-01--3457431--mr-8608.patch",
         "Issue #3459881: Fix TypeError: implode(): Argument #1 ($array) must be of type array, string given in implode() (line 537 of core/lib/Drupal/Core/Field/WidgetBase.php)":
