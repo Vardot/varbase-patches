@@ -169,10 +169,6 @@
         "Issue #3499406: Fix fallback logic for empty $source in browse() method to ensure config validation with improved fallback logic":
         "https://www.drupal.org/files/issues/2025-01-30/project_browser--2025-01-30--3499406-10.patch"
       },
-      "drupal/tour": {
-        "Issue #3506084: Remove the Tour module does not have integration with Navigation warning when saving any config":
-        "https://www.drupal.org/files/issues/2025-02-12/tour--2025-02-12--3506084--mr-98.patch"
-      },
       "drupal/block_class": {
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
         "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
