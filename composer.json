@@ -192,6 +192,10 @@
       "drupal/block_class": {
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
         "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
+      },
+      "drupal/ui_patterns": {
+        "Issue #3496209: Add Support for Attributes Prop Type Source Replacing Token Values":
+        "https://www.drupal.org/files/issues/2025-05-16/ui_patterns--2025-05-16--3496209--mr-378.patch"
       }
     }
   }
