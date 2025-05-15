@@ -160,10 +160,6 @@
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
       },
-      "drupal/tour": {
-        "Issue #3506084: Remove the Tour module does not have integration with Navigation warning when saving any config":
-        "https://www.drupal.org/files/issues/2025-02-12/tour--2025-02-12--3506084--mr-98.patch"
-      },
       "drupal/block_class": {
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
         "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
