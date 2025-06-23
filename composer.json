@@ -11,10 +11,12 @@
     }
   ],
   "require": {
-    "drupal/core": "~10.4.0 || ~11.1.0",
+    "drupal/core": "~10.5.0",
     "composer/installers": "~2",
     "oomphinc/composer-installers-extender": "~2",
-    "cweagans/composer-patches": "~1 || ~2"
+    "cweagans/composer-patches": "~1 || ~2",
+    "vardot/entity-definition-update-manager": "~1",
+    "vardot/module-installer-factory": "~1"
   },
   "extra": {
     "enable-patching": true,
