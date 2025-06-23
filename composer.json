@@ -21,8 +21,6 @@
   "extra": {
     "patches": {
       "drupal/core": {
-        "Issue #2869592: Disabled update module shouldn't produce a status report warning":
-        "https://www.drupal.org/files/issues/2024-06-14/2869592-disabled-update-module-63.patch",
         "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal":
         "https://www.drupal.org/files/issues/2018-12-10/core--getDerivatives-Invalid-argument-foreach--2893892-11-d8.patch",
         "Issue #3044656: Add a helper method to strip subdirectories from URL paths":
