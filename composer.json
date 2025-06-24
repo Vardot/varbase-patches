@@ -192,6 +192,10 @@
       "drupal/ui_patterns": {
         "Issue #3496209: Add Support for Attributes Prop Type Source Replacing Token Values":
         "https://www.drupal.org/files/issues/2025-05-16/ui_patterns--2025-05-16--3496209--mr-378.patch"
+      },
+      "drupal/dashboard": {
+        "Issue #3528064: Add support for Layout Builder Restrictions":
+        "https://www.drupal.org/files/issues/2025-06-24/dashboard--2025-06-24--3528064--mr-63.patch"
       }
     }
   }
