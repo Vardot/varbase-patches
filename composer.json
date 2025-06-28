@@ -200,6 +200,10 @@
       "drupal/ckeditor5_premium_features": {
         "Issue #3531493: Fix WProofreader JS Error Preventing CKEditor 5 from Loading":
         "https://www.drupal.org/files/issues/2025-06-28/ckeditor5_premium_features--2025-06-28--3531493--mr-30.patch"
+      },
+      "drupal/ckeditor_media_resize": {
+        "Issue #3531299: Plugin not found error in CKEditor5 45.x prevents loading of CKEditor5 altogether when enabled":
+        "https://www.drupal.org/files/issues/2025-06-28/ckeditor_media_resize--2025-06-28--3531299--mr-16.patch"
       }
     }
   }
