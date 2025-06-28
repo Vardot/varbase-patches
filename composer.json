@@ -173,7 +173,7 @@
       },
       "drupal/ckeditor5_plugin_pack": {
         "Issue #3531493: Fix WProofreader JS Error Preventing CKEditor 5 from Loading":
-        "https://www.drupal.org/files/issues/2025-06-24/3531493_9.patch"
+        "https://www.drupal.org/files/issues/2025-06-23/3531493.patch"
       }
     }
   }
