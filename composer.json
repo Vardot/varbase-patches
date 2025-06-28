@@ -197,9 +197,9 @@
         "Issue #3528064: Add support for Layout Builder Restrictions":
         "https://www.drupal.org/files/issues/2025-06-24/dashboard--2025-06-24--3528064--mr-63.patch"
       },
-      "drupal/ckeditor5_plugin_pack": {
+      "drupal/ckeditor5_premium_features": {
         "Issue #3531493: Fix WProofreader JS Error Preventing CKEditor 5 from Loading":
-        "https://www.drupal.org/files/issues/2025-06-24/3531493_9.patch"
+        "https://www.drupal.org/files/issues/2025-06-28/ckeditor5_premium_features--2025-06-28--3531493--mr-30.patch"
       }
     }
   }
