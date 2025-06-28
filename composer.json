@@ -171,9 +171,9 @@
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
         "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
       },
-      "drupal/ckeditor5_plugin_pack": {
+      "drupal/ckeditor5_premium_features": {
         "Issue #3531493: Fix WProofreader JS Error Preventing CKEditor 5 from Loading":
-        "https://www.drupal.org/files/issues/2025-06-23/3531493.patch"
+        "https://www.drupal.org/files/issues/2025-06-28/ckeditor5_premium_features--2025-06-28--3531493--mr-30.patch"
       }
     }
   }
