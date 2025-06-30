@@ -161,6 +161,10 @@
       "drupal/block_class": {
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
         "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
+      },
+      "drupal/editor_advanced_link": {
+        "Issue #3531194: D11.2 / D10.5: Uncaught CKEditorError: Cannot read properties of undefined (reading viewUid)":
+        "https://www.drupal.org/files/issues/2025-06-30/editor_advanced_link--2025-06-30--3531194--mr-35--for-02-02-06.patch"
       }
     }
   }
