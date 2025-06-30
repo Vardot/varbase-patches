@@ -105,6 +105,10 @@
         "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()":
         "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
       },
+      "drupal/embed": {
+        "Issue #3517882: The namespace of EmbedCKEditor5PluginBase does not respect PSR4":
+        "https://www.drupal.org/files/issues/2025-06-30/embed--2025-06-30--3517882--mr-26.patch"
+      },
       "drupal/entity_embed": {
         "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
         "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
