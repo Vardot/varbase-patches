@@ -61,7 +61,9 @@
         "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
         "Issue #3496329: Fix not loading CKEditor 5 and Tour with BigPipe enabled after Drupal 10.4 update":
-        "https://www.drupal.org/files/issues/2025-01-03/drupal-core--2025-01-02--3496329-32--mr-10753.patch"
+        "https://www.drupal.org/files/issues/2025-01-03/drupal-core--2025-01-02--3496329-32--mr-10753.patch",
+        "Issue #3415961: [drupalMedia] Using the Insert Media button causes the window to scroll to the bottom of the page":
+        "https://www.drupal.org/files/issues/2025-06-10/drupal-3415961-19.patch"
       },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
