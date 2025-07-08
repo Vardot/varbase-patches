@@ -1,14 +1,6 @@
 {
   "name": "vardot/varbase-patches",
-  "description": "List of needed patches for Varbase used packages with Composer Patches.",
-  "keywords": ["composer", "patches", "composer patches", "varbase", "varbase patches", "drupal", "drupal patches"],
+  "description": "No patches from Varbase Patches",
   "license": "GPL-2.0-or-later",
-  "authors": [
-    {
-      "name": "Vardot",
-      "homepage": "https://www.drupal.org/vardot",
-      "role": "Maintainer"
-    }
-  ],
   "require": {  }
 }
