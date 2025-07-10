@@ -214,6 +214,10 @@
       "drupal/tour": {
         "Issue #3535035: Fix uncaught TypeError in Tour module by validating focus() and currentStep usage in Shepherd callbacks":
         "https://www.drupal.org/files/issues/2025-07-10/tour--2025-07-10--3535035--mr-103.patch"
+      },
+      "drupal/navigation_extra_tools": {
+        "Issue #3532284: Use Icon Api for adding icons in Navigation items":
+        "https://www.drupal.org/files/issues/2025-07-10/navigation_extra_tools--2025-07-10--3532284--mr-28.patch"
       }
     }
   }
