@@ -214,6 +214,10 @@
       "drupal/tour": {
         "Issue #3535035: Fix uncaught TypeError in Tour module by validating focus() and currentStep usage in Shepherd callbacks":
         "https://www.drupal.org/files/issues/2025-07-10/tour--2025-07-10--3535035--mr-103.patch"
+      },
+      "drupal/access_unpublished": {
+        "Issue #3421309: Unable to save 'access unpublished' setting form: Argument #1 ($elements) must be of type array, null given":
+        "https://www.drupal.org/files/issues/2024-07-29/access_unpublished-n3421309-14.patch"
       }
     }
   }
