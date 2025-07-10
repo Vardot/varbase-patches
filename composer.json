@@ -210,6 +210,10 @@
       "drupal/ckeditor_media_resize": {
         "Issue #3531299: Plugin not found error in CKEditor5 45.x prevents loading of CKEditor5 altogether when enabled":
         "https://www.drupal.org/files/issues/2025-06-28/ckeditor_media_resize--2025-06-28--3531299--mr-16.patch"
+      },
+      "drupal/tour": {
+        "Issue #3535035: Fix uncaught TypeError in Tour module by validating focus() and currentStep usage in Shepherd callbacks":
+        "https://www.drupal.org/files/issues/2025-07-10/tour--2025-07-10--3535035--mr-103.patch"
       }
     }
   }
