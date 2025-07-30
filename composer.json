@@ -52,9 +52,9 @@
         "Issue #3431330: Add Action Method to Add a button plugin and settings into the Active toolbar in editor":
         "https://www.drupal.org/files/issues/2024-03-18/distributions_recipes--3431330-2.patch",
         "Issue #3497061: Allow recipe input values in array keys":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/drupal-core--2025-01-26--3497061--for-drupal-10-4-x.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-01-26--3497061--for-drupal-10-4-x.patch",
         "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
         "Issue #3496329: Fix not loading CKEditor 5 and Tour with BigPipe enabled after Drupal 10.4 update":
         "https://www.drupal.org/files/issues/2025-01-03/drupal-core--2025-01-02--3496329-32--mr-10753.patch"
       },
@@ -116,7 +116,7 @@
       },
       "drupal/ckeditor_media_embed": {
         "Issue #2900313: Add ability to embed media and other rich content in WYSIWYG with Varbase Editor [Rich editor] Text format":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/ckeditor_media_embed--2024-05-20--2900313.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor_media_embed--2024-05-20--2900313.patch"
       },
       "drupal/linkit": {
         "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
