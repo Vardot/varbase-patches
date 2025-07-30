@@ -1,0 +1,248 @@
+diff --git a/js/responsive-preview.js b/js/responsive-preview.js
+index 23db79c7cb0535fdac949a4449f4eba6139695ca..7fc7295ca5175e6f7612b017bf3f026d0ea3fb40 100644
+--- a/js/responsive-preview.js
++++ b/js/responsive-preview.js
+@@ -605,7 +605,7 @@
+ 
+           var $container = this.$el.find('#responsive-preview-frame-container');
+           var $frame = $container.find('#responsive-preview-frame');
+-          $frame.get(0).contentWindow.location = Drupal.url(drupalSettings.responsive_preview.url);
++          $frame.get(0).contentWindow.location = drupalSettings.responsive_preview.url;
+ 
+           return this;
+         },
+diff --git a/responsive_preview.module b/responsive_preview.module
+index 800892b06d60c99e4aa986a72636b79b0e95ff33..90f1bd977800d4f49074af8fea92aac8512bfdef 100644
+--- a/responsive_preview.module
++++ b/responsive_preview.module
+@@ -67,3 +67,13 @@ function responsive_preview_form_alter(&$form, FormStateInterface $form_state, $
+ 
+   $responsivePreviewService->formAlter($form, $form_state, $form_id);
+ }
++
++/**
++ * Implements hook_preprocess_html().
++ */
++function responsive_preview_preprocess_html(&$variables): void {
++  /** @var \Drupal\responsive_preview\ResponsivePreview $responsivePreviewService */
++  $responsivePreviewService = \Drupal::service('responsive_preview');
++
++  $responsivePreviewService->preprocessHtml($variables);
++}
+diff --git a/responsive_preview.services.yml b/responsive_preview.services.yml
+index a85b4b0ce3625e05384d820a55fa9ed86f185a64..fdfc88382571622b1339c207e377d8332c6ca9b7 100644
+--- a/responsive_preview.services.yml
++++ b/responsive_preview.services.yml
+@@ -8,7 +8,7 @@ services:
+       class: Drupal\responsive_preview\ResponsivePreview
+       arguments:
+         - '@router.admin_context'
+-        - '@path.current'
+         - '@current_route_match'
+         - '@entity_type.manager'
+         - '@current_user'
++        - '@request_stack'
+diff --git a/src/Plugin/Block/ResponsivePreviewBlock.php b/src/Plugin/Block/ResponsivePreviewBlock.php
+index 047c93dca23b5c37b26e1e201c099dcef7c1b39e..d2c7e0ab5635416090089136dac65fd7037823c4 100644
+--- a/src/Plugin/Block/ResponsivePreviewBlock.php
++++ b/src/Plugin/Block/ResponsivePreviewBlock.php
+@@ -111,7 +111,7 @@ class ResponsivePreviewBlock extends BlockBase implements ContainerFactoryPlugin
+           'library' => ['responsive_preview/drupal.responsive-preview'],
+           'drupalSettings' => [
+             'responsive_preview' => [
+-              'url' => ltrim($url, '/'),
++              'url' => $url,
+             ],
+           ],
+         ],
+diff --git a/src/ResponsivePreview.php b/src/ResponsivePreview.php
+index dc01b65e860e15f43d3695df8f9c39b5e2ca2ce2..1e9a60edf33409a1efb37be8972e25249d45200f 100644
+--- a/src/ResponsivePreview.php
++++ b/src/ResponsivePreview.php
+@@ -8,7 +8,6 @@ use Drupal\Core\Ajax\SettingsCommand;
+ use Drupal\Core\Cache\Cache;
+ use Drupal\Core\Entity\EntityTypeManagerInterface;
+ use Drupal\Core\Form\FormStateInterface;
+-use Drupal\Core\Path\CurrentPathStack;
+ use Drupal\Core\Routing\AdminContext;
+ use Drupal\Core\Routing\RouteMatchInterface;
+ use Drupal\Core\Session\AccountProxyInterface;
+@@ -18,69 +17,39 @@ use Drupal\node\NodeForm;
+ use Drupal\node\NodeInterface;
+ use Drupal\node\NodeTypeInterface;
+ use Drupal\responsive_preview\Entity\Device;
++use Symfony\Component\HttpFoundation\RequestStack;
+ 
+ /**
+  * Responsive preview service.
+  */
+ class ResponsivePreview {
+ 
+-  use StringTranslationTrait;
+-
+-  /**
+-   * Admin context service.
+-   *
+-   * @var \Drupal\Core\Routing\AdminContext
+-   */
+-  protected $routerAdminContext;
++  const RESPONSIVE_PREVIEW_QUERY_PARAMETER = 'responsive_preview';
++  const RESPONSIVE_PREVIEW_ENABLED = 'enabled';
+ 
+-  /**
+-   * The current path.
+-   *
+-   * @var \Drupal\Core\Path\CurrentPathStack
+-   */
+-  protected $currentPathStack;
+-
+-  /**
+-   * The route match service.
+-   *
+-   * @var \Drupal\Core\Routing\RouteMatchInterface
+-   */
+-  protected $routeMatch;
+-
+-  /**
+-   * The entity type manager.
+-   *
+-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+-   */
+-  protected $entityTypeManager;
+-
+-  /**
+-   * The current user.
+-   *
+-   * @var \Drupal\Core\Session\AccountProxyInterface
+-   */
+-  protected $currentUser;
++  use StringTranslationTrait;
+ 
+   /**
+    * ResponsivePreview constructor.
+    *
+-   * @param \Drupal\Core\Routing\AdminContext $adminContext
++   * @param \Drupal\Core\Routing\AdminContext $routerAdminContext
+    *   Admin context service.
+-   * @param \Drupal\Core\Path\CurrentPathStack $currentPathStack
+-   *   CurrentPathStack service to get the path.
+    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+    *   The route match service.
+    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+    *   The entity type manager.
+    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
+    *   The current user.
++   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
++   *   The request stack.
+    */
+-  public function __construct(AdminContext $adminContext, CurrentPathStack $currentPathStack, RouteMatchInterface $routeMatch, EntityTypeManagerInterface $entityTypeManager, AccountProxyInterface $currentUser) {
+-    $this->routerAdminContext = $adminContext;
+-    $this->currentPathStack = $currentPathStack;
+-    $this->routeMatch = $routeMatch;
+-    $this->entityTypeManager = $entityTypeManager;
+-    $this->currentUser = $currentUser;
++  public function __construct(
++    protected AdminContext $routerAdminContext,
++    protected RouteMatchInterface $routeMatch,
++    protected EntityTypeManagerInterface $entityTypeManager,
++    protected AccountProxyInterface $currentUser,
++    protected RequestStack $requestStack
++  ) {
+   }
+ 
+   /**
+@@ -88,12 +57,14 @@ class ResponsivePreview {
+    */
+   public function getPreviewUrl() {
+     // Determine if responsive preview should be available for this node type.
++    $url = NULL;
++
+     if ($this->routeMatch->getRouteName() === 'node.add') {
+       $node_type = $this->routeMatch->getParameter('node_type');
+       if ($node_type && !$this->previewEnabled($node_type)) {
+         return NULL;
+       }
+-      return '/';
++      $url = Url::fromRoute('<front>');
+     }
+     elseif ($form = $this->routeMatch->getRouteObject()->getDefault("_entity_form")) {
+       $entity_type_id = current(explode('.', $form));
+@@ -105,13 +76,37 @@ class ResponsivePreview {
+         return NULL;
+       }
+       if ($entity->hasLinkTemplate('canonical')) {
+-        return $entity->toUrl()->toString();
++        $url = $entity->toUrl();
+       }
+     }
++
+     if (!$this->routerAdminContext->isAdminRoute()) {
+-      return $this->currentPathStack->getPath();
++      $url = Url::fromRouteMatch($this->routeMatch);
+     }
+-    return NULL;
++
++    return ($url instanceof Url)
++      ? static::preparePreviewUrl($url)
++      : NULL;
++  }
++
++  /**
++   * Prepares the preview URL to format it as expected.
++   *
++   * @param \Drupal\Core\Url $url
++   *   The URL object.
++   *
++   * @return string
++   *   The preview URL in string format with the proper format.
++   */
++  protected static function preparePreviewUrl(Url $url): string {
++    $url_options = [
++      'query' => [
++        static::RESPONSIVE_PREVIEW_QUERY_PARAMETER => static::RESPONSIVE_PREVIEW_ENABLED,
++      ],
++      'absolute' => TRUE
++    ];
++
++    return $url->mergeOptions($url_options)->toString();
+   }
+ 
+   /**
+@@ -280,7 +275,7 @@ class ResponsivePreview {
+         new SettingsCommand(
+           [
+             'responsive_preview' => [
+-              'url' => ltrim($redirectUrl->toString(), '/'),
++              'url' => static::preparePreviewUrl($redirectUrl),
+             ],
+           ],
+           TRUE
+@@ -353,7 +348,7 @@ class ResponsivePreview {
+           'library' => ['responsive_preview/drupal.responsive-preview'],
+           'drupalSettings' => [
+             'responsive_preview' => [
+-              'url' => ltrim($url, '/'),
++              'url' => $url,
+             ],
+           ],
+         ],
+@@ -363,4 +358,19 @@ class ResponsivePreview {
+     return $items;
+   }
+ 
++  /**
++   * Implements hook_preprocess_html().
++   */
++  public function preprocessHtml(array &$variables): void {
++    // Remove the admin toolbar/navigation when in same page preview mode.
++    if ($this->currentUser->hasPermission('access responsive preview') &&
++     $this->requestStack->getCurrentRequest()->query->get(static::RESPONSIVE_PREVIEW_QUERY_PARAMETER) === static::RESPONSIVE_PREVIEW_ENABLED
++    ) {
++      unset($variables['page_top']['toolbar'], $variables['page_top']['navigation'], $variables['page_top']['top_bar']);
++      // @todo Needs additional cleanup to remove toolbar related classes on body.
++      // Remove contextual links.
++      $variables['page']['#attached']['library'] = array_values(array_diff($variables['page']['#attached']['library'], ['contextual/drupal.contextual-links']));
++    }
++  }
++
+ }
