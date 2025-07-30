@@ -1,9 +1,9 @@
 diff --git a/src/Plugin/TopBarItem/TourTopBarItem.php b/src/Plugin/TopBarItem/TourTopBarItem.php
 new file mode 100644
-index 0000000000000000000000000000000000000000..27aadc5459e7cb56c32ff0c7e9fbc7e0dc22ec4f
+index 0000000000000000000000000000000000000000..5581a6c618b19717a53629d45c12fbf928391fa5
 --- /dev/null
 +++ b/src/Plugin/TopBarItem/TourTopBarItem.php
-@@ -0,0 +1,146 @@
+@@ -0,0 +1,147 @@
 +<?php
 +
 +declare(strict_types=1);
@@ -146,6 +146,7 @@ index 0000000000000000000000000000000000000000..27aadc5459e7cb56c32ff0c7e9fbc7e0
 +        'contexts' => ['url'],
 +        'tags' => ['tour_settings'],
 +      ],
++      '#weight' => 10,
 +    ];
 +  }
 +

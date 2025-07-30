@@ -55,10 +55,10 @@ index 0000000000000000000000000000000000000000..e6f128706240db31c7c3e5a236401fb3
 \ No newline at end of file
 diff --git a/src/Plugin/TopBarItem/CoffeeTopBarItem.php b/src/Plugin/TopBarItem/CoffeeTopBarItem.php
 new file mode 100644
-index 0000000000000000000000000000000000000000..ae1f429aa6fe38e6380203e1d6e7b765661cfa8e
+index 0000000000000000000000000000000000000000..95565e6068f3c484bceb9446b89e41c716ba22e6
 --- /dev/null
 +++ b/src/Plugin/TopBarItem/CoffeeTopBarItem.php
-@@ -0,0 +1,122 @@
+@@ -0,0 +1,123 @@
 +<?php
 +
 +declare(strict_types=1);
@@ -177,6 +177,7 @@ index 0000000000000000000000000000000000000000..ae1f429aa6fe38e6380203e1d6e7b765
 +      '#attached' => [
 +        'library' => ['coffee/drupal.coffee'],
 +      ],
++      '#weight' => 5,
 +    ];
 +  }
 +
