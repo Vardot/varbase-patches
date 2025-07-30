@@ -226,6 +226,10 @@
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/responsive_preview--2025-07-30--3531527--mr-27.patch",
         "Issue #3501374: Preview displays include Navigation Toolbars":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/responsive_preview--2025-07-30--3501374--mr-25.patch"
+      },
+      "drupal/tour": {
+        "Issue #3535875: Add Navigation Top Bar integration for Tour module in Drupal ~11.2.0 with Gin admin theme":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/tour--2025-07-30--3535875--mr-104.patch"
       }
     }
   }
