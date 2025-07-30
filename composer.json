@@ -57,9 +57,9 @@
         "Issue #3431330: Add Action Method to Add a button plugin and settings into the Active toolbar in editor":
         "https://www.drupal.org/files/issues/2024-03-18/distributions_recipes--3431330-2.patch",
         "Issue #3497061: Allow recipe input values in array keys":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/drupal-core--2025-01-26--3497061--for-drupal-10-4-x.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-01-26--3497061--for-drupal-10-4-x.patch",
         "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
         "Issue #3496329: Fix not loading CKEditor 5 and Tour with BigPipe enabled after Drupal 10.4 update":
         "https://www.drupal.org/files/issues/2025-01-03/drupal-core--2025-01-02--3496329-32--mr-10753.patch",
         "Issue #3415961: [drupalMedia] Using the Insert Media button causes the window to scroll to the bottom of the page":
@@ -71,7 +71,7 @@
       },
       "drupal/gin": {
         "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/gin--2024-11-12--3325263.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2024-11-12--3325263.patch",
         "Issue #3398040: Fix issue with changing between responsive views and Gin Toolbar over menus":
         "https://www.drupal.org/files/issues/2023-10-31/3398040-8.patch"
       },
@@ -121,7 +121,7 @@
       },
       "drupal/ckeditor_media_embed": {
         "Issue #3444588: Switch from base_path to origin_url to fix issues when retrieving the path of the CKEditor plugins for use in a URL":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/ckeditor_media_embed--2024-05-01--3444588--mr-15.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor_media_embed--2024-05-01--3444588--mr-15.patch"
       },
       "drupal/focal_point": {
         "Issue #2906631: After changing focal point, image doesn't change until you click preview":
