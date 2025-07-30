@@ -1,0 +1,183 @@
+diff --git a/coffee.icons.yml b/coffee.icons.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..e003d97103b81ef1abf0cbbfe695520127ae3ecf
+--- /dev/null
++++ b/coffee.icons.yml
+@@ -0,0 +1,36 @@
++coffee:
++  enabled: true
++  label: "Coffe"
++  description: "Icons available within Coffee module."
++  version: 11.x
++  license:
++    name: GPL2-or-later
++    url: https://api.drupal.org/api/drupal/core%21LICENSE.txt/11.x
++    gpl-compatible: true
++  extractor: svg
++  config:
++    sources:
++      - images/icons/*.svg
++  settings:
++    size:
++      title: "Size"
++      description: "Set a size for this icon."
++      type: "integer"
++      default: 20
++    class:
++      title: "Class"
++      description: "Set a class for this icon."
++      type: "string"
++      default: ""
++  template: >
++    <svg
++      {{ attributes
++          .setAttribute('viewBox', attributes.viewBox|default('0 0 24 24'))
++          .setAttribute('class', class)
++          .setAttribute('width', size|default('20'))
++          .setAttribute('height', size|default('20'))
++          .setAttribute('aria-hidden', 'true')
++      }}
++    >
++      {{ content }}
++    </svg>
+diff --git a/images/icons/coffee.svg b/images/icons/coffee.svg
+new file mode 100644
+index 0000000000000000000000000000000000000000..e6f128706240db31c7c3e5a236401fb3e6a432ac
+--- /dev/null
++++ b/images/icons/coffee.svg
+@@ -0,0 +1,6 @@
++<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++  <g fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
++    <circle cx="11" cy="11" r="8" />
++    <path d="m21 21-4.35-4.35" />
++  </g>
++</svg>
+\ No newline at end of file
+diff --git a/src/Plugin/TopBarItem/CoffeeTopBarItem.php b/src/Plugin/TopBarItem/CoffeeTopBarItem.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..ae1f429aa6fe38e6380203e1d6e7b765661cfa8e
+--- /dev/null
++++ b/src/Plugin/TopBarItem/CoffeeTopBarItem.php
+@@ -0,0 +1,122 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\coffee\Plugin\TopBarItem;
++
++use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
++use Drupal\Core\Session\AccountProxyInterface;
++use Drupal\Core\StringTranslation\StringTranslationTrait;
++use Drupal\Core\StringTranslation\TranslatableMarkup;
++use Drupal\navigation\Attribute\TopBarItem;
++use Drupal\navigation\TopBarItemBase;
++use Drupal\navigation\TopBarRegion;
++use Symfony\Component\DependencyInjection\ContainerInterface;
++use Drupal\Core\Template\Attribute;
++use Drupal\Core\Url;
++
++/**
++ * Provides the Coffee top bar item.
++ */
++#[TopBarItem(
++  id: 'coffee_topbar',
++  region: TopBarRegion::Tools,
++  label: new TranslatableMarkup('Coffee'),
++)]
++class CoffeeTopBarItem extends TopBarItemBase implements ContainerFactoryPluginInterface {
++
++  use StringTranslationTrait;
++
++  /**
++   * Constructs a new CoffeeTopBarItem instance.
++   *
++   * @param array $configuration
++   *   A configuration array containing plugin instance information.
++   * @param string $plugin_id
++   *   The plugin ID for the plugin instance.
++   * @param mixed $plugin_definition
++   *   The plugin implementation definition.
++   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
++   *   The current user.
++   */
++  public function __construct(
++    array $configuration,
++    string $plugin_id,
++    $plugin_definition,
++    protected AccountProxyInterface $currentUser,
++  ) {
++    parent::__construct($configuration, $plugin_id, $plugin_definition);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
++    return new static(
++      $configuration,
++      $plugin_id,
++      $plugin_definition,
++      $container->get('current_user'),
++    );
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function build(): array {
++    $build = [
++      '#cache' => [
++        'contexts' => [
++          'user.permissions',
++          'route',
++        ],
++      ],
++    ];
++    // Check if the user has the required permission.
++    if (!$this->currentUser->hasPermission('access coffee')) {
++      return $build;
++    }
++
++    return $this->buildCoffeeNavigation();
++
++    return $build;
++  }
++
++  /**
++   * Builds the Coffee navigation render array.
++   *
++   * @param array $cache_contexts
++   *   The cache contexts.
++   *
++   * @return array
++   *   A render array for the Coffee navigation.
++   */
++  protected function buildCoffeeNavigation(): array {
++
++    return [
++      '#type' => 'component',
++      '#component' => 'navigation:toolbar-button',
++      '#props' => [
++        'text' => t('Go To') ,
++        'modifiers' => ['small-offset'],
++        'icon' => ['pack_id' => 'coffee', 'icon_id' => 'coffee'],
++        'html_tag' => 'button',
++        'content' => t('Go To'),
++        'attributes' => new Attribute([
++          'href' => '',
++          'title' => t('Use alt+d to start Coffee and search for a page to go to')
++        ]),
++        'extra_classes' => [
++          'toolbar-icon-coffee',
++        ]
++      ],
++      '#cache' => [
++        'contexts' => ['user.permissions'],
++      ],
++      '#attached' => [
++        'library' => ['coffee/drupal.coffee'],
++      ],
++    ];
++  }
++
++}
