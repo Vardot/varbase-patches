@@ -221,7 +221,9 @@
       },
       "drupal/responsive_preview": {
         "Issue #3489112: Integrate responsive preview with Navigation top bar":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/responsive_preview--2025-07-30--3489112--mr-22.patch"
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/responsive_preview--2025-07-30--3489112--mr-22.patch",
+        "Issue #3531527: Gin: button font":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/patches/responsive_preview--2025-07-30--3531527--mr-27.patch"
       }
     }
   }
