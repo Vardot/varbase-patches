@@ -1,0 +1,327 @@
+diff --git a/modules/responsive_preview_navigation/css/responsive-preview.navigation.css b/modules/responsive_preview_navigation/css/responsive-preview.navigation.css
+new file mode 100644
+index 0000000000000000000000000000000000000000..3e961c0fe0816a46e48eaada30ee6a9c5002da7b
+--- /dev/null
++++ b/modules/responsive_preview_navigation/css/responsive-preview.navigation.css
+@@ -0,0 +1,34 @@
++.responsive-preview-navigation-bar {
++  background-color: #eee;
++  border-radius: 4px;
++  margin: 0;
++  padding: 0;
++}
++
++.responsive-preview-navigation-bar button {
++  width: 50px;
++  height: 35px;
++  cursor: pointer;
++  background-color: transparent;
++  border: 2px solid transparent;
++  border-radius: 4px;
++  padding: 3px 10px;
++  background-repeat: no-repeat;
++  background-position: center;
++  background-size: 25px 25px;
++  font-size: 0;
++}
++
++.responsive-preview-navigation-bar button.device-icon-mobile {
++  background-image: url("../images/mobile.svg");
++}
++
++.responsive-preview-navigation-bar button.device-icon-desktop {
++  background-image: url("../images/desktop.svg");
++}
++
++.responsive-preview-navigation-bar button.active {
++  background-color: #fff;
++  border-color: #eee;
++  border-radius: 4px;
++}
+diff --git a/modules/responsive_preview_navigation/images/desktop.svg b/modules/responsive_preview_navigation/images/desktop.svg
+new file mode 100644
+index 0000000000000000000000000000000000000000..b89ba7b5ec8b08ca040a18fb974211f2e1866504
+--- /dev/null
++++ b/modules/responsive_preview_navigation/images/desktop.svg
+@@ -0,0 +1,7 @@
++<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="25" height="25">
++	<title>desktop</title>
++	<style>
++		.s0 { fill: #000000 } 
++	</style>
++	<path class="s0" d="m42 4h-36c-2.2 0-4 1.8-4 4v24c0 2.2 1.8 4 4 4h14v4h-4v4h16v-4h-4v-4h14c2.2 0 4-1.8 4-4v-24c0-2.2-1.8-4-4-4zm0 28h-36v-24h36z"/>
++</svg>
+\ No newline at end of file
+diff --git a/modules/responsive_preview_navigation/images/mobile.svg b/modules/responsive_preview_navigation/images/mobile.svg
+new file mode 100644
+index 0000000000000000000000000000000000000000..848382fd1a50f4e758ed938d7f003e9eaef6ebd1
+--- /dev/null
++++ b/modules/responsive_preview_navigation/images/mobile.svg
+@@ -0,0 +1,7 @@
++<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="25" height="25">
++	<title>mobile</title>
++	<style>
++		.s0 { fill: #000000 } 
++	</style>
++	<path class="s0" d="m66 11h-32c-3.3 0-6 2.7-6 6v66c0 3.3 2.7 6 6 6h32c3.3 0 6-2.7 6-6v-66c0-3.3-2.7-6-6-6zm2 72c0 1.1-0.9 2-2 2h-32c-1.1 0-2-0.9-2-2v-4h36zm0-8h-36v-50h36zm0-54h-36v-4c0-1.1 0.9-2 2-2h32c1.1 0 2 0.9 2 2z"/>
++</svg>
+\ No newline at end of file
+diff --git a/modules/responsive_preview_navigation/responsive_preview_navigation.info.yml b/modules/responsive_preview_navigation/responsive_preview_navigation.info.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..169cd43a636d9ee57d2674b9912f8e01197c8d31
+--- /dev/null
++++ b/modules/responsive_preview_navigation/responsive_preview_navigation.info.yml
+@@ -0,0 +1,9 @@
++name: 'Responsive Preview Navigation'
++type: module
++description: 'Provides a navigation with responsive preview icons.'
++core_version_requirement: ^10.3 || ^11
++package: 'Responsive Preview'
++dependencies:
++  - drupal:responsive_preview
++  - drupal:navigation
++
+diff --git a/modules/responsive_preview_navigation/responsive_preview_navigation.libraries.yml b/modules/responsive_preview_navigation/responsive_preview_navigation.libraries.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..8cc48030231410cc19260b577f2595800248cc74
+--- /dev/null
++++ b/modules/responsive_preview_navigation/responsive_preview_navigation.libraries.yml
+@@ -0,0 +1,5 @@
++drupal.responsive-preview-navigation:
++  version: VERSION
++  css:
++    theme:
++      css/responsive-preview.navigation.css: {}
+diff --git a/modules/responsive_preview_navigation/responsive_preview_navigation.module b/modules/responsive_preview_navigation/responsive_preview_navigation.module
+new file mode 100644
+index 0000000000000000000000000000000000000000..013d70912c366437ed3bd5e56588ff7be25026d8
+--- /dev/null
++++ b/modules/responsive_preview_navigation/responsive_preview_navigation.module
+@@ -0,0 +1,15 @@
++<?php
++
++/**
++ * Implements hook_theme().
++ */
++function responsive_preview_navigation_theme() {
++  return [
++    'responsive_preview_navigation' => [
++      'variables' => [
++        'items' => [],
++        'attributes' => [],
++      ],
++    ],
++  ];
++}
+diff --git a/modules/responsive_preview_navigation/src/Plugin/TopBarItem/ResponsiveIcons.php b/modules/responsive_preview_navigation/src/Plugin/TopBarItem/ResponsiveIcons.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..79387abd627f95c67ba307532d25426ac88e7dd0
+--- /dev/null
++++ b/modules/responsive_preview_navigation/src/Plugin/TopBarItem/ResponsiveIcons.php
+@@ -0,0 +1,182 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\responsive_preview_navigation\Plugin\TopBarItem;
++
++use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
++use Drupal\Core\Session\AccountProxyInterface;
++use Drupal\Core\StringTranslation\StringTranslationTrait;
++use Drupal\Core\StringTranslation\TranslatableMarkup;
++use Drupal\navigation\Attribute\TopBarItem;
++use Drupal\navigation\TopBarItemBase;
++use Drupal\navigation\TopBarRegion;
++use Symfony\Component\DependencyInjection\ContainerInterface;
++use Drupal\responsive_preview\ResponsivePreview;
++
++/**
++ * Provides the Responsive Icons top bar item.
++ */
++#[TopBarItem(
++  id: 'responsive_icons',
++  region: TopBarRegion::Tools,
++  label: new TranslatableMarkup('Responsive Icons'),
++)]
++class ResponsiveIcons extends TopBarItemBase implements ContainerFactoryPluginInterface {
++
++  use StringTranslationTrait;
++
++  /**
++   * Constructs a new ResponsiveIcons instance.
++   *
++   * @param array $configuration
++   *   A configuration array containing plugin instance information.
++   * @param string $plugin_id
++   *   The plugin ID for the plugin instance.
++   * @param mixed $plugin_definition
++   *   The plugin implementation definition.
++   * @param \Drupal\responsive_preview\ResponsivePreview $responsivePreview
++   *   The ResponsivePreview.
++   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
++   *   The current user.
++   */
++  public function __construct(
++    array $configuration,
++    string $plugin_id,
++    $plugin_definition,
++    protected ResponsivePreview $responsivePreview,
++    protected AccountProxyInterface $currentUser,
++  ) {
++    parent::__construct($configuration, $plugin_id, $plugin_definition);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
++    return new static(
++      $configuration,
++      $plugin_id,
++      $plugin_definition,
++      $container->get('responsive_preview'),
++      $container->get('current_user'),
++    );
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function build(): array {
++    $build = [
++      '#cache' => [
++        'contexts' => [
++          'user.permissions',
++          'route',
++        ],
++      ],
++    ];
++    // Check if the user has the required permission.
++    if (!$this->currentUser->hasPermission('access responsive preview')) {
++      return $build;
++    }
++
++    try {
++      $url = $this->responsivePreview->getPreviewUrl();
++    }
++    catch (\InvalidArgumentException $e) {
++      return $build;
++    }
++
++    if ($url) {
++      return $this->buildResponsivePreviewNavigation($url);
++    }
++
++    return $build;
++  }
++
++  /**
++   * Builds the responsive preview navigation render array.
++   *
++   * @param string $url
++   *   The responsive preview URL.
++   * @param array $cache_contexts
++   *   The cache contexts.
++   *
++   * @return array
++   *   A render array for the responsive preview navigation.
++   */
++  protected function buildResponsivePreviewNavigation(string $url): array {
++    return [
++      '#theme' => 'responsive_preview_navigation',
++      '#cache' => [
++        'contexts' => [
++          'user.permissions',
++          'route',
++        ],
++        'tags' => ['config:node_type_list'],
++      ],
++      '#attached' => [
++        'library' => [
++          'responsive_preview/drupal.responsive-preview',
++          'responsive_preview_navigation/drupal.responsive-preview-navigation',
++        ],
++        'drupalSettings' => [
++          'responsive_preview' => [
++            'url' => ltrim($url, '/'),
++          ],
++        ],
++      ],
++      '#items' => $this->getResponsivePreviewItems(),
++      '#attributes' => [
++        'id' => 'responsive-preview-toolbar-tab',
++        'class' => ['responsive-preview-navigation-bar'],
++      ],
++    ];
++  }
++
++  /**
++   * Defines the responsive preview items.
++   *
++   * @return array
++   *   An array of responsive preview items.
++   */
++  protected function getResponsivePreviewItems(): array {
++    return [
++      [
++        '#type' => 'html_tag',
++        '#tag' => 'button',
++        '#value' => $this->t('Desktop'),
++        '#attributes' => [
++          'data-responsive-preview-name' => 'desktop',
++          'data-responsive-preview-width' => 1280,
++          'data-responsive-preview-height' => 768,
++          'data-responsive-preview-dppx' => 1.0,
++          'data-responsive-preview-orientation' => 'landscape',
++          'class' => [
++            'responsive-preview-device',
++            'responsive-preview-icon',
++            'device-icon-desktop',
++          ],
++        ],
++      ],
++      [
++        '#type' => 'html_tag',
++        '#tag' => 'button',
++        '#value' => $this->t('Mobile'),
++        '#attributes' => [
++          'data-responsive-preview-name' => 'mobile',
++          'data-responsive-preview-width' => 768,
++          'data-responsive-preview-height' => 1280,
++          'data-responsive-preview-dppx' => 2,
++          'data-responsive-preview-orientation' => 'portrait',
++          'class' => [
++            'responsive-preview-device',
++            'responsive-preview-icon',
++            'device-icon-mobile',
++          ],
++        ],
++      ],
++    ];
++  }
++
++}
+diff --git a/modules/responsive_preview_navigation/templates/responsive-preview-navigation.html.twig b/modules/responsive_preview_navigation/templates/responsive-preview-navigation.html.twig
+new file mode 100644
+index 0000000000000000000000000000000000000000..b19f318856ab0669bd32c2536f05a2c566bbbe67
+--- /dev/null
++++ b/modules/responsive_preview_navigation/templates/responsive-preview-navigation.html.twig
+@@ -0,0 +1,18 @@
++{#
++/**
++ * @file
++ * Theme override for the responsive preview navigation.
++ *
++ * Available variables:
++ * - items: A list of items to render. Each item contains:
++ *   - attributes: HTML attributes for the item.
++ *   - content: The rendered content of the item (e.g., Mobile, Desktop).
++ * - attributes: HTML attributes for the main wrapper.
++ *
++ * @see template_preprocess_responsive_preview_navigation()
++ */
++#}
++
++<div{{ attributes }}>
++    {{items}}
++</div>
