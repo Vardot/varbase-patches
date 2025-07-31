@@ -232,6 +232,10 @@
       "drupal/coffee": {
         "Issue #3535874: Add Navigation Top Bar integration for Coffee module in Drupal ~11.2.0 and Gin ~5.0":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/coffee--2025-07-30--3535874--mr-19.patch"
+      },
+      "drupal/entity": {
+        "Issue #3532309: Fix Deprecation notice from DeleteAction class causes errors in ECA module":
+        "https://www.drupal.org/files/issues/2025-06-25/entity-fix-deprecation.patch"
       }
     }
   }
