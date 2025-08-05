@@ -173,10 +173,6 @@
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
       },
-      "drupal/project_browser": {
-        "Issue #3499406: Fix fallback logic for empty $source in browse() method to ensure config validation with improved fallback logic":
-        "https://www.drupal.org/files/issues/2025-01-30/project_browser--2025-01-30--3499406-10.patch"
-      },
       "drupal/ds": {
         "Issue #3507312: Fix array_unshift() Error in ds_theme_registry_alter() when running Field Group pre-process before ds_entity_view":
         "https://www.drupal.org/files/issues/2025-02-18/ds--2025-02-18--3507312--mr-43.patch"
