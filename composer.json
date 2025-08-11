@@ -165,6 +165,10 @@
       "drupal/block_class": {
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
         "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
+      },
+      "drupal/access_unpublished": {
+        "Issue #3421309: Fix Unable to save `Access Unpublished` settings form due to TypeError in Drupal Core Render Element::children()":
+        "https://www.drupal.org/files/issues/2024-07-29/access_unpublished-n3421309-14.patch"
       }
     }
   }
