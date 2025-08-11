@@ -182,6 +182,10 @@
       "drupal/entity": {
         "Issue #3532309: Fix Deprecation notice from DeleteAction class causes errors in ECA module":
         "https://www.drupal.org/files/issues/2025-06-25/entity-fix-deprecation.patch"
+      },
+      "drupal/access_unpublished": {
+        "Issue #3421309: Fix Unable to save `Access Unpublished` settings form due to TypeError in Drupal Core Render Element::children()":
+        "https://www.drupal.org/files/issues/2024-07-29/access_unpublished-n3421309-14.patch"
       }
     }
   }
