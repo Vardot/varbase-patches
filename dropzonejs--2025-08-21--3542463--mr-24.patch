@@ -1,0 +1,16 @@
+diff --git a/src/Form/DropzoneJsUploadForm.php b/src/Form/DropzoneJsUploadForm.php
+index f813f8e306b89d18cdc00d8a043a68a667a537bb..0bf2486a5a8640804f338bc11334771318d211f8 100644
+--- a/src/Form/DropzoneJsUploadForm.php
++++ b/src/Form/DropzoneJsUploadForm.php
+@@ -122,7 +122,10 @@ class DropzoneJsUploadForm extends FileUploadForm {
+       $element['#value'] = [];
+     }
+     $values = $form_state->getValue('upload', []);
+-    if (count($values['uploaded_files']) > $element['#cardinality'] && $element['#cardinality'] !== FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
++    if (!empty($value) && is_array($value)
++      && count($values['uploaded_files']) > $element['#cardinality']
++      && $element['#cardinality'] !== FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
++
+       $form_state->setError($element, $this->t('A maximum of @count files can be uploaded.', [
+         '@count' => $element['#cardinality'],
+       ]));
