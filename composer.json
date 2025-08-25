@@ -232,6 +232,10 @@
       "drupal/dropzonejs": {
         "Issue #3542463: Fix TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in DropzoneJsUploadForm::validateUploadElement()":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dropzonejs--2025-08-21--3542463--mr-24.patch"
+      },
+      "drupal/trash": {
+        "Issue #3491947: Add support for taxonomy terms":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/trash--2025-08-25--3491947--mr-71.patch"
       }
     }
   }
