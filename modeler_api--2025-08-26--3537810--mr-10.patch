@@ -1,0 +1,314 @@
+diff --git a/modeler_api.services.yml b/modeler_api.services.yml
+index 91387f1..d300e6e 100644
+--- a/modeler_api.services.yml
++++ b/modeler_api.services.yml
+@@ -1,5 +1,4 @@
+ services:
+-
+   modeler_api.service:
+     class: Drupal\modeler_api\Api
+     arguments:
+@@ -9,7 +8,7 @@ services:
+       - '@config.storage.export'
+       - '@file_system'
+       - '@entity_type.manager'
+-      - '@router.route_provider'
++      - '@?router.route_provider'
+       - '@plugin.manager.menu.link'
+ 
+   logger.channel.modeler_api:
+@@ -51,9 +50,11 @@ services:
+   Drupal\modeler_api\Plugin\ModelOwnerPluginManager: '@plugin.manager.modeler_api.model_owner'
+   Drupal\modeler_api\Plugin\ModelerPluginManager: '@plugin.manager.modeler_api.modeler'
+ 
++  # FIXED: Remove ALL dependencies to break circular reference
+   # @deprecated in modeler_api:1.0.0 and is removed in modeler_api:2.0.0 which will then only
+   # support Drupal 11.2 and later, so that no BC layer like this will be required any more.
+   # @see https://www.drupal.org/project/modeler_api/issues/3532644
+   Drupal\modeler_api\Hook\EntityHooks:
+     class: Drupal\modeler_api\Hook\EntityHooks
+-    autowire: true
++    # NO arguments - use lazy loading instead to break circular dependency
++    arguments: []
+diff --git a/src/Api.php b/src/Api.php
+index ff88abc..6ff9d20 100644
+--- a/src/Api.php
++++ b/src/Api.php
+@@ -78,7 +78,7 @@ class Api {
+     protected ManagedStorage $configStorage,
+     protected FileSystemInterface $fileSystem,
+     protected EntityTypeManagerInterface $entityTypeManager,
+-    protected RouteProviderInterface $routeProvider,
++    protected ?RouteProviderInterface $routeProvider,
+     protected MenuLinkManagerInterface $menuLinkManager,
+   ) {}
+ 
+@@ -537,12 +537,21 @@ class Api {
+    *   The route, if it exists, NULL otherwise.
+    */
+   public function getRouteByName(string $name): ?Route {
++    // Skip during installation to prevent recursive router rebuild.
++    if (!$this->routeProvider || defined('MAINTENANCE_MODE')) {
++      return NULL;
++    }
++    
+     try {
+       return $this->routeProvider->getRouteByName($name);
+     }
+     catch (RouteNotFoundException) {
+       // If the route can not be found, don't set the configure route.
+     }
++    catch (\Exception $e) {
++      // Skip any other exceptions during installation/bootstrap.
++      return NULL;
++    }
+     return NULL;
+   }
+ 
+diff --git a/src/Hook/EntityHooks.php b/src/Hook/EntityHooks.php
+index d4291cf..9b00bd8 100644
+--- a/src/Hook/EntityHooks.php
++++ b/src/Hook/EntityHooks.php
+@@ -23,26 +23,70 @@ use Drupal\modeler_api\Plugin\ModelOwnerPluginManager;
+ class EntityHooks {
+ 
+   /**
+-   * Constructs a new ModelerApiHooks object.
+-   *
+-   * @param \Drupal\modeler_api\Api $modelerApiService
+-   *   The modeler API service.
+-   * @param \Drupal\modeler_api\Plugin\ModelerPluginManager $modelerManager
+-   *   The modeler plugin manager.
+-   * @param \Drupal\modeler_api\Plugin\ModelOwnerPluginManager $modelOwnerPluginManager
+-   *   The model owner plugin manager.
+-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+-   *   The current user.
+-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+-   *   The entity type manager.
++   * Lazy-loaded services to prevent circular dependencies.
++   */
++  protected ?Api $modelerApiService = NULL;
++  protected ?ModelerPluginManager $modelerManager = NULL;
++  protected ?ModelOwnerPluginManager $modelOwnerPluginManager = NULL;
++  protected ?AccountInterface $currentUser = NULL;
++  protected ?EntityTypeManagerInterface $entityTypeManager = NULL;
++
++  /**
++   * Constructor with no dependencies to break circular reference.
++   */
++  public function __construct() {
++    // No dependencies injected to prevent circular reference
++  }
++
++  /**
++   * Get the modeler API service lazily.
++   */
++  protected function getModelerApiService(): Api {
++    if ($this->modelerApiService === NULL) {
++      $this->modelerApiService = \Drupal::service('modeler_api.service');
++    }
++    return $this->modelerApiService;
++  }
++
++  /**
++   * Get the modeler plugin manager lazily.
++   */
++  protected function getModelerManager(): ModelerPluginManager {
++    if ($this->modelerManager === NULL) {
++      $this->modelerManager = \Drupal::service('plugin.manager.modeler_api.modeler');
++    }
++    return $this->modelerManager;
++  }
++
++  /**
++   * Get the model owner plugin manager lazily.
+    */
+-  public function __construct(
+-    protected Api $modelerApiService,
+-    protected ModelerPluginManager $modelerManager,
+-    protected ModelOwnerPluginManager $modelOwnerPluginManager,
+-    protected AccountInterface $currentUser,
+-    protected EntityTypeManagerInterface $entityTypeManager,
+-  ) {}
++  protected function getModelOwnerPluginManager(): ModelOwnerPluginManager {
++    if ($this->modelOwnerPluginManager === NULL) {
++      $this->modelOwnerPluginManager = \Drupal::service('plugin.manager.modeler_api.model_owner');
++    }
++    return $this->modelOwnerPluginManager;
++  }
++
++  /**
++   * Get the current user lazily.
++   */
++  protected function getCurrentUser(): AccountInterface {
++    if ($this->currentUser === NULL) {
++      $this->currentUser = \Drupal::currentUser();
++    }
++    return $this->currentUser;
++  }
++
++  /**
++   * Get the entity type manager lazily.
++   */
++  protected function getEntityTypeManager(): EntityTypeManagerInterface {
++    if ($this->entityTypeManager === NULL) {
++      $this->entityTypeManager = \Drupal::entityTypeManager();
++    }
++    return $this->entityTypeManager;
++  }
+ 
+   /**
+    * Implements hook_entity_type_build().
+@@ -59,7 +103,7 @@ class EntityHooks {
+       return;
+     }
+     $alreadyRunning = TRUE;
+-    foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
++    foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
+       $basePath = $owner->configEntityBasePath();
+       if ($basePath === NULL) {
+         continue;
+@@ -93,7 +137,7 @@ class EntityHooks {
+   #[Hook('entity_operation')]
+   public function entityOperation(EntityInterface $entity): array {
+     $operations = [];
+-    $modelers = $this->modelerManager->getAllInstances();
++    $modelers = $this->getModelerManager()->getAllInstances();
+     $numberOfModelers = count($modelers);
+     if ($numberOfModelers === 1) {
+       // There is only the fallback modeler, no operation provided.
+@@ -101,7 +145,7 @@ class EntityHooks {
+     }
+     if (
+       $entity instanceof ConfigEntityInterface &&
+-      ($owner = $this->modelerApiService->findOwner($entity)) &&
++      ($owner = $this->getModelerApiService()->findOwner($entity)) &&
+       $owner->configEntityBasePath()
+     ) {
+       $type = $entity->getEntityTypeId();
+@@ -111,9 +155,9 @@ class EntityHooks {
+         // The default edit form comes from the list builder. If we have both
+         // routes, "edit_form" and "edit", let's add the second one here.
+         $name = 'entity.' . $type . '.edit';
+-        $defaultModeler = $this->modelerApiService->getModeler();
++        $defaultModeler = $this->getModelerApiService()->getModeler();
+         $modelerId = $defaultModeler->getPluginId();
+-        if ($this->modelerApiService->getRouteByName($name) && $this->currentUser->hasPermission(ModelerApiPermissions::getPermissionKey('edit', $owner->getPluginId(), $defaultModeler->getPluginId()))) {
++        if ($this->getModelerApiService()->getRouteByName($name) && $this->getCurrentUser()->hasPermission(ModelerApiPermissions::getPermissionKey('edit', $owner->getPluginId(), $defaultModeler->getPluginId()))) {
+           $operations['edit_with_modeler'] = [
+             'title' => t('Edit with modeler'),
+             'url' => Url::fromRoute($name, [$type => $entity->id()]),
+@@ -123,14 +167,14 @@ class EntityHooks {
+       }
+       else {
+         foreach ($modelers as $id => $modeler) {
+-          if ($modelerId !== $id && $modeler->isEditable() && $this->currentUser->hasPermission(ModelerApiPermissions::getPermissionKey('edit', $owner->getPluginId(), $id))) {
++          if ($modelerId !== $id && $modeler->isEditable() && $this->getCurrentUser()->hasPermission(ModelerApiPermissions::getPermissionKey('edit', $owner->getPluginId(), $id))) {
+             $operations['open_with_' . $id] = [
+               'title' => t('Edit with :label', [':label' => $modeler->label()]),
+               'url' => Url::fromRoute('entity.' . $type . '.edit_with.' . $id, [$type => $entity->id()]),
+               'weight' => 40,
+             ];
+           }
+-          if ($id !== 'fallback' && $modelerId !== $id && $this->currentUser->hasPermission(ModelerApiPermissions::getPermissionKey('view', $owner->getPluginId(), $id))) {
++          if ($id !== 'fallback' && $modelerId !== $id && $this->getCurrentUser()->hasPermission(ModelerApiPermissions::getPermissionKey('view', $owner->getPluginId(), $id))) {
+             $operations['view_with_' . $id] = [
+               'title' => t('View with :label', [':label' => $modeler->label()]),
+               'url' => Url::fromRoute('entity.' . $type . '.view_with.' . $id, [$type => $entity->id()]),
+@@ -141,14 +185,14 @@ class EntityHooks {
+       }
+ 
+       $name = 'entity.' . $type . '.canonical';
+-      if ($this->modelerApiService->getRouteByName($name) && $this->currentUser->hasPermission(ModelerApiPermissions::getPermissionKey('view', $owner->getPluginId()))) {
++      if ($this->getModelerApiService()->getRouteByName($name) && $this->getCurrentUser()->hasPermission(ModelerApiPermissions::getPermissionKey('view', $owner->getPluginId()))) {
+         $operations['view'] = [
+           'title' => t('View'),
+           'url' => Url::fromRoute($name, [$type => $entity->id()]),
+           'weight' => 44,
+         ];
+       }
+-      if ($owner->supportsStatus() && $this->currentUser->hasPermission(ModelerApiPermissions::getPermissionKey('edit', $owner->getPluginId(), $modelerId))) {
++      if ($owner->supportsStatus() && $this->getCurrentUser()->hasPermission(ModelerApiPermissions::getPermissionKey('edit', $owner->getPluginId(), $modelerId))) {
+         if (!$entity->status()) {
+           $operations['enable'] = [
+             'title' => t('Enable'),
+@@ -165,7 +209,7 @@ class EntityHooks {
+         }
+       }
+       $name = 'entity.' . $type . '.clone';
+-      if ($this->modelerApiService->getRouteByName($name) && $this->currentUser->hasPermission(ModelerApiPermissions::getPermissionKey('edit', $owner->getPluginId(), $modelerId))) {
++      if ($this->getModelerApiService()->getRouteByName($name) && $this->getCurrentUser()->hasPermission(ModelerApiPermissions::getPermissionKey('edit', $owner->getPluginId(), $modelerId))) {
+         if ($owner->isEditable($entity)) {
+           $operations['clone'] = [
+             'title' => t('Clone'),
+@@ -176,7 +220,7 @@ class EntityHooks {
+       }
+       if ($owner->isExportable($entity)) {
+         $name = 'entity.' . $type . '.export';
+-        if ($this->modelerApiService->getRouteByName($name)) {
++        if ($this->getModelerApiService()->getRouteByName($name)) {
+           $operations['export'] = [
+             'title' => t('Export'),
+             'url' => Url::fromRoute($name, [$type => $entity->id()]),
+@@ -184,7 +228,7 @@ class EntityHooks {
+           ];
+         }
+         $name = 'entity.' . $type . '.export_recipe';
+-        if ($this->modelerApiService->getRouteByName($name)) {
++        if ($this->getModelerApiService()->getRouteByName($name)) {
+           $operations['export_recipe'] = [
+             'title' => t('Export as recipe'),
+             'url' => Url::fromRoute($name, [$type => $entity->id()]),
+@@ -206,7 +250,7 @@ class EntityHooks {
+    */
+   #[Hook('config_schema_info_alter')]
+   public function configSchemaInfoAlter(array &$definitions): void {
+-    foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
++    foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
+       $provider = $owner->configEntityProviderId();
+       $entityTypeId = $owner->configEntityTypeId();
+       $key = implode('.', [$provider, $entityTypeId, '*']);
+@@ -328,12 +372,23 @@ class EntityHooks {
+    */
+   #[Hook('system_info_alter')]
+   public function systemInfoAlter(array &$info, Extension $file, string $type): void {
++    // Skip during installation to prevent recursive router rebuild.
++    try {
++      if (!\Drupal::hasService('router.route_provider') || 
++          !\Drupal::hasService('current_user') ||
++          defined('MAINTENANCE_MODE')) {
++        return;
++      }
++    } catch (\Exception $e) {
++      return;
++    }
++    
+     if ($type === 'module') {
+-      foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
++      foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
+         $provider = $owner->getPluginDefinition()['provider'];
+         if (str_ends_with($file->getPathname(), '/' . $provider . '.info.yml')) {
+           $name = 'entity.' . $owner->configEntityTypeId() . '.collection';
+-          if ($route = $this->modelerApiService->getRouteByName($name)) {
++          if ($route = $this->getModelerApiService()->getRouteByName($name)) {
+             $info['configure'] = $name;
+           }
+         }
+@@ -351,13 +406,13 @@ class EntityHooks {
+     if ($is_syncing) {
+       return;
+     }
+-    foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
++    foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
+       $provider = $owner->getPluginDefinition()['provider'];
+       if (in_array($provider, $modules)) {
+-        $this->entityTypeManager->clearCachedDefinitions();
++        $this->getEntityTypeManager()->clearCachedDefinitions();
+         return;
+       }
+     }
+   }
+ 
+-}
++}
+\ No newline at end of file
