@@ -61,7 +61,9 @@
         "Issue #3352384: Add Exception for TypeError Argument must be String in Drupal Component Utility Html escape{}":
         "https://www.drupal.org/files/issues/2024-11-07/TypeError_htmlspecialchars_ArgumentNustBeTypeString_ArrayGiven-3352384-62.patch",
         "Issue #3415961: [drupalMedia] Using the Insert Media button causes the window to scroll to the bottom of the page":
-        "https://www.drupal.org/files/issues/2025-06-10/drupal-3415961-19.patch"
+        "https://www.drupal.org/files/issues/2025-06-10/drupal-3415961-19.patch",
+        "Issue #3543210: Quick Edit Save Via Contextual Links Redirects to 404 Page":
+        "https://www.drupal.org/files/issues/2025-08-26/drupal-core-3543210-7.patch"
       },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
@@ -116,14 +118,6 @@
         "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch",
         "Issue #3531672:  Drupal 10.5/11.2 compatability (tooltip broken, cannot edit embedded entities)":
         "https://www.drupal.org/files/issues/2025-06-30/entity_embed--2025-06-30--3531672--mr-62.patch"
-      },
-      "drupal/ckeditor_media_embed": {
-        "Issue #3444588: Switch from base_path to origin_url to fix issues when retrieving the path of the CKEditor plugins for use in a URL":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor_media_embed--2024-05-01--3444588--mr-15.patch"
-      },
-      "vardot/ckeditor_media_embed": {
-        "Issue #3444588: Switch from base_path to origin_url to fix issues when retrieving the path of the CKEditor plugins for use in a URL":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor_media_embed--2024-05-01--3444588--mr-15.patch"
       },
       "drupal/focal_point": {
         "Issue #2906631: After changing focal point, image doesn't change until you click preview":
@@ -232,6 +226,10 @@
       "drupal/dropzonejs": {
         "Issue #3542463: Fix TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in DropzoneJsUploadForm::validateUploadElement()":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dropzonejs--2025-08-21--3542463--mr-24.patch"
+      },
+      "drupal/trash": {
+        "Issue #3491947: Add support for taxonomy terms":
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/trash--2025-08-25--3491947--mr-71.patch"
       }
     }
   }
