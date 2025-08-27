@@ -61,7 +61,9 @@
         "Issue #3352384: Add Exception for TypeError Argument must be String in Drupal Component Utility Html escape{}":
         "https://www.drupal.org/files/issues/2024-11-07/TypeError_htmlspecialchars_ArgumentNustBeTypeString_ArrayGiven-3352384-62.patch",
         "Issue #3415961: [drupalMedia] Using the Insert Media button causes the window to scroll to the bottom of the page":
-        "https://www.drupal.org/files/issues/2025-06-10/drupal-3415961-19.patch"
+        "https://www.drupal.org/files/issues/2025-06-10/drupal-3415961-19.patch",
+        "Issue #3543210: Quick Edit Save Via Contextual Links Redirects to 404 Page":
+        "https://www.drupal.org/files/issues/2025-08-26/drupal-core-3543210-7.patch"
       },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
