@@ -1,23 +1,19 @@
 diff --git a/modeler_api.services.yml b/modeler_api.services.yml
-index 91387f1..d300e6e 100644
+index 91387f1..f65b4bb 100644
 --- a/modeler_api.services.yml
 +++ b/modeler_api.services.yml
-@@ -1,5 +1,4 @@
- services:
--
-   modeler_api.service:
-     class: Drupal\modeler_api\Api
-     arguments:
-@@ -9,7 +8,7 @@ services:
+@@ -9,8 +9,8 @@ services:
        - '@config.storage.export'
        - '@file_system'
        - '@entity_type.manager'
 -      - '@router.route_provider'
+-      - '@plugin.manager.menu.link'
 +      - '@?router.route_provider'
-       - '@plugin.manager.menu.link'
++      - '@?plugin.manager.menu.link'
  
    logger.channel.modeler_api:
-@@ -51,9 +50,11 @@ services:
+     parent: logger.channel_base
+@@ -51,9 +51,11 @@ services:
    Drupal\modeler_api\Plugin\ModelOwnerPluginManager: '@plugin.manager.modeler_api.model_owner'
    Drupal\modeler_api\Plugin\ModelerPluginManager: '@plugin.manager.modeler_api.modeler'
  
@@ -31,18 +27,20 @@ index 91387f1..d300e6e 100644
 +    # NO arguments - use lazy loading instead to break circular dependency
 +    arguments: []
 diff --git a/src/Api.php b/src/Api.php
-index ff88abc..6ff9d20 100644
+index ff88abc..31b5bd5 100644
 --- a/src/Api.php
 +++ b/src/Api.php
-@@ -78,7 +78,7 @@ class Api {
+@@ -78,8 +78,8 @@ class Api {
      protected ManagedStorage $configStorage,
      protected FileSystemInterface $fileSystem,
      protected EntityTypeManagerInterface $entityTypeManager,
 -    protected RouteProviderInterface $routeProvider,
+-    protected MenuLinkManagerInterface $menuLinkManager,
 +    protected ?RouteProviderInterface $routeProvider,
-     protected MenuLinkManagerInterface $menuLinkManager,
++    protected ?MenuLinkManagerInterface $menuLinkManager,
    ) {}
  
+   /**
 @@ -537,12 +537,21 @@ class Api {
     *   The route, if it exists, NULL otherwise.
     */
@@ -51,7 +49,7 @@ index ff88abc..6ff9d20 100644
 +    if (!$this->routeProvider || defined('MAINTENANCE_MODE')) {
 +      return NULL;
 +    }
-+    
++
      try {
        return $this->routeProvider->getRouteByName($name);
      }
@@ -65,8 +63,36 @@ index ff88abc..6ff9d20 100644
      return NULL;
    }
  
+@@ -556,14 +565,19 @@ class Api {
+    *   The menu name of the parent path, if we can find it, FALSE otherwise.
+    */
+   public function getParentMenuName(string $path): ?string {
+-    $parts = explode('/', trim($path, '/'));
+-    array_pop($parts);
+-    $path = implode('/', $parts);
+-    $url = Url::fromUri('internal:/' . $path);
+-    $links = $this->menuLinkManager->loadLinksByRoute($url->getRouteName(), $url->getRouteParameters());
+-    if (!empty($links)) {
+-      $menuLink = reset($links);
+-      return $menuLink->getPluginId();
++    try {
++      $parts = explode('/', trim($path, '/'));
++      array_pop($parts);
++      $path = implode('/', $parts);
++      $url = Url::fromUri('internal:/' . $path);
++      $links = $this->menuLinkManager->loadLinksByRoute($url->getRouteName(), $url->getRouteParameters());
++      if (!empty($links)) {
++        $menuLink = reset($links);
++        return $menuLink->getPluginId();
++      }
++    } catch (\Exception $e) {
++      // Skip any exceptions during installation/bootstrap
++      return NULL;
+     }
+     return NULL;
+   }
 diff --git a/src/Hook/EntityHooks.php b/src/Hook/EntityHooks.php
-index d4291cf..9b00bd8 100644
+index d4291cf..55cbf67 100644
 --- a/src/Hook/EntityHooks.php
 +++ b/src/Hook/EntityHooks.php
 @@ -23,26 +23,70 @@ use Drupal\modeler_api\Plugin\ModelOwnerPluginManager;
@@ -122,14 +148,7 @@ index d4291cf..9b00bd8 100644
 +
 +  /**
 +   * Get the model owner plugin manager lazily.
-    */
--  public function __construct(
--    protected Api $modelerApiService,
--    protected ModelerPluginManager $modelerManager,
--    protected ModelOwnerPluginManager $modelOwnerPluginManager,
--    protected AccountInterface $currentUser,
--    protected EntityTypeManagerInterface $entityTypeManager,
--  ) {}
++   */
 +  protected function getModelOwnerPluginManager(): ModelOwnerPluginManager {
 +    if ($this->modelOwnerPluginManager === NULL) {
 +      $this->modelOwnerPluginManager = \Drupal::service('plugin.manager.modeler_api.model_owner');
@@ -139,7 +158,14 @@ index d4291cf..9b00bd8 100644
 +
 +  /**
 +   * Get the current user lazily.
-+   */
+    */
+-  public function __construct(
+-    protected Api $modelerApiService,
+-    protected ModelerPluginManager $modelerManager,
+-    protected ModelOwnerPluginManager $modelOwnerPluginManager,
+-    protected AccountInterface $currentUser,
+-    protected EntityTypeManagerInterface $entityTypeManager,
+-  ) {}
 +  protected function getCurrentUser(): AccountInterface {
 +    if ($this->currentUser === NULL) {
 +      $this->currentUser = \Drupal::currentUser();
@@ -268,21 +294,9 @@ index d4291cf..9b00bd8 100644
        $provider = $owner->configEntityProviderId();
        $entityTypeId = $owner->configEntityTypeId();
        $key = implode('.', [$provider, $entityTypeId, '*']);
-@@ -328,12 +372,23 @@ class EntityHooks {
-    */
+@@ -329,11 +373,11 @@ class EntityHooks {
    #[Hook('system_info_alter')]
    public function systemInfoAlter(array &$info, Extension $file, string $type): void {
-+    // Skip during installation to prevent recursive router rebuild.
-+    try {
-+      if (!\Drupal::hasService('router.route_provider') || 
-+          !\Drupal::hasService('current_user') ||
-+          defined('MAINTENANCE_MODE')) {
-+        return;
-+      }
-+    } catch (\Exception $e) {
-+      return;
-+    }
-+    
      if ($type === 'module') {
 -      foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
 +      foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
@@ -294,7 +308,7 @@ index d4291cf..9b00bd8 100644
              $info['configure'] = $name;
            }
          }
-@@ -351,13 +406,13 @@ class EntityHooks {
+@@ -351,10 +395,10 @@ class EntityHooks {
      if ($is_syncing) {
        return;
      }
@@ -307,8 +321,3 @@ index d4291cf..9b00bd8 100644
          return;
        }
      }
-   }
- 
--}
-+}
-\ No newline at end of file
