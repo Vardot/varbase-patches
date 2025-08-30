@@ -110,10 +110,6 @@
         "Issue #2679875: Inline Entity Form integration":
         "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
       },
-      "drupal/ckeditor_media_embed": {
-        "Issue #3444588: Switch from base_path to origin_url to fix issues when retrieving the path of the CKEditor plugins for use in a URL":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor_media_embed--2024-05-01--3444588--mr-15.patch"
-      },
       "drupal/linkit": {
         "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
         "https://www.drupal.org/files/issues/2023-04-25/3158783-24.patch",
