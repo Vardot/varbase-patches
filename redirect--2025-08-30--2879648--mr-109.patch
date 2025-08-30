@@ -151,7 +151,7 @@ index 81c7c7a5a9c674d77a067ba14d28cd0860c06462..e1eadc49cfc95d1f0a7ce78d9ef23252
        '#title' => $this->t('Retain query string through redirect.'),
 diff --git a/src/PathProcessor/RedirectPathProcessorManager.php b/src/PathProcessor/RedirectPathProcessorManager.php
 new file mode 100644
-index 0000000000000000000000000000000000000000..b8ee211327347b294777bf02dfe6fd94dd558a6c
+index 0000000000000000000000000000000000000000..399366015acbfdabc07bb9bf28c41f9269fcb761
 --- /dev/null
 +++ b/src/PathProcessor/RedirectPathProcessorManager.php
 @@ -0,0 +1,94 @@
@@ -189,7 +189,7 @@ index 0000000000000000000000000000000000000000..b8ee211327347b294777bf02dfe6fd94
 +
 +    // Do the inbound processing to get the source path.
 +    $path = $request->getPathInfo();
-+    $allow_alias = $this->config->get('allow_from_alias') ?? 0;
++    $allow_alias = isset($this->config) ? $this->config->get('allow_from_alias') ?? 0 : 0;
 +    $skip_alias = !$allow_alias;
 +    $source_path = $this->processRedirectInbound($path, $request, $skip_alias);
 +    $paths[] = trim($source_path, '/');
@@ -280,7 +280,7 @@ index 0000000000000000000000000000000000000000..4da387767c56526aac5d5fbcf0efb0ce
 +}
 \ No newline at end of file
 diff --git a/src/RedirectRepository.php b/src/RedirectRepository.php
-index 3c5ba7a55262b144b591c776475ebbb72876b45e..f93fdd6a21813ac084db7978a93ce3967b9eec41 100644
+index 3c5ba7a55262b144b591c776475ebbb72876b45e..9938e7fe063abb498bff7f9b0c14045e126a4272 100644
 --- a/src/RedirectRepository.php
 +++ b/src/RedirectRepository.php
 @@ -68,7 +68,31 @@ class RedirectRepository {
@@ -316,7 +316,7 @@ index 3c5ba7a55262b144b591c776475ebbb72876b45e..f93fdd6a21813ac084db7978a93ce396
     *
     * @param string $source_path
     *   The redirect source path.
-@@ -86,6 +110,19 @@ class RedirectRepository {
+@@ -86,6 +110,51 @@ class RedirectRepository {
     */
    public function findMatchingRedirect($source_path, array $query = [], $language = Language::LANGCODE_NOT_SPECIFIED, ?CacheableMetadata $cacheable_metadata = NULL) {
      $source_path = ltrim($source_path, '/');
@@ -333,10 +333,42 @@ index 3c5ba7a55262b144b591c776475ebbb72876b45e..f93fdd6a21813ac084db7978a93ce396
 +      }
 +    }
 +
++    $hashes = [Redirect::generateHash($source_path, $query, $language)];
++    if ($language != Language::LANGCODE_NOT_SPECIFIED) {
++      $hashes[] = Redirect::generateHash($source_path, $query, Language::LANGCODE_NOT_SPECIFIED);
++    }
++
++    // Add a hash without the query string if using passthrough_querystring.
++    if (!empty($query) && $this->config->get('passthrough_querystring')) {
++      $hashes[] = Redirect::generateHash($source_path, [], $language);
++      if ($language != Language::LANGCODE_NOT_SPECIFIED) {
++        $hashes[] = Redirect::generateHash($source_path, [], Language::LANGCODE_NOT_SPECIFIED);
++      }
++    }
++
++    return $hashes;
++  }
++
++   /**
++   * Gets hashes for a given path, query and language.
++   *
++   * @param string $source_path
++   *   The redirect source path.
++   * @param array $query
++   *   The redirect source path query.
++   * @param string $language
++   *   The language for which is the redirect.
++   *
++   * @return array
++   *   Array of redirect hashes.
++   */
++  protected function getHashesByPath($source_path, array $query = [], $language = Language::LANGCODE_NOT_SPECIFIED) {
++    $source_path = ltrim($source_path, '/');
++
      $hashes = [Redirect::generateHash($source_path, $query, $language)];
      if ($language != Language::LANGCODE_NOT_SPECIFIED) {
        $hashes[] = Redirect::generateHash($source_path, $query, Language::LANGCODE_NOT_SPECIFIED);
-@@ -99,6 +136,26 @@ class RedirectRepository {
+@@ -99,6 +168,26 @@ class RedirectRepository {
        }
      }
  
@@ -363,7 +395,7 @@ index 3c5ba7a55262b144b591c776475ebbb72876b45e..f93fdd6a21813ac084db7978a93ce396
      // Load redirects by hash. A direct query is used to improve performance.
      try {
        $rid = $this->connection->query('SELECT rid FROM {redirect} WHERE hash IN (:hashes[]) AND enabled = 1 ORDER BY LENGTH(redirect_source__query) DESC', [':hashes[]' => $hashes])->fetchField();
-@@ -162,8 +219,8 @@ class RedirectRepository {
+@@ -162,8 +251,8 @@ class RedirectRepository {
     * @param string $source_path
     *   The redirect source path (without the query).
     *
