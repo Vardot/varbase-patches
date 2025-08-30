@@ -1,0 +1,17 @@
+diff --git a/core/lib/Drupal/Core/Block/BlockManager.php b/core/lib/Drupal/Core/Block/BlockManager.php
+index a80a3110738..93082afb9e8 100644
+--- a/core/lib/Drupal/Core/Block/BlockManager.php
++++ b/core/lib/Drupal/Core/Block/BlockManager.php
+@@ -90,7 +90,11 @@ public function getFallbackPluginId($plugin_id, array $configuration = []) {
+    * {@inheritdoc}
+    */
+   protected function handlePluginNotFound($plugin_id, array $configuration) {
+-    $this->logger->warning('The "%plugin_id" block plugin was not found', ['%plugin_id' => $plugin_id]);
++    // Only log warning if not installing or not a Layout Builder dynamic plugin.
++    if (!(defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'install')
++      || !(preg_match('/^(field_block|extra_field_block|block_content|views_block):/', $plugin_id))) {
++      $this->logger->warning('The "%plugin_id" block plugin was not found', ['%plugin_id' => $plugin_id]);
++    }
+     return parent::handlePluginNotFound($plugin_id, $configuration);
+   }
+ 
