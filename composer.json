@@ -230,6 +230,10 @@
       "drupal/trash": {
         "Issue #3491947: Add support for taxonomy terms":
         "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/trash--2025-08-25--3491947--mr-71.patch"
+      },
+      "drupal/scheduler_content_moderation_integration": {
+        "Issue #3543642: Fix duplicates bundles for cleaner output":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/scheduler_content_moderation_integration--2025-08-30--3543642--mr-86.patch"
       }
     }
   }
