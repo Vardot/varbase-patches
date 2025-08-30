@@ -1,0 +1,579 @@
+diff --git a/config/install/redirect.settings.yml b/config/install/redirect.settings.yml
+index 70a96888dce3ced6bfe581ac1fc5a8e3d264f05e..9fbbde06ccfefa84d164fcd1895cf5d1d1ee5da8 100644
+--- a/config/install/redirect.settings.yml
++++ b/config/install/redirect.settings.yml
+@@ -1,4 +1,5 @@
+ auto_redirect: true
++allow_from_alias: false
+ default_status_code: 301
+ passthrough_querystring: true
+ warning: false
+diff --git a/config/schema/redirect.schema.yml b/config/schema/redirect.schema.yml
+index bd9ccd5d6e5fa4c6c7888a9980c47064ad51d896..050dc6ed4dbed47aee81e1cd99e04e9236cbe753 100644
+--- a/config/schema/redirect.schema.yml
++++ b/config/schema/redirect.schema.yml
+@@ -7,6 +7,9 @@ redirect.settings:
+     auto_redirect:
+       type: boolean
+       label: 'Automatically create redirects when URL aliases are changed.'
++    allow_from_alias:
++      type: boolean
++      label: 'Allow redirects from aliases.'
+     default_status_code:
+       type: integer
+       label: 'Default redirect status'
+diff --git a/redirect.services.yml b/redirect.services.yml
+index 0f8518a873592c3fc384be83d87c17e1400e41bb..edf3d4eed8532b370b1f66b0ec6c78ebc1fed6b1 100644
+--- a/redirect.services.yml
++++ b/redirect.services.yml
+@@ -13,7 +13,7 @@ services:
+   Drupal\redirect\RedirectChecker: '@redirect.checker'
+   redirect.request_subscriber:
+     class: Drupal\redirect\EventSubscriber\RedirectRequestSubscriber
+-    arguments: ['@redirect.repository', '@language_manager', '@config.factory', '@path_alias.manager', '@module_handler', '@entity_type.manager', '@redirect.checker', '@router.request_context', '@path_processor_manager']
++    arguments: ['@redirect.repository', '@language_manager', '@config.factory', '@path_alias.manager', '@module_handler', '@entity_type.manager', '@redirect.checker', '@router.request_context', '@redirect.path_processor_manager']
+     tags:
+       - { name: event_subscriber }
+   redirect.settings_cache_tag:
+@@ -30,3 +30,7 @@ services:
+     class: Drupal\redirect\Routing\RouteSubscriber
+     tags:
+       - { name: event_subscriber }
++  redirect.path_processor_manager:
++    class: Drupal\redirect\PathProcessor\RedirectPathProcessorManager
++    tags:
++      - { name: service_collector, tag: path_processor_inbound, call: addInbound }
+diff --git a/src/EventSubscriber/RedirectRequestSubscriber.php b/src/EventSubscriber/RedirectRequestSubscriber.php
+index 44479539c1acb54c449e5d7b7dc165cb608e9a13..536fb1ddfc75cc4ebe5a7f31612a1e5a0000ca82 100644
+--- a/src/EventSubscriber/RedirectRequestSubscriber.php
++++ b/src/EventSubscriber/RedirectRequestSubscriber.php
+@@ -7,11 +7,11 @@ use Drupal\Core\Config\ConfigFactoryInterface;
+ use Drupal\Core\Entity\EntityTypeManagerInterface;
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Language\LanguageManagerInterface;
+-use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
+ use Drupal\Core\Routing\TrustedRedirectResponse;
+ use Drupal\Core\Url;
+ use Drupal\path_alias\AliasManagerInterface;
+ use Drupal\redirect\Exception\RedirectLoopException;
++use Drupal\redirect\PathProcessor\RedirectPathProcessorManagerInterface;
+ use Drupal\redirect\RedirectChecker;
+ use Drupal\redirect\RedirectRepository;
+ use Symfony\Component\HttpFoundation\Response;
+@@ -66,11 +66,11 @@ class RedirectRequestSubscriber implements EventSubscriberInterface {
+   protected $context;
+ 
+   /**
+-   * A path processor manager for resolving the system path.
++   * The redirect path processor manager.
+    *
+-   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface
++   * @var \Drupal\redirect\PathProcessor\RedirectPathProcessorManagerInterface
+    */
+-  protected $pathProcessor;
++  protected $redirectPathProcessor;
+ 
+   /**
+    * Constructs a \Drupal\redirect\EventSubscriber\RedirectRequestSubscriber object.
+@@ -91,10 +91,10 @@ class RedirectRequestSubscriber implements EventSubscriberInterface {
+    *   The redirect checker service.
+    * @param \Symfony\Component\Routing\RequestContext $context
+    *   Request context.
+-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
+-   *   The path processor.
++   * @param \Drupal\redirect\PathProcessor\RedirectPathProcessorManagerInterface $redirect_path_processor
++   *   The redirect path processor.
+    */
+-  public function __construct(RedirectRepository $redirect_repository, LanguageManagerInterface $language_manager, ConfigFactoryInterface $config, AliasManagerInterface $alias_manager, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, RedirectChecker $checker, RequestContext $context, InboundPathProcessorInterface $path_processor) {
++  public function __construct(RedirectRepository $redirect_repository, LanguageManagerInterface $language_manager, ConfigFactoryInterface $config, AliasManagerInterface $alias_manager, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, RedirectChecker $checker, RequestContext $context, RedirectPathProcessorManagerInterface $redirect_path_processor) {
+     $this->redirectRepository = $redirect_repository;
+     $this->languageManager = $language_manager;
+     $this->config = $config->get('redirect.settings');
+@@ -103,7 +103,7 @@ class RedirectRequestSubscriber implements EventSubscriberInterface {
+     $this->entityTypeManager = $entity_type_manager;
+     $this->checker = $checker;
+     $this->context = $context;
+-    $this->pathProcessor = $path_processor;
++    $this->redirectPathProcessor = $redirect_path_processor;
+   }
+ 
+   /**
+@@ -128,27 +128,16 @@ class RedirectRequestSubscriber implements EventSubscriberInterface {
+     // Get URL info and process it to be used for hash generation.
+     $request_query = $request->query->all();
+ 
+-    if (str_starts_with($request->getPathInfo(), '/system/files/') && !$request->query->has('file')) {
+-      // Private files paths are split by the inbound path processor and the
+-      // relative file path is moved to the 'file' query string parameter. This
+-      // is because the route system does not allow an arbitrary amount of
+-      // parameters. We preserve the path as is returned by the request object.
+-      // @see \Drupal\system\PathProcessor\PathProcessorFiles::processInbound()
+-      $path = $request->getPathInfo();
+-    }
+-    else {
+-      // Do the inbound processing so that for example language prefixes are
+-      // removed.
+-      $path = $this->pathProcessor->processInbound($request->getPathInfo(), $request);
+-    }
+-    $path = trim($path, '/');
++    // Get the possible paths for the current request.
++    $paths = $this->redirectPathProcessor->getRedirectRequestPaths($request);
+ 
++    // Store current request context.
+     $this->context->fromRequest($request);
+ 
+     $cacheable_metadata = new CacheableMetadata();
+ 
+     try {
+-      $redirect = $this->redirectRepository->findMatchingRedirect($path, $request_query, $this->languageManager->getCurrentLanguage()->getId(), $cacheable_metadata);
++      $redirect = $this->redirectRepository->findMatchingRedirectMultiple($paths, $request_query, $this->languageManager->getCurrentLanguage()->getId());
+     }
+     catch (RedirectLoopException $e) {
+       \Drupal::logger('redirect')->warning('Redirect loop identified at %path for redirect %rid', ['%path' => $e->getPath(), '%rid' => $e->getRedirectId()]);
+diff --git a/src/Form/RedirectSettingsForm.php b/src/Form/RedirectSettingsForm.php
+index 81c7c7a5a9c674d77a067ba14d28cd0860c06462..e1eadc49cfc95d1f0a7ce78d9ef23252a57c8541 100644
+--- a/src/Form/RedirectSettingsForm.php
++++ b/src/Form/RedirectSettingsForm.php
+@@ -51,6 +51,14 @@ class RedirectSettingsForm extends ConfigFormBase {
+       '#default_value' => $config->get('auto_redirect'),
+       '#disabled' => $this->moduleHandler->moduleExists('path'),
+     ];
++    $form['redirect_allow_from_alias'] = [
++      '#type' => 'checkbox',
++      '#title' => $this->t('Allow redirects from aliases.'),
++      '#description' => $this->t(
++        'Enable this option to allow redirects from Drupal URL aliases that are associated with existing internal paths, for example, a published node with a URL alias. This is disabled by default to prevent unintended redirects, for example, redirecting an existing node, thus preventing content editors from viewing/editing the node.'),
++      '#default_value' => $config->get('allow_from_alias'),
++      '#disabled' => !\Drupal::moduleHandler()->moduleExists('path'),
++    ];
+     $form['redirect_passthrough_querystring'] = [
+       '#type' => 'checkbox',
+       '#title' => $this->t('Retain query string through redirect.'),
+diff --git a/src/PathProcessor/RedirectPathProcessorManager.php b/src/PathProcessor/RedirectPathProcessorManager.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..b8ee211327347b294777bf02dfe6fd94dd558a6c
+--- /dev/null
++++ b/src/PathProcessor/RedirectPathProcessorManager.php
+@@ -0,0 +1,94 @@
++<?php
++
++namespace Drupal\redirect\PathProcessor;
++
++use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
++use Drupal\Core\PathProcessor\PathProcessorManager;
++use Drupal\path_alias\PathProcessor\AliasPathProcessor;
++use Drupal\system\PathProcessor\PathProcessorFiles;
++use Symfony\Component\HttpFoundation\Request;
++
++/**
++ * Redirect path processor manager.
++ *
++ * Extends PathProcessorManager to customize the processInbound logic.
++ */
++class RedirectPathProcessorManager extends PathProcessorManager implements RedirectPathProcessorManagerInterface {
++
++  /**
++   * {@inheritdoc}
++   */
++  public function addInbound(InboundPathProcessorInterface $processor, $priority = 0) {
++    if ($this->applies($processor)) {
++      parent::addInbound($processor, $priority);
++    }
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function getRedirectRequestPaths(Request $request) {
++    $paths = [];
++
++    // Do the inbound processing to get the source path.
++    $path = $request->getPathInfo();
++    $allow_alias = $this->config->get('allow_from_alias') ?? 0;
++    $skip_alias = !$allow_alias;
++    $source_path = $this->processRedirectInbound($path, $request, $skip_alias);
++    $paths[] = trim($source_path, '/');
++
++    // Add the aliased path.
++    $alias_path = $this->processRedirectInbound($path, $request, TRUE);
++    $paths[] = trim($alias_path, '/');
++
++    return array_filter(array_unique($paths));
++  }
++
++  /**
++   * Processes the inbound path.
++   *
++   * @param string $path
++   *   The path to process, with a leading slash.
++   * @param \Symfony\Component\HttpFoundation\Request $request
++   *   The request object.
++   * @param bool $skip_alias
++   *   Whether to skip AliasPathProcessor::processInbound.
++   *
++   * @return string
++   *   The processed path.
++   */
++  protected function processRedirectInbound($path, Request $request, $skip_alias = FALSE) {
++    $processors = $this->getInbound();
++    foreach ($processors as $processor) {
++      // Skip AliasPathProcessor::processInbound if specified.
++      if ($skip_alias === TRUE && $processor instanceof AliasPathProcessor) {
++        continue;
++      }
++
++      $path = $processor->processInbound($path, $request);
++    }
++    return $path;
++  }
++
++  /**
++   * Returns whether this processor should be added or not.
++   *
++   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $processor
++   *   The processor object to add.
++   *
++   * @return bool
++   *   True if the processor should be added, false otherwise.
++   */
++  protected function applies(InboundPathProcessorInterface $processor) {
++    // Skip PathProcessorFiles::processInbound().
++    // Private files paths are split by the inbound path processor and the
++    // relative file path is moved to the 'file' query string parameter. This
++    // is because the route system does not allow an arbitrary amount of
++    // parameters.
++    if ($processor instanceof PathProcessorFiles) {
++      return FALSE;
++    }
++    return TRUE;
++  }
++
++}
+diff --git a/src/PathProcessor/RedirectPathProcessorManagerInterface.php b/src/PathProcessor/RedirectPathProcessorManagerInterface.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..4da387767c56526aac5d5fbcf0efb0ce765715f6
+--- /dev/null
++++ b/src/PathProcessor/RedirectPathProcessorManagerInterface.php
+@@ -0,0 +1,23 @@
++<?php
++
++namespace Drupal\redirect\PathProcessor;
++
++use Symfony\Component\HttpFoundation\Request;
++
++/**
++ * Defines an interface for redirect path processor manager classes.
++ */
++interface RedirectPathProcessorManagerInterface {
++
++  /**
++   * Get the paths that will be used to find matching redirects.
++   *
++   * @param \Symfony\Component\HttpFoundation\Request $request
++   *   The request object.
++   *
++   * @return array
++   *   An array of paths.
++   */
++  public function getRedirectRequestPaths(Request $request);
++
++}
+\ No newline at end of file
+diff --git a/src/RedirectRepository.php b/src/RedirectRepository.php
+index 3c5ba7a55262b144b591c776475ebbb72876b45e..f93fdd6a21813ac084db7978a93ce3967b9eec41 100644
+--- a/src/RedirectRepository.php
++++ b/src/RedirectRepository.php
+@@ -68,7 +68,31 @@ class RedirectRepository {
+   }
+ 
+   /**
+-   * Gets a redirect for given path, query and language.
++   * Finds a redirect from the given paths, query and language.
++   *
++   * @param array $source_paths
++   *   An array of redirect source paths.
++   * @param array $query
++   *   The redirect source path query.
++   * @param $language
++   *   The language for which is the redirect.
++   *
++   * @return \Drupal\redirect\Entity\Redirect|null
++   *   The matched redirect entity or null if not found.
++   *
++   * @throws \Drupal\redirect\Exception\RedirectLoopException
++   */
++  public function findMatchingRedirectMultiple(array $source_paths, array $query = [], $language = Language::LANGCODE_NOT_SPECIFIED) {
++    $hashes = [];
++    foreach ($source_paths as $source_path) {
++      $hashes = array_merge($hashes, $this->getHashesByPath($source_path, $query, $language));
++    }
++
++    return $this->findRedirectByHashes($hashes, reset($source_paths), $language);
++  }
++
++  /**
++   * Finds a redirect from the given path, query and language.
+    *
+    * @param string $source_path
+    *   The redirect source path.
+@@ -86,6 +110,19 @@ class RedirectRepository {
+    */
+   public function findMatchingRedirect($source_path, array $query = [], $language = Language::LANGCODE_NOT_SPECIFIED, ?CacheableMetadata $cacheable_metadata = NULL) {
+     $source_path = ltrim($source_path, '/');
++
++    if (\Drupal::moduleHandler()->moduleExists('path')) {
++      $route = \Drupal::service('path.validator')->getUrlIfValid($source_path);
++      $allow_alias = $this->config->get('allow_from_alias') ?? 0;
++      $skip_alias = !$allow_alias;
++      if ($route && $skip_alias) {
++        // This URL path has a valid internal route and the Redirect settings
++        // are not configured to allow redirects from aliases. Do not redirect.
++        // See https://www.drupal.org/project/redirect/issues/2879648
++        return [];
++      }
++    }
++
+     $hashes = [Redirect::generateHash($source_path, $query, $language)];
+     if ($language != Language::LANGCODE_NOT_SPECIFIED) {
+       $hashes[] = Redirect::generateHash($source_path, $query, Language::LANGCODE_NOT_SPECIFIED);
+@@ -99,6 +136,26 @@ class RedirectRepository {
+       }
+     }
+ 
++    return $hashes;
++  }
++
++  /**
++   * Finds a redirect from the given hashes.
++   *
++   * @param array $hashes
++   *   An array of redirect hashes.
++   * @param string $source_path
++   *   The redirect source path.
++   * @param string $language
++   *   The language for which is the redirect.
++   *
++   * @return \Drupal\redirect\Entity\Redirect|null
++   *   The matched redirect entity or null if not found.
++   */
++  protected function findRedirectByHashes(array $hashes, $source_path, $language) {
++    if (empty($hashes)) {
++      return NULL;
++    }
+     // Load redirects by hash. A direct query is used to improve performance.
+     try {
+       $rid = $this->connection->query('SELECT rid FROM {redirect} WHERE hash IN (:hashes[]) AND enabled = 1 ORDER BY LENGTH(redirect_source__query) DESC', [':hashes[]' => $hashes])->fetchField();
+@@ -162,8 +219,8 @@ class RedirectRepository {
+    * @param string $source_path
+    *   The redirect source path (without the query).
+    *
+-   * @return \Drupal\redirect\Entity\Redirect[]
+-   *   Array of redirect entities.
++   * @return \Drupal\redirect\Entity\Redirect|null
++   *   The matched redirect entity or null if not found.
+    */
+   public function findBySourcePath($source_path) {
+     $ids = $this->manager->getStorage('redirect')->getQuery()
+diff --git a/tests/src/Functional/RedirectUILanguageTest.php b/tests/src/Functional/RedirectUILanguageTest.php
+index 849346264b1ff5412b0683030087ebf8bafb66c8..686c1d43b5f374800ec2f67ad58f0d2cf50bb495 100644
+--- a/tests/src/Functional/RedirectUILanguageTest.php
++++ b/tests/src/Functional/RedirectUILanguageTest.php
+@@ -16,6 +16,11 @@ use Drupal\language\Entity\ConfigurableLanguage;
+  */
+ class RedirectUILanguageTest extends RedirectUITest {
+ 
++  /**
++   * @var \Drupal\Core\Config\Config
++   */
++  protected $config;
++
+   /**
+    * {@inheritdoc}
+    */
+@@ -31,6 +36,8 @@ class RedirectUILanguageTest extends RedirectUITest {
+     $language->save();
+     $language = ConfigurableLanguage::createFromLangcode('es');
+     $language->save();
++
++    $this->config = $this->config('redirect.settings');
+   }
+ 
+   /**
+@@ -129,4 +136,40 @@ class RedirectUILanguageTest extends RedirectUITest {
+     $this->assertRedirect('de/lang-path', '/de/user', 301);
+   }
+ 
++  /**
++   * Test language specific redirects with node aliases.
++   */
++  public function testLanguageSpecificNodeAliasRedirects(): void {
++    // Opt into allowing redirects from aliases.
++    $this->config->set('allow_from_alias', TRUE)->save();
++    $this->drupalLogin($this->adminUser);
++
++    // Create a node with alias "test-alias".
++    $this->drupalCreateNode([
++      'type' => 'article',
++      'title' => 'Test english node',
++      'path' => ['alias' => '/test-alias'],
++    ]);
++
++    // Create a redirect with en language.
++    $this->drupalGet('admin/config/search/redirect/add');
++    $this->submitForm([
++      'redirect_source[0][path]' => 'test-alias',
++      'redirect_redirect[0][uri]' => '/node',
++      'language[0][value]' => 'en',
++    ], 'Save');
++    $this->assertRedirect('test-alias', '/node', 301);
++    $this->assertRedirect('de/test-alias', NULL, 404);
++
++    // Create a redirect with de language.
++    $this->drupalGet('admin/config/search/redirect/add');
++    $this->submitForm([
++      'redirect_source[0][path]' => 'test-alias',
++      'redirect_redirect[0][uri]' => '/node/add',
++      'language[0][value]' => 'de',
++    ], 'Save');
++    $this->assertRedirect('test-alias', '/node', 301);
++    $this->assertRedirect('de/test-alias', 'de/node/add', 301);
++  }
++
+ }
+diff --git a/tests/src/Functional/RedirectUITest.php b/tests/src/Functional/RedirectUITest.php
+index 08f80c780bdaa00847ca0da2b1aeaed314af670c..fca14d785b50570bf9c5b09a6ecb0d32227c48a4 100644
+--- a/tests/src/Functional/RedirectUITest.php
++++ b/tests/src/Functional/RedirectUITest.php
+@@ -27,6 +27,11 @@ class RedirectUITest extends BrowserTestBase {
+    */
+   protected $adminUser;
+ 
++  /**
++   * @var \Drupal\Core\Config\Config
++   */
++  protected $config;
++
+   /**
+    * The redirect repository.
+    *
+@@ -85,6 +90,8 @@ class RedirectUITest extends BrowserTestBase {
+     $this->repository = \Drupal::service('redirect.repository');
+ 
+     $this->storage = \Drupal::entityTypeManager()->getStorage('redirect');
++
++    $this->config = $this->config('redirect.settings');
+   }
+ 
+   /**
+@@ -207,6 +214,8 @@ class RedirectUITest extends BrowserTestBase {
+   public function testRedirectLoop() {
+     // Redirect loop redirection only works when page caching is disabled.
+     \Drupal::service('module_installer')->uninstall(['page_cache']);
++    // Opt into allowing redirects from aliases.
++    $this->config->set('allow_from_alias', TRUE)->save();
+ 
+     /** @var \Drupal\redirect\Entity\Redirect $redirect1 */
+     $redirect1 = $this->storage->create();
+@@ -291,4 +300,71 @@ class RedirectUITest extends BrowserTestBase {
+     $this->drupalLogin($this->adminUser);
+   }
+ 
++  /**
++   * Test redirects with node aliases.
++   */
++  public function testNodeAliasRedirects(): void {
++    $this->drupalLogin($this->adminUser);
++
++
++
++    // Create a node with alias "test-alias".
++    $node = $this->drupalCreateNode([
++      'type' => 'article',
++      'title' => 'Test node redirect',
++      'langcode' => Language::LANGCODE_NOT_SPECIFIED,
++      'path' => ['alias' => '/test-alias'],
++    ]);
++
++    // Create a redirect from "test-alias" to "/node" and assert redirect.
++    $this->drupalGet('admin/config/search/redirect/add');
++    $this->submitForm([
++      'redirect_source[0][path]' => 'test-alias',
++      'redirect_redirect[0][uri]' => '/node',
++    ], 'Save');
++    // By default, aliases associated with internal routes do NOT redirect.
++    $this->drupalGet('node');
++    $url = $this->getSession()->getCurrentUrl();
++    $this->assertEquals('/node', parse_url($url, PHP_URL_PATH));
++    $this->assertSession()->statusCodeEquals(200);
++    // Opt into allowing redirects from aliases.
++    $this->config->set('allow_from_alias', TRUE)->save();
++    $this->assertRedirect('test-alias', '/node', 301);
++
++    // Update the node alias to "test-alias-updated".
++    $this->drupalGet($node->toUrl('edit-form'));
++    $this->submitForm([
++      'path[0][alias]' => '/test-alias-updated',
++    ], 'Save');
++    // Assert the "test-alias" redirect is still present.
++    $this->assertRedirect('test-alias', '/node', 301);
++
++    // Delete the node and assert redirect is still present.
++    $node->delete();
++    $this->assertRedirect('test-alias', '/node', 301);
++  }
++
++  /**
++   * Test adding a node alias when a redirect already exists.
++   */
++  public function testNodeAliasOnExistingRedirect(): void {
++    $this->drupalLogin($this->adminUser);
++
++    $this->drupalGet('admin/config/search/redirect/add');
++    $this->submitForm([
++      'redirect_source[0][path]' => 'some-url',
++      'redirect_redirect[0][uri]' => '/node',
++    ], 'Save');
++
++    $this->assertRedirect('some-url', '/node', 301);
++
++    $this->drupalCreateNode([
++      'type' => 'article',
++      'title' => 'Test node redirect',
++      'path' => ['alias' => '/some-url'],
++    ]);
++
++    $this->assertRedirect('some-url', '/node', 301);
++  }
++
+ }
+diff --git a/tests/src/Unit/RedirectRequestSubscriberTest.php b/tests/src/Unit/RedirectRequestSubscriberTest.php
+index 001c8c9be302569f159e275dda11e579208c6a40..a941ba1db3cd99aa72a65af08c3a6044e35bb0ec 100644
+--- a/tests/src/Unit/RedirectRequestSubscriberTest.php
++++ b/tests/src/Unit/RedirectRequestSubscriberTest.php
+@@ -137,7 +137,7 @@ class RedirectRequestSubscriberTest extends UnitTestCase {
+ 
+     $context = $this->createMock('Symfony\Component\Routing\RequestContext');
+ 
+-    $inbound_path_processor = $this->createMock('Drupal\Core\PathProcessor\InboundPathProcessorInterface');
++    $inbound_path_processor = $this->createMock('Drupal\redirect\PathProcessor\RedirectPathProcessorManagerInterface');
+     $inbound_path_processor->expects($this->any())
+       ->method('processInbound')
+       ->with($request->getPathInfo(), $request)
+@@ -150,7 +150,7 @@ class RedirectRequestSubscriberTest extends UnitTestCase {
+           // @see \Drupal\system\PathProcessor\PathProcessorFiles::processInbound()
+           $path = '/system/files';
+         }
+-        return $path;
++        return [trim($path, '/')];
+       });
+ 
+     $alias_manager = $this->createMock(AliasManagerInterface::class);
+@@ -158,7 +158,7 @@ class RedirectRequestSubscriberTest extends UnitTestCase {
+     $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
+ 
+     $subscriber = new RedirectRequestSubscriber(
+-      $this->getRedirectRepositoryStub('findMatchingRedirect', $redirect),
++      $this->getRedirectRepositoryStub('findMatchingRedirectMultiple', $redirect),
+       $this->getLanguageManagerStub(),
+       $this->getConfigFactoryStub(['redirect.settings' => ['passthrough_querystring' => $retain_query]]),
+       $alias_manager,
