@@ -1,0 +1,13 @@
+diff --git a/scheduler_content_moderation_integration.module b/scheduler_content_moderation_integration.module
+index c07ee56f38b278e3afe1611800d636899655ef04..b7fa9900688e527c639a7681fce1d899ffd56dba 100644
+--- a/scheduler_content_moderation_integration.module
++++ b/scheduler_content_moderation_integration.module
+@@ -281,7 +281,7 @@ function _scheduler_content_moderation_integration_reset_form_display(): array {
+  */
+ function _scheduler_content_moderation_integration_format_text($fields): string {
+   return implode(', ', array_map(function ($name, $bundles) {
+-    return "$name (" . implode(', ', $bundles) . ")";
++    return "$name (" . implode(', ', array_unique($bundles)) . ")";
+   }, array_keys($fields), $fields));
+ }
+ 
