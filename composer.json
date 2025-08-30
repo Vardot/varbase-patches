@@ -150,7 +150,7 @@
       },
       "drupal/redirect": {
         "Issue #2879648: Redirects from aliased paths aren't triggered":
-        "https://www.drupal.org/files/issues/2024-08-11/redirect--2024-08-11--2879648--mr-109.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-08-30--3057250--mr-109.patch",
         "Issue #3057250: Validation issue on adding url redirect":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-08-30--3057250--mr-133.patch"
       },
