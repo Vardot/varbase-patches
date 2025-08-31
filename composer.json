@@ -197,7 +197,7 @@
       },
       "drupal/dashboard": {
         "Issue #3528064: Add support for Layout Builder Restrictions":
-        "https://www.drupal.org/files/issues/2025-06-24/dashboard--2025-06-24--3528064--mr-63.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboard--2025-08-31--3528064--mr-63.patch"
       },
       "drupal/ckeditor_media_resize": {
         "Issue #3531299: Plugin not found error in CKEditor5 45.x prevents loading of CKEditor5 altogether when enabled":
