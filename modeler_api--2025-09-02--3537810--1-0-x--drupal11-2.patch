@@ -92,7 +92,7 @@ index ff88abc..31b5bd5 100644
      return NULL;
    }
 diff --git a/src/Hook/EntityHooks.php b/src/Hook/EntityHooks.php
-index d4291cf..2a8524c 100644
+index d4291cf..65690eb 100644
 --- a/src/Hook/EntityHooks.php
 +++ b/src/Hook/EntityHooks.php
 @@ -23,26 +23,70 @@ use Drupal\modeler_api\Plugin\ModelOwnerPluginManager;
@@ -301,7 +301,7 @@ index d4291cf..2a8524c 100644
 -      foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
 +
 +      // Skip during container compilation to avoid circular dependencies.
-+      if (\Drupal::hasContainer() === FALSE || \Drupal::getContainer()->isCompiled() === FALSE) {
++      if (\Drupal::hasContainer() === FALSE) {
 +        return;
 +      }
 +
