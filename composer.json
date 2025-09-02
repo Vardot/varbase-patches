@@ -205,7 +205,7 @@
       },
       "drupal/modeler_api": {
         "Issue #3537810: Fix Circular Reference by Removing Autowire and Minimizing Dependencies in modeler_api.service":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/modeler_api--2025-08-26--3537810--mr-10.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/modeler_api--2025-09-02--3537810--1-0-x--drupal11-2.patch"
       },
       "drupal/responsive_preview": {
         "Issue #3489112: Integrate responsive preview with Navigation top bar":
