@@ -1,0 +1,32 @@
+diff --git a/src/Form/BulkEditFormTrait.php b/src/Form/BulkEditFormTrait.php
+index 10a4c71f6190ca82a565734a549cf88f707925a7..9dcbbb6314c6ce2c74635823f5679eeec85d5684 100644
+--- a/src/Form/BulkEditFormTrait.php
++++ b/src/Form/BulkEditFormTrait.php
+@@ -289,15 +289,16 @@ trait BulkEditFormTrait {
+ 
+       // Add options.
+       $options = [];
++      $cardinality = $definitions[$key]->getFieldStorageDefinition()->getCardinality();
+       if (in_array($definitions[$key]->getType(), [
+         'string',
+         'string_long',
+         'text',
+         'text_long',
+-      ])) {
++      ]) && $cardinality === 1) {
+         $options['append'] = $this->t('Append to the current value');
+       }
+-      if ($definitions[$key]->getFieldStorageDefinition()->getCardinality() !== 1) {
++      if ($cardinality !== 1) {
+         $options['new'] = $this->t('Add a new value to the multivalue field');
+       }
+       $options['replace'] = $this->t('Replace the current value');
+@@ -307,7 +308,7 @@ trait BulkEditFormTrait {
+         '#title' => $this->t('Change method'),
+         '#type' => count($options) > 1 ? 'radios' : 'hidden',
+         '#options' => $options,
+-        '#default_value' => reset($option_keys),
++        '#default_value' => 'replace',
+         '#states' => count($options) > 1 ? $form[$key]['#states'] : [],
+         '#weight' => isset($form[$key]['#weight']) ? $form[$key]['#weight'] + 0.01 : 0,
+       ];
