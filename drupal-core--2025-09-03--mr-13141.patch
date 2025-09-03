@@ -1,0 +1,110 @@
+diff --git a/core/modules/media_library/js/media_library.ui.js b/core/modules/media_library/js/media_library.ui.js
+index 10fe212f4a57af7ed7a51304fc21ee252575ea3b..47e8885daf76f9bf2ec3cffc94bab21521455e8f 100644
+--- a/core/modules/media_library/js/media_library.ui.js
++++ b/core/modules/media_library/js/media_library.ui.js
+@@ -213,6 +213,19 @@
+             if (displayAnnouncement) {
+               Drupal.announce(displayAnnouncement);
+             }
++
++            // Restore selection state after AJAX request.
++            const currentSelection = Drupal.MediaLibrary.currentSelection;
++            if (currentSelection && currentSelection.length > 0) {
++              setTimeout(() => {
++                currentSelection.forEach((value) => {
++                  const $checkbox = $(`input[type="checkbox"][value="${value}"]`);
++                  if ($checkbox.length && !$checkbox.prop('checked')) {
++                    $checkbox.prop('checked', true).trigger('change');
++                  }
++                });
++              }, 100);
++            }
+           };
+         }
+ 
+@@ -396,6 +409,65 @@
+     },
+   };
+ 
++  /**
++   * Preserve media library selection across AJAX pagination requests.
++   *
++   * @type {Drupal~behavior}
++   *
++   * @prop {Drupal~behaviorAttach} attach
++   *   Attaches behavior to preserve selection during pagination.
++   */
++  Drupal.behaviors.MediaLibraryPreserveSelection = {
++    attach(context) {
++      // Hook into all AJAX responses for media library.
++      if (!window.mediaLibraryAjaxFixed) {
++        window.mediaLibraryAjaxFixed = true;
++
++        // Store original AJAX success handler.
++        const originalProcessAjaxData = Drupal.Ajax.prototype.success;
++
++        Drupal.Ajax.prototype.success = function(response, status) {
++          // Store selection before AJAX.
++          const beforeSelection = Drupal.MediaLibrary ? Drupal.MediaLibrary.currentSelection.slice() : [];
++          const beforeHiddenValue = document.querySelector('#media-library-modal-selection') ? 
++            document.querySelector('#media-library-modal-selection').value : '';
++
++          // Call original success handler.
++          const result = originalProcessAjaxData.call(this, response, status);
++
++          // Check if this affects media library.
++          const isMediaLibraryAjax = response.some && response.some(r => 
++            (r.selector && (r.selector.includes('media-library-view') || r.selector.includes('media_library'))) ||
++            (r.method === 'replaceWith' && r.data && r.data.includes('js-media-library'))
++          );
++
++          if (isMediaLibraryAjax || (this.element && this.element.closest('.js-media-library-view'))) {
++            // Restore selections after a delay to ensure DOM is updated.
++            setTimeout(() => {
++              if (beforeSelection.length > 0) {
++                beforeSelection.forEach((value) => {
++                  const checkbox = document.querySelector(`input[type="checkbox"][value="${value}"]`);
++                  if (checkbox && !checkbox.checked) {
++                    checkbox.checked = true;
++                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
++                  }
++                });
++
++                // Also restore hidden field if it got cleared.
++                const hiddenField = document.querySelector('#media-library-modal-selection');
++                if (hiddenField && !hiddenField.value && beforeHiddenValue) {
++                  hiddenField.value = beforeHiddenValue;
++                }
++              }
++            }, 300);
++          }
++
++          return result;
++        };
++      }
++    },
++  };
++
+   /**
+    * Clear the current selection.
+    *
+diff --git a/core/modules/media_library/src/Plugin/views/field/MediaLibrarySelectForm.php b/core/modules/media_library/src/Plugin/views/field/MediaLibrarySelectForm.php
+index 2e233cab5e468815d41a3327cd9fd7343ed28a0d..05dbeeb4c7c4200618950ffedf0956dadc00288c 100644
+--- a/core/modules/media_library/src/Plugin/views/field/MediaLibrarySelectForm.php
++++ b/core/modules/media_library/src/Plugin/views/field/MediaLibrarySelectForm.php
+@@ -184,7 +184,14 @@ public static function updateWidget(array &$form, FormStateInterface $form_state
+    */
+   public function viewsFormValidate(array &$form, FormStateInterface $form_state) {
+     $selected = array_filter($form_state->getValue($this->options['id']));
+-    if (empty($selected)) {
++
++    // Also check the hidden selection field which contains selections from other pages.
++    $selection_field_id = $this->options['id'] . '_selection';
++    $hidden_selection = $form_state->getValue($selection_field_id);
++    $hidden_selected = $hidden_selection ? array_filter(explode(',', $hidden_selection)) : [];
++
++    // If no items are selected on current page and no items in hidden selection, show error.
++    if (empty($selected) && empty($hidden_selected)) {
+       $form_state->setErrorByName('', $this->t('No items selected.'));
+     }
+   }
