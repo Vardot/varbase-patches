@@ -171,6 +171,10 @@
       "drupal/scheduler_content_moderation_integration": {
         "Issue #3543642: Fix duplicates bundles for cleaner output":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/scheduler_content_moderation_integration--2025-08-30--3543642--mr-86.patch"
+      },
+      "drupal/views_bulk_edit": {
+        "Issue #3544584: Change default Change method to Replace the current value when configuring Modify field values action":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-09-03--3544584--mr-44.patch"
       }
     }
   }
