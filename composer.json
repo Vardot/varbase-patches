@@ -152,9 +152,9 @@
       },
       "drupal/redirect": {
         "Issue #2879648: Redirects from aliased paths aren't triggered":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-08-30--2879648--mr-109.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-09-04--2879648--mr-109.patch",
         "Issue #3057250: Validation issue on adding url redirect":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-08-30--3057250--mr-133.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-09-04--3057250--mr-133.patch"
       },
       "drupal/page_manager": {
         "Issue #3438993: Some mandatory parameters are missing (machine_name, step) to generate a URL for route entity.page.devel_load":
