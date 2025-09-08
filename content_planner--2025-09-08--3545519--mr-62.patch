@@ -1,0 +1,16 @@
+diff --git a/modules/content_kanban/src/Component/KanbanEntry.php b/modules/content_kanban/src/Component/KanbanEntry.php
+index a3d0ade5821d86875b27f5a5999f88fb673dd2f9..2a5194ce4fbcf05e020b79c832e857589d9becb9 100644
+--- a/modules/content_kanban/src/Component/KanbanEntry.php
++++ b/modules/content_kanban/src/Component/KanbanEntry.php
+@@ -89,6 +89,11 @@ class KanbanEntry extends BaseEntry {
+       $this->entity->time = $datetime->format('H:i');
+       $this->entity->entityLoaded = $entityType->load($this->entity->$entityId);
+ 
++      // Check if entity was successfully loaded.
++      if (!$this->entity->entityLoaded) {
++        return [];
++      }
++
+       // Get User Picture.
+       $user_picture = $this->getUserPictureUrl($entityKeys['owner'] ?: $entityKeys['uid']);
+       $build = [
