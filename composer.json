@@ -196,6 +196,10 @@
       "drupal/views_bulk_edit": {
         "Issue #3544584: Change default Change method to Replace the current value when configuring Modify field values action":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-09-03--3544584--mr-44.patch"
+      },
+      "drupal/content_planner": {
+        "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch"
       }
     }
   }
