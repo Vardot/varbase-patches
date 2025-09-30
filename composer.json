@@ -173,10 +173,6 @@
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
         "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
       },
-      "drupal/ckeditor_media_resize": {
-        "Issue #3531299: Plugin not found error in CKEditor5 45.x prevents loading of CKEditor5 altogether when enabled":
-        "https://www.drupal.org/files/issues/2025-06-28/ckeditor_media_resize--2025-06-28--3531299--mr-16.patch"
-      },
       "drupal/entity": {
         "Issue #3532309: Fix Deprecation notice from DeleteAction class causes errors in ECA module":
         "https://www.drupal.org/files/issues/2025-06-25/entity-fix-deprecation.patch"
