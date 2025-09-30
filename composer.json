@@ -201,10 +201,6 @@
         "Issue #3528064: Add support for Layout Builder Restrictions":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboard--2025-08-31--3528064--mr-63.patch"
       },
-      "drupal/ckeditor_media_resize": {
-        "Issue #3531299: Plugin not found error in CKEditor5 45.x prevents loading of CKEditor5 altogether when enabled":
-        "https://www.drupal.org/files/issues/2025-06-28/ckeditor_media_resize--2025-06-28--3531299--mr-16.patch"
-      },
       "drupal/modeler_api": {
         "Issue #3537810: Fix Circular Reference by Removing Autowire and Minimizing Dependencies in modeler_api.service":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/modeler_api--2025-09-02--3537810--1-0-x--drupal11-2.patch"
