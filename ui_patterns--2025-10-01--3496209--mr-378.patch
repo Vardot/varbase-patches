@@ -1,0 +1,60 @@
+diff --git a/src/Plugin/UiPatterns/Source/AttributesWidget.php b/src/Plugin/UiPatterns/Source/AttributesWidget.php
+index 3c2f7d24e5a8f50852247f51515edd693513b4a7..4596965828505ffee006b8a37f1d587c95168c6e 100644
+--- a/src/Plugin/UiPatterns/Source/AttributesWidget.php
++++ b/src/Plugin/UiPatterns/Source/AttributesWidget.php
+@@ -42,7 +42,15 @@ class AttributesWidget extends SourcePluginPropValueWidget implements TrustedCal
+     // In UI Patterns Settings, we built the Attribute object here. It is not
+     // possible anymore because SDC will not validate it against the prop
+     // type schema.
+-    return static::convertValueToAttributesMapping(parent::getPropValue());
++    $value = parent::getPropValue();
++
++    // Replace tokens if we have an entity context.
++    $token_data = $this->getTokenData();
++    if (!empty($token_data) && is_string($value)) {
++      $value = $this->replaceTokens($value);
++    }
++
++    return static::convertValueToAttributesMapping($value);
+   }
+ 
+   /**
+@@ -91,6 +99,10 @@ class AttributesWidget extends SourcePluginPropValueWidget implements TrustedCal
+     $form['value']['#description'] = $this->t("HTML attributes with double-quoted values or a space-separated list of HTML classes.");
+ 
+     $form['value']['#element_validate'][] = [static::class, 'validateUnicodePattern'];
++
++    // Add token tree link if token module is enabled.
++    $this->addTokenTreeLink($form);
++
+     return $form;
+   }
+ 
+diff --git a/tests/fixtures/source_only_tests.yml b/tests/fixtures/source_only_tests.yml
+index 1975db7ebb5e15d05edc4a7b985ca7876380c493..cf135751c0a35fdf992e8b3c1e36ebf64bdfa7b3 100644
+--- a/tests/fixtures/source_only_tests.yml
++++ b/tests/fixtures/source_only_tests.yml
+@@ -31,3 +31,23 @@ attributes_2:
+         same:
+           data-hello: "world"
+           class: "hello-world-class hello-world-class-2"
++
++attributes_3:
++  component:
++    component_id: ui_patterns_test:test-component
++    props:
++      attributes:
++        source_id: attributes
++        source:
++          value: 'aria-label="Read more about [node:title]" target="_parent"'
++  entity:
++    title:
++      value: 'title_entity_1'
++    body:
++      value: 'value_text_1'
++  output:
++    props:
++      attributes_with_default:
++        same:
++          aria-label: "Read more about title_entity_1"
++          target: "_parent"
