@@ -1,0 +1,35 @@
+diff --git a/src/Decorate/Messenger.php b/src/Decorate/Messenger.php
+index 340b406539a92eadb66ea17747297af9bcdeed1b..950173022a9ad934830fed075234ecf829ab3af0 100644
+--- a/src/Decorate/Messenger.php
++++ b/src/Decorate/Messenger.php
+@@ -41,15 +41,22 @@ class Messenger implements MessengerInterface {
+    */
+   public function addMessage($message, $type = self::TYPE_STATUS, $repeat = FALSE) {
+     if ($message instanceof \Stringable) {
+-      /** @var \Drupal\eca_helper\Event\StatusMessagesEvent $event */
+-      $msg = (string) $message;
+-      $event = $this->triggerEvent->dispatchFromPlugin('eca_helper:status_messages', $msg, $type);
+-      if ($event->isChanged()) {
+-        $message_altered = $event->getMessage();
+-        if ($message_altered && mb_strlen($message) > 0) {
+-          return $this->originalMessenger->addMessage($message_altered, $type, $repeat);
++      try {
++        /** @var \Drupal\eca_helper\Event\StatusMessagesEvent $event */
++        $msg = (string) $message;
++        $event = $this->triggerEvent->dispatchFromPlugin('eca_helper:status_messages', $msg, $type);
++        if ($event->isChanged()) {
++          $message_altered = $event->getMessage();
++          if ($message_altered && mb_strlen($message) > 0) {
++            return $this->originalMessenger->addMessage($message_altered, $type, $repeat);
++          }
++         return $this;
+         }
+-        return $this;
++      }
++      catch (\Exception $e) {
++        // During early bootstrap (e.g., installation), some services may not
++        // be available yet. In this case, fall back to the original messenger.
++        return $this->originalMessenger->addMessage($message, $type, $repeat);
+       }
+     }
+     return $this->originalMessenger->addMessage($message, $type, $repeat);
