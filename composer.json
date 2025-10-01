@@ -242,6 +242,10 @@
       "drupal/content_planner": {
         "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch"
+      },
+      "drupal/eca_helper": {
+        "[#3549723] fix: Prevent DIC RuntimeException when kernel service unavailable during Drupal installation":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/eca_helper--2025-10-01--3549723--mr-8.patch"
       }
     }
   }
