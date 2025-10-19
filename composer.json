@@ -185,9 +185,7 @@
       },
       "drupal/jsonapi_extras": {
         "Issue #3508142: Fix installation error with JSON:API Extra in custom Drupal 11 profiles due to missing synthetic service `kernel`":
-        "https://www.drupal.org/files/issues/2025-02-21/jsonapi_extras--2025-02-21--3508142--mr-65.patch",
-        "Issue #3452036: Update constructor when #3100732: Allow specifying metadata on JSON:API objects lands":
-        "https://www.drupal.org/files/issues/2025-06-30/jsonapi_extras--2025-06-30--3452036--mr-51.patch"
+        "https://www.drupal.org/files/issues/2025-02-21/jsonapi_extras--2025-02-21--3508142--mr-65.patch"
       },
       "drupal/block_class": {
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
