@@ -1,3 +1,9 @@
+commit 8b8c6efbecb590df76f1f91f606a08130d871e2c
+Author: Rajab Natshah <rajabn@gmail.com>
+Date:   Tue Nov 4 00:22:21 2025 +0300
+
+    mf6
+
 diff --git a/modeler_api.services.yml b/modeler_api.services.yml
 index 91387f1..f65b4bb 100644
 --- a/modeler_api.services.yml
@@ -26,6 +32,41 @@ index 91387f1..f65b4bb 100644
 -    autowire: true
 +    # NO arguments - use lazy loading instead to break circular dependency
 +    arguments: []
+diff --git a/src/Api.php b/src/Api.php
+index 808a8d3..f2f0f6a 100644
+--- a/src/Api.php
++++ b/src/Api.php
+@@ -78,8 +78,8 @@ class Api {
+     protected ManagedStorage $configStorage,
+     protected FileSystemInterface $fileSystem,
+     protected EntityTypeManagerInterface $entityTypeManager,
+-    protected RouteProviderInterface $routeProvider,
+-    protected MenuLinkManagerInterface $menuLinkManager,
++    protected ?RouteProviderInterface $routeProvider = NULL,
++    protected ?MenuLinkManagerInterface $menuLinkManager = NULL,
+   ) {}
+ 
+   /**
+@@ -538,6 +538,9 @@ class Api {
+    *   The route, if it exists, NULL otherwise.
+    */
+   public function getRouteByName(string $name): ?Route {
++    if ($this->routeProvider === NULL) {
++      return NULL;
++    }
+     try {
+       return $this->routeProvider->getRouteByName($name);
+     }
+@@ -557,6 +560,9 @@ class Api {
+    *   The menu name of the parent path, if we can find it, FALSE otherwise.
+    */
+   public function getParentMenuName(string $path): ?string {
++    if ($this->menuLinkManager === NULL) {
++      return NULL;
++    }
+     $parts = explode('/', trim($path, '/'));
+     array_pop($parts);
+     $path = implode('/', $parts);
 diff --git a/src/Hook/EntityHooks.php b/src/Hook/EntityHooks.php
 index a036f72..ac6a891 100644
 --- a/src/Hook/EntityHooks.php
