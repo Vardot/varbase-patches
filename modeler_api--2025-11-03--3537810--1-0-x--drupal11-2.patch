@@ -1,9 +1,3 @@
-commit 50c6b1a5e193cddcde66af276f794e8d6a2cff7d
-Author: Rajab Natshah <rajabn@gmail.com>
-Date:   Mon Nov 3 19:57:21 2025 +0300
-
-    MF5
-
 diff --git a/modeler_api.services.yml b/modeler_api.services.yml
 index 91387f1..f65b4bb 100644
 --- a/modeler_api.services.yml
@@ -32,73 +26,8 @@ index 91387f1..f65b4bb 100644
 -    autowire: true
 +    # NO arguments - use lazy loading instead to break circular dependency
 +    arguments: []
-diff --git a/src/Api.php b/src/Api.php
-index 808a8d3..8b9ccb1 100644
---- a/src/Api.php
-+++ b/src/Api.php
-@@ -78,8 +78,8 @@ class Api {
-     protected ManagedStorage $configStorage,
-     protected FileSystemInterface $fileSystem,
-     protected EntityTypeManagerInterface $entityTypeManager,
--    protected RouteProviderInterface $routeProvider,
--    protected MenuLinkManagerInterface $menuLinkManager,
-+    protected ?RouteProviderInterface $routeProvider,
-+    protected ?MenuLinkManagerInterface $menuLinkManager,
-   ) {}
- 
-   /**
-@@ -538,12 +538,21 @@ class Api {
-    *   The route, if it exists, NULL otherwise.
-    */
-   public function getRouteByName(string $name): ?Route {
-+    // Skip during installation to prevent recursive router rebuild.
-+    if (!$this->routeProvider || defined('MAINTENANCE_MODE')) {
-+      return NULL;
-+    }
-+
-     try {
-       return $this->routeProvider->getRouteByName($name);
-     }
-     catch (RouteNotFoundException) {
-       // If the route can not be found, don't set the configure route.
-     }
-+    catch (\Exception $e) {
-+      // Skip any other exceptions during installation/bootstrap.
-+      return NULL;
-+    }
-     return NULL;
-   }
- 
-@@ -557,14 +566,19 @@ class Api {
-    *   The menu name of the parent path, if we can find it, FALSE otherwise.
-    */
-   public function getParentMenuName(string $path): ?string {
--    $parts = explode('/', trim($path, '/'));
--    array_pop($parts);
--    $path = implode('/', $parts);
--    $url = Url::fromUri('internal:/' . $path);
--    $links = $this->menuLinkManager->loadLinksByRoute($url->getRouteName(), $url->getRouteParameters());
--    if (!empty($links)) {
--      $menuLink = reset($links);
--      return $menuLink->getPluginId();
-+    try {
-+      $parts = explode('/', trim($path, '/'));
-+      array_pop($parts);
-+      $path = implode('/', $parts);
-+      $url = Url::fromUri('internal:/' . $path);
-+      $links = $this->menuLinkManager->loadLinksByRoute($url->getRouteName(), $url->getRouteParameters());
-+      if (!empty($links)) {
-+        $menuLink = reset($links);
-+        return $menuLink->getPluginId();
-+      }
-+    } catch (\Exception $e) {
-+      // Skip any exceptions during installation/bootstrap
-+      return NULL;
-     }
-     return NULL;
-   }
 diff --git a/src/Hook/EntityHooks.php b/src/Hook/EntityHooks.php
-index a036f72..e1edc5d 100644
+index a036f72..ac6a891 100644
 --- a/src/Hook/EntityHooks.php
 +++ b/src/Hook/EntityHooks.php
 @@ -23,26 +23,70 @@ use Drupal\modeler_api\Plugin\ModelOwnerPluginManager;
@@ -154,7 +83,14 @@ index a036f72..e1edc5d 100644
 +
 +  /**
 +   * Get the model owner plugin manager lazily.
-+   */
+    */
+-  public function __construct(
+-    protected Api $modelerApiService,
+-    protected ModelerPluginManager $modelerManager,
+-    protected ModelOwnerPluginManager $modelOwnerPluginManager,
+-    protected AccountInterface $currentUser,
+-    protected EntityTypeManagerInterface $entityTypeManager,
+-  ) {}
 +  protected function getModelOwnerPluginManager(): ModelOwnerPluginManager {
 +    if ($this->modelOwnerPluginManager === NULL) {
 +      $this->modelOwnerPluginManager = \Drupal::service('plugin.manager.modeler_api.model_owner');
@@ -174,14 +110,7 @@ index a036f72..e1edc5d 100644
 +
 +  /**
 +   * Get the entity type manager lazily.
-    */
--  public function __construct(
--    protected Api $modelerApiService,
--    protected ModelerPluginManager $modelerManager,
--    protected ModelOwnerPluginManager $modelOwnerPluginManager,
--    protected AccountInterface $currentUser,
--    protected EntityTypeManagerInterface $entityTypeManager,
--  ) {}
++   */
 +  protected function getEntityTypeManager(): EntityTypeManagerInterface {
 +    if ($this->entityTypeManager === NULL) {
 +      $this->entityTypeManager = \Drupal::entityTypeManager();
@@ -191,11 +120,14 @@ index a036f72..e1edc5d 100644
  
    /**
     * Implements hook_entity_type_build().
-@@ -59,7 +103,14 @@ class EntityHooks {
+@@ -59,22 +103,56 @@ class EntityHooks {
        return;
      }
      $alreadyRunning = TRUE;
 -    foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
+-      $basePath = $owner->configEntityBasePath();
+-      if ($basePath === NULL) {
+-        continue;
 +
 +    // Skip during installation to prevent circular dependency issues.
 +    if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
@@ -203,11 +135,64 @@ index a036f72..e1edc5d 100644
 +      return;
 +    }
 +
-+    foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
-       $basePath = $owner->configEntityBasePath();
-       if ($basePath === NULL) {
-         continue;
-@@ -93,7 +144,7 @@ class EntityHooks {
++    // ALWAYS set the handlers for known entity types first, regardless of service availability
++    // This ensures entity types are never cached in an incomplete state
++    $known_types = ['eca', 'bpmn_io', 'model', 'modeler'];
++    foreach ($known_types as $type) {
++      if (isset($entity_types[$type])) {
++        $entity_types[$type]
++          ->setAccessClass(AccessControlHandler::class)
++          ->setListBuilderClass(ListBuilder::class);
++      }
++    }
++
++    // Now try to set the link templates dynamically if service is available
++    try {
++      $container = \Drupal::getContainer();
++      $serviceReady = $container->has('modeler_api.service') && $container->initialized('modeler_api.service');
++
++      // If service is ready, we can set the dynamic link templates
++      if ($serviceReady) {
++        foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
++          $basePath = $owner->configEntityBasePath();
++          if ($basePath === NULL) {
++            continue;
++          }
++          $type = $owner->configEntityTypeId();
++          if (!isset($entity_types[$type])) {
++            continue;
++          }
++          /**
++           * @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types
++           */
++          $entity_types[$type]
++            ->setLinkTemplate('collection', '/' . $basePath)
++            ->setFormClass('delete', DeleteForm::class)
++            ->setLinkTemplate('edit-form', '/' . $basePath . '/{' . $type . '}/edit')
++            ->setLinkTemplate('delete-form', '/' . $basePath . '/{' . $type . '}/delete');
++        }
++      }
++    }
++    catch (\Exception $e) {
++      // If we can't set dynamic templates, that's OK - the critical handlers are already set
++      if (function_exists('watchdog_exception')) {
++        watchdog_exception('modeler_api', $e);
+       }
+-      $type = $owner->configEntityTypeId();
+-      /**
+-       * @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types
+-       */
+-      $entity_types[$type]
+-        ->setAccessClass(AccessControlHandler::class)
+-        ->setListBuilderClass(ListBuilder::class)
+-        ->setLinkTemplate('collection', '/' . $basePath)
+-        ->setFormClass('delete', DeleteForm::class)
+-        ->setLinkTemplate('edit-form', '/' . $basePath . '/{' . $type . '}/edit')
+-        ->setLinkTemplate('delete-form', '/' . $basePath . '/{' . $type . '}/delete');
+     }
+     $alreadyRunning = FALSE;
+   }
+@@ -93,7 +171,7 @@ class EntityHooks {
    #[Hook('entity_operation')]
    public function entityOperation(EntityInterface $entity): array {
      $operations = [];
@@ -216,7 +201,7 @@ index a036f72..e1edc5d 100644
      $numberOfModelers = count($modelers);
      if ($numberOfModelers === 1) {
        // There is only the fallback modeler, no operation provided.
-@@ -101,7 +152,7 @@ class EntityHooks {
+@@ -101,7 +179,7 @@ class EntityHooks {
      }
      if (
        $entity instanceof ConfigEntityInterface &&
@@ -225,7 +210,7 @@ index a036f72..e1edc5d 100644
        $owner->configEntityBasePath()
      ) {
        $type = $entity->getEntityTypeId();
-@@ -111,9 +162,9 @@ class EntityHooks {
+@@ -111,9 +189,9 @@ class EntityHooks {
          // The default edit form comes from the list builder. If we have both
          // routes, "edit_form" and "edit", let's add the second one here.
          $name = 'entity.' . $type . '.edit';
@@ -237,7 +222,7 @@ index a036f72..e1edc5d 100644
            $operations['edit_with_modeler'] = [
              'title' => t('Edit with modeler'),
              'url' => Url::fromRoute($name, [$type => $entity->id()]),
-@@ -123,14 +174,14 @@ class EntityHooks {
+@@ -123,14 +201,14 @@ class EntityHooks {
        }
        else {
          foreach ($modelers as $id => $modeler) {
@@ -254,7 +239,7 @@ index a036f72..e1edc5d 100644
              $operations['view_with_' . $id] = [
                'title' => t('View with :label', [':label' => $modeler->label()]),
                'url' => Url::fromRoute('entity.' . $type . '.view_with.' . $id, [$type => $entity->id()]),
-@@ -141,14 +192,14 @@ class EntityHooks {
+@@ -141,14 +219,14 @@ class EntityHooks {
        }
  
        $name = 'entity.' . $type . '.canonical';
@@ -271,7 +256,7 @@ index a036f72..e1edc5d 100644
          if (!$entity->status()) {
            $operations['enable'] = [
              'title' => t('Enable'),
-@@ -165,7 +216,7 @@ class EntityHooks {
+@@ -165,7 +243,7 @@ class EntityHooks {
          }
        }
        $name = 'entity.' . $type . '.clone';
@@ -280,7 +265,7 @@ index a036f72..e1edc5d 100644
          if ($owner->isEditable($entity)) {
            $operations['clone'] = [
              'title' => t('Clone'),
-@@ -176,7 +227,7 @@ class EntityHooks {
+@@ -176,7 +254,7 @@ class EntityHooks {
        }
        if ($owner->isExportable($entity)) {
          $name = 'entity.' . $type . '.export';
@@ -289,7 +274,7 @@ index a036f72..e1edc5d 100644
            $operations['export'] = [
              'title' => t('Export'),
              'url' => Url::fromRoute($name, [$type => $entity->id()]),
-@@ -184,7 +235,7 @@ class EntityHooks {
+@@ -184,7 +262,7 @@ class EntityHooks {
            ];
          }
          $name = 'entity.' . $type . '.export_recipe';
@@ -298,7 +283,7 @@ index a036f72..e1edc5d 100644
            $operations['export_recipe'] = [
              'title' => t('Export as recipe'),
              'url' => Url::fromRoute($name, [$type => $entity->id()]),
-@@ -206,7 +257,12 @@ class EntityHooks {
+@@ -206,7 +284,24 @@ class EntityHooks {
     */
    #[Hook('config_schema_info_alter')]
    public function configSchemaInfoAlter(array &$definitions): void {
@@ -308,43 +293,59 @@ index a036f72..e1edc5d 100644
 +      return;
 +    }
 +
++    // Skip if we're in early bootstrap before the container is fully built.
++    // This prevents circular dependency when router is being compiled.
++    try {
++      if (!\Drupal::hasContainer() || !\Drupal::getContainer()->initialized('router.route_provider')) {
++        return;
++      }
++    }
++    catch (\Exception $e) {
++      // If any error occurs checking the container state, skip to prevent circular dependency.
++      return;
++    }
++
 +    foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
        $provider = $owner->configEntityProviderId();
        $entityTypeId = $owner->configEntityTypeId();
        $key = implode('.', [$provider, $entityTypeId, '*']);
-@@ -333,11 +389,29 @@ class EntityHooks {
+@@ -333,15 +428,29 @@ class EntityHooks {
    #[Hook('system_info_alter')]
    public function systemInfoAlter(array &$info, Extension $file, string $type): void {
      if ($type === 'module') {
 -      foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
+-        $provider = $owner->getPluginDefinition()['provider'];
+-        if (str_ends_with($file->getPathname(), '/' . $provider . '.info.yml')) {
+-          $name = 'entity.' . $owner->configEntityTypeId() . '.collection';
+-          if ($route = $this->modelerApiService->getRouteByName($name)) {
+-            $info['configure'] = $name;
 +
 +      // Skip during installation to prevent circular dependency issues.
 +      if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
 +        return;
 +      }
 +
-+      // Skip if we're in early bootstrap before the container is fully built.
-+      // This prevents circular dependency when router is being compiled.
++      // CRITICAL: Wrap in try-catch to prevent circular dependency during container compilation.
++      // This prevents the hook from running when modeler_api.service is being built.
 +      try {
-+        if (!\Drupal::hasContainer() || !\Drupal::getContainer()->initialized('router.route_provider')) {
-+          return;
-+        }
-+      }
-+      catch (\Exception $e) {
-+        // If any error occurs checking the container state, skip to prevent circular dependency.
-+        return;
-+      }
-+
-+      foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
-         $provider = $owner->getPluginDefinition()['provider'];
-         if (str_ends_with($file->getPathname(), '/' . $provider . '.info.yml')) {
-           $name = 'entity.' . $owner->configEntityTypeId() . '.collection';
--          if ($route = $this->modelerApiService->getRouteByName($name)) {
-+          if ($route = $this->getModelerApiService()->getRouteByName($name)) {
-             $info['configure'] = $name;
++        foreach ($this->getModelOwnerPluginManager()->getAllInstances(TRUE) as $owner) {
++          $provider = $owner->getPluginDefinition()['provider'];
++          if (str_ends_with($file->getPathname(), '/' . $provider . '.info.yml')) {
++            $name = 'entity.' . $owner->configEntityTypeId() . '.collection';
++            if ($route = $this->getModelerApiService()->getRouteByName($name)) {
++              $info['configure'] = $name;
++            }
            }
          }
-@@ -355,10 +429,16 @@ class EntityHooks {
+       }
++      catch (\Exception $e) {
++        // Silently catch any exceptions during container compilation to prevent circular dependency.
++        // The hook will run successfully on subsequent requests after the container is built.
++      }
+     }
+   }
+ 
+@@ -355,10 +464,28 @@ class EntityHooks {
      if ($is_syncing) {
        return;
      }
@@ -352,6 +353,18 @@ index a036f72..e1edc5d 100644
 +
 +    // Skip during installation to prevent circular dependency issues.
 +    if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
++      return;
++    }
++
++    // Skip if we're in early bootstrap before the container is fully built.
++    // This prevents circular dependency when router is being compiled.
++    try {
++      if (!\Drupal::hasContainer() || !\Drupal::getContainer()->initialized('router.route_provider')) {
++        return;
++      }
++    }
++    catch (\Exception $e) {
++      // If any error occurs checking the container state, skip to prevent circular dependency.
 +      return;
 +    }
 +
