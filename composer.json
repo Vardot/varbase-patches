@@ -201,7 +201,7 @@
       },
       "drupal/modeler_api": {
         "Issue #3537810: Fix Circular Reference by Removing Autowire and Minimizing Dependencies in modeler_api.service":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/modeler_api--2025-09-02--3537810--1-0-x--drupal11-2.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/modeler_api--2025-11-03--3537810--1-0-x--drupal11-2.patch"
       },
       "drupal/coffee": {
         "Issue #3535874: Add Navigation Top Bar integration for Coffee module in Drupal ~11.2.0 and Gin ~5.0":
