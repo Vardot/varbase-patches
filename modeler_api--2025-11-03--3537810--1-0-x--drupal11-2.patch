@@ -1,8 +1,8 @@
-commit bdbf0ae15558463518a806e6f817a60d23efcf6d
+commit 50c6b1a5e193cddcde66af276f794e8d6a2cff7d
 Author: Rajab Natshah <rajabn@gmail.com>
-Date:   Mon Nov 3 19:29:20 2025 +0300
+Date:   Mon Nov 3 19:57:21 2025 +0300
 
-    Mf4
+    MF5
 
 diff --git a/modeler_api.services.yml b/modeler_api.services.yml
 index 91387f1..f65b4bb 100644
@@ -98,7 +98,7 @@ index 808a8d3..8b9ccb1 100644
      return NULL;
    }
 diff --git a/src/Hook/EntityHooks.php b/src/Hook/EntityHooks.php
-index a036f72..9842c4f 100644
+index a036f72..e1edc5d 100644
 --- a/src/Hook/EntityHooks.php
 +++ b/src/Hook/EntityHooks.php
 @@ -23,26 +23,70 @@ use Drupal\modeler_api\Plugin\ModelOwnerPluginManager;
@@ -134,14 +134,7 @@ index a036f72..9842c4f 100644
 +
 +  /**
 +   * Get the modeler API service lazily.
-    */
--  public function __construct(
--    protected Api $modelerApiService,
--    protected ModelerPluginManager $modelerManager,
--    protected ModelOwnerPluginManager $modelOwnerPluginManager,
--    protected AccountInterface $currentUser,
--    protected EntityTypeManagerInterface $entityTypeManager,
--  ) {}
++   */
 +  protected function getModelerApiService(): Api {
 +    if ($this->modelerApiService === NULL) {
 +      $this->modelerApiService = \Drupal::service('modeler_api.service');
@@ -181,7 +174,14 @@ index a036f72..9842c4f 100644
 +
 +  /**
 +   * Get the entity type manager lazily.
-+   */
+    */
+-  public function __construct(
+-    protected Api $modelerApiService,
+-    protected ModelerPluginManager $modelerManager,
+-    protected ModelOwnerPluginManager $modelOwnerPluginManager,
+-    protected AccountInterface $currentUser,
+-    protected EntityTypeManagerInterface $entityTypeManager,
+-  ) {}
 +  protected function getEntityTypeManager(): EntityTypeManagerInterface {
 +    if ($this->entityTypeManager === NULL) {
 +      $this->entityTypeManager = \Drupal::entityTypeManager();
@@ -312,7 +312,7 @@ index a036f72..9842c4f 100644
        $provider = $owner->configEntityProviderId();
        $entityTypeId = $owner->configEntityTypeId();
        $key = implode('.', [$provider, $entityTypeId, '*']);
-@@ -333,11 +389,17 @@ class EntityHooks {
+@@ -333,11 +389,29 @@ class EntityHooks {
    #[Hook('system_info_alter')]
    public function systemInfoAlter(array &$info, Extension $file, string $type): void {
      if ($type === 'module') {
@@ -320,6 +320,18 @@ index a036f72..9842c4f 100644
 +
 +      // Skip during installation to prevent circular dependency issues.
 +      if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
++        return;
++      }
++
++      // Skip if we're in early bootstrap before the container is fully built.
++      // This prevents circular dependency when router is being compiled.
++      try {
++        if (!\Drupal::hasContainer() || !\Drupal::getContainer()->initialized('router.route_provider')) {
++          return;
++        }
++      }
++      catch (\Exception $e) {
++        // If any error occurs checking the container state, skip to prevent circular dependency.
 +        return;
 +      }
 +
@@ -332,7 +344,7 @@ index a036f72..9842c4f 100644
              $info['configure'] = $name;
            }
          }
-@@ -355,10 +417,16 @@ class EntityHooks {
+@@ -355,10 +429,16 @@ class EntityHooks {
      if ($is_syncing) {
        return;
      }
