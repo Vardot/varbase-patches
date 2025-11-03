@@ -1,8 +1,8 @@
-commit 4651ebbb3194b2f338844a8303f4d64f85ef5fda
+commit bdbf0ae15558463518a806e6f817a60d23efcf6d
 Author: Rajab Natshah <rajabn@gmail.com>
-Date:   Mon Nov 3 18:17:12 2025 +0300
+Date:   Mon Nov 3 19:29:20 2025 +0300
 
-    mf2
+    Mf4
 
 diff --git a/modeler_api.services.yml b/modeler_api.services.yml
 index 91387f1..f65b4bb 100644
@@ -98,7 +98,7 @@ index 808a8d3..8b9ccb1 100644
      return NULL;
    }
 diff --git a/src/Hook/EntityHooks.php b/src/Hook/EntityHooks.php
-index a036f72..b175ace 100644
+index a036f72..9842c4f 100644
 --- a/src/Hook/EntityHooks.php
 +++ b/src/Hook/EntityHooks.php
 @@ -23,26 +23,70 @@ use Drupal\modeler_api\Plugin\ModelOwnerPluginManager;
@@ -191,26 +191,14 @@ index a036f72..b175ace 100644
  
    /**
     * Implements hook_entity_type_build().
-@@ -59,7 +103,26 @@ class EntityHooks {
+@@ -59,7 +103,14 @@ class EntityHooks {
        return;
      }
      $alreadyRunning = TRUE;
 -    foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
 +
-+    // Skip during installation or when the service container is being built
-+    // to prevent circular dependency issues. We only check if the container
-+    // and plugin manager service exist, but we don't force initialization.
-+    try {
-+      if (!\Drupal::hasContainer()) {
-+        $alreadyRunning = FALSE;
-+        return;
-+      }
-+      $container = \Drupal::getContainer();
-+      if (!$container->has('plugin.manager.modeler_api.model_owner')) {
-+        $alreadyRunning = FALSE;
-+        return;
-+      }
-+    } catch (\Exception $e) {
++    // Skip during installation to prevent circular dependency issues.
++    if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
 +      $alreadyRunning = FALSE;
 +      return;
 +    }
@@ -219,7 +207,7 @@ index a036f72..b175ace 100644
        $basePath = $owner->configEntityBasePath();
        if ($basePath === NULL) {
          continue;
-@@ -93,7 +156,7 @@ class EntityHooks {
+@@ -93,7 +144,7 @@ class EntityHooks {
    #[Hook('entity_operation')]
    public function entityOperation(EntityInterface $entity): array {
      $operations = [];
@@ -228,7 +216,7 @@ index a036f72..b175ace 100644
      $numberOfModelers = count($modelers);
      if ($numberOfModelers === 1) {
        // There is only the fallback modeler, no operation provided.
-@@ -101,7 +164,7 @@ class EntityHooks {
+@@ -101,7 +152,7 @@ class EntityHooks {
      }
      if (
        $entity instanceof ConfigEntityInterface &&
@@ -237,7 +225,7 @@ index a036f72..b175ace 100644
        $owner->configEntityBasePath()
      ) {
        $type = $entity->getEntityTypeId();
-@@ -111,9 +174,9 @@ class EntityHooks {
+@@ -111,9 +162,9 @@ class EntityHooks {
          // The default edit form comes from the list builder. If we have both
          // routes, "edit_form" and "edit", let's add the second one here.
          $name = 'entity.' . $type . '.edit';
@@ -249,7 +237,7 @@ index a036f72..b175ace 100644
            $operations['edit_with_modeler'] = [
              'title' => t('Edit with modeler'),
              'url' => Url::fromRoute($name, [$type => $entity->id()]),
-@@ -123,14 +186,14 @@ class EntityHooks {
+@@ -123,14 +174,14 @@ class EntityHooks {
        }
        else {
          foreach ($modelers as $id => $modeler) {
@@ -266,7 +254,7 @@ index a036f72..b175ace 100644
              $operations['view_with_' . $id] = [
                'title' => t('View with :label', [':label' => $modeler->label()]),
                'url' => Url::fromRoute('entity.' . $type . '.view_with.' . $id, [$type => $entity->id()]),
-@@ -141,14 +204,14 @@ class EntityHooks {
+@@ -141,14 +192,14 @@ class EntityHooks {
        }
  
        $name = 'entity.' . $type . '.canonical';
@@ -283,7 +271,7 @@ index a036f72..b175ace 100644
          if (!$entity->status()) {
            $operations['enable'] = [
              'title' => t('Enable'),
-@@ -165,7 +228,7 @@ class EntityHooks {
+@@ -165,7 +216,7 @@ class EntityHooks {
          }
        }
        $name = 'entity.' . $type . '.clone';
@@ -292,7 +280,7 @@ index a036f72..b175ace 100644
          if ($owner->isEditable($entity)) {
            $operations['clone'] = [
              'title' => t('Clone'),
-@@ -176,7 +239,7 @@ class EntityHooks {
+@@ -176,7 +227,7 @@ class EntityHooks {
        }
        if ($owner->isExportable($entity)) {
          $name = 'entity.' . $type . '.export';
@@ -301,7 +289,7 @@ index a036f72..b175ace 100644
            $operations['export'] = [
              'title' => t('Export'),
              'url' => Url::fromRoute($name, [$type => $entity->id()]),
-@@ -184,7 +247,7 @@ class EntityHooks {
+@@ -184,7 +235,7 @@ class EntityHooks {
            ];
          }
          $name = 'entity.' . $type . '.export_recipe';
@@ -310,22 +298,13 @@ index a036f72..b175ace 100644
            $operations['export_recipe'] = [
              'title' => t('Export as recipe'),
              'url' => Url::fromRoute($name, [$type => $entity->id()]),
-@@ -206,7 +269,21 @@ class EntityHooks {
+@@ -206,7 +257,12 @@ class EntityHooks {
     */
    #[Hook('config_schema_info_alter')]
    public function configSchemaInfoAlter(array &$definitions): void {
 -    foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
-+    // Skip during installation or when the service container is being built
-+    // to prevent circular dependency issues.
-+    try {
-+      if (!\Drupal::hasContainer()) {
-+        return;
-+      }
-+      $container = \Drupal::getContainer();
-+      if (!$container->has('plugin.manager.modeler_api.model_owner')) {
-+        return;
-+      }
-+    } catch (\Exception $e) {
++    // Skip during installation to prevent circular dependency issues.
++    if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
 +      return;
 +    }
 +
@@ -333,25 +312,14 @@ index a036f72..b175ace 100644
        $provider = $owner->configEntityProviderId();
        $entityTypeId = $owner->configEntityTypeId();
        $key = implode('.', [$provider, $entityTypeId, '*']);
-@@ -333,11 +410,28 @@ class EntityHooks {
+@@ -333,11 +389,17 @@ class EntityHooks {
    #[Hook('system_info_alter')]
    public function systemInfoAlter(array &$info, Extension $file, string $type): void {
      if ($type === 'module') {
 -      foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
 +
-+      // Skip during container compilation to avoid circular dependencies.
-+      if (\Drupal::hasContainer() === FALSE) {
-+        return;
-+      }
-+
-+      // Skip during installation or when the service container is being built
-+      // to prevent circular dependency issues.
-+      try {
-+        $container = \Drupal::getContainer();
-+        if (!$container->has('plugin.manager.modeler_api.model_owner')) {
-+          return;
-+        }
-+      } catch (\Exception $e) {
++      // Skip during installation to prevent circular dependency issues.
++      if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
 +        return;
 +      }
 +
@@ -364,23 +332,14 @@ index a036f72..b175ace 100644
              $info['configure'] = $name;
            }
          }
-@@ -355,10 +449,25 @@ class EntityHooks {
+@@ -355,10 +417,16 @@ class EntityHooks {
      if ($is_syncing) {
        return;
      }
 -    foreach ($this->modelOwnerPluginManager->getAllInstances(TRUE) as $owner) {
 +
-+    // Skip during installation or when the service container is being built
-+    // to prevent circular dependency issues.
-+    try {
-+      if (!\Drupal::hasContainer()) {
-+        return;
-+      }
-+      $container = \Drupal::getContainer();
-+      if (!$container->has('plugin.manager.modeler_api.model_owner')) {
-+        return;
-+      }
-+    } catch (\Exception $e) {
++    // Skip during installation to prevent circular dependency issues.
++    if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
 +      return;
 +    }
 +
