@@ -234,6 +234,10 @@
       "drupal/content_planner": {
         "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch"
+      },
+      "drupal/webform": {
+        "Issue #3556347: Fix WebformEntityStorageTrait::__get() declaration after Drupal 11.2.6":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webform--2025-11-06--3556347--mr-768.patch"
       }
     }
   }
