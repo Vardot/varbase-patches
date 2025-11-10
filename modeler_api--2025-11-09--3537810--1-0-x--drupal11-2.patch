@@ -1,8 +1,17 @@
 diff --git a/modeler_api.services.yml b/modeler_api.services.yml
-index 91387f1..46945ac 100644
+index 91387f1..c66383a 100644
 --- a/modeler_api.services.yml
 +++ b/modeler_api.services.yml
-@@ -51,9 +51,3 @@ services:
+@@ -9,8 +9,6 @@ services:
+       - '@config.storage.export'
+       - '@file_system'
+       - '@entity_type.manager'
+-      - '@router.route_provider'
+-      - '@plugin.manager.menu.link'
+ 
+   logger.channel.modeler_api:
+     parent: logger.channel_base
+@@ -51,9 +49,3 @@ services:
    Drupal\modeler_api\Plugin\ModelOwnerPluginManager: '@plugin.manager.modeler_api.model_owner'
    Drupal\modeler_api\Plugin\ModelerPluginManager: '@plugin.manager.modeler_api.modeler'
  
@@ -12,3 +21,38 @@ index 91387f1..46945ac 100644
 -  Drupal\modeler_api\Hook\EntityHooks:
 -    class: Drupal\modeler_api\Hook\EntityHooks
 -    autowire: true
+diff --git a/src/Api.php b/src/Api.php
+index 808a8d3..0fa1e05 100644
+--- a/src/Api.php
++++ b/src/Api.php
+@@ -78,8 +78,8 @@ class Api {
+     protected ManagedStorage $configStorage,
+     protected FileSystemInterface $fileSystem,
+     protected EntityTypeManagerInterface $entityTypeManager,
+-    protected RouteProviderInterface $routeProvider,
+-    protected MenuLinkManagerInterface $menuLinkManager,
++    protected RouteProviderInterface|null $routeProvider = null,
++    protected MenuLinkManagerInterface|null $menuLinkManager = null,
+   ) {}
+ 
+   /**
+@@ -538,6 +538,9 @@ class Api {
+    *   The route, if it exists, NULL otherwise.
+    */
+   public function getRouteByName(string $name): ?Route {
++    if ($this->routeProvider === null) {
++      return NULL;
++    }
+     try {
+       return $this->routeProvider->getRouteByName($name);
+     }
+@@ -557,6 +560,9 @@ class Api {
+    *   The menu name of the parent path, if we can find it, FALSE otherwise.
+    */
+   public function getParentMenuName(string $path): ?string {
++    if ($this->menuLinkManager === null) {
++      return NULL;
++    }
+     $parts = explode('/', trim($path, '/'));
+     array_pop($parts);
+     $path = implode('/', $parts);
