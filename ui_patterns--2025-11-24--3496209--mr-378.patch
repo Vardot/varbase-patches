@@ -1,0 +1,78 @@
+diff --git a/src/Plugin/UiPatterns/Source/AttributesWidget.php b/src/Plugin/UiPatterns/Source/AttributesWidget.php
+index 3c2f7d24e5a8f50852247f51515edd693513b4a7..dd1e626ceb5af9f1141a545c3542891540789352 100644
+--- a/src/Plugin/UiPatterns/Source/AttributesWidget.php
++++ b/src/Plugin/UiPatterns/Source/AttributesWidget.php
+@@ -5,6 +5,7 @@ declare(strict_types=1);
+ namespace Drupal\ui_patterns\Plugin\UiPatterns\Source;
+ 
+ use Drupal\Core\Form\FormStateInterface;
++use Drupal\Core\Plugin\Context\ContextDefinition;
+ use Drupal\Core\Security\TrustedCallbackInterface;
+ use Drupal\Core\StringTranslation\TranslatableMarkup;
+ use Drupal\Core\Template\Attribute;
+@@ -22,6 +23,9 @@ use Drupal\ui_patterns\UnicodePatternValidatorTrait;
+   description: new TranslatableMarkup('Textfield with double-quoted values or a space-separated list of HTML classes.'),
+   prop_types: ['attributes'],
+   tags: ['widget', 'widget:dismissible'],
++  context_definitions: [
++    'entity' => new ContextDefinition('entity', label: new TranslatableMarkup('Entity'), required: FALSE),
++  ]
+ )]
+ class AttributesWidget extends SourcePluginPropValueWidget implements TrustedCallbackInterface {
+ 
+@@ -42,7 +46,15 @@ class AttributesWidget extends SourcePluginPropValueWidget implements TrustedCal
+     // In UI Patterns Settings, we built the Attribute object here. It is not
+     // possible anymore because SDC will not validate it against the prop
+     // type schema.
+-    return static::convertValueToAttributesMapping(parent::getPropValue());
++    $value = parent::getPropValue();
++
++    // Replace tokens if we have an entity context.
++    $token_data = $this->getTokenData();
++    if (!empty($token_data) && is_string($value)) {
++      $value = $this->replaceTokens($value);
++    }
++
++    return static::convertValueToAttributesMapping($value);
+   }
+ 
+   /**
+@@ -91,6 +103,10 @@ class AttributesWidget extends SourcePluginPropValueWidget implements TrustedCal
+     $form['value']['#description'] = $this->t("HTML attributes with double-quoted values or a space-separated list of HTML classes.");
+ 
+     $form['value']['#element_validate'][] = [static::class, 'validateUnicodePattern'];
++
++    // Add token tree link if token module is enabled.
++    $this->addTokenTreeLink($form);
++
+     return $form;
+   }
+ 
+diff --git a/tests/fixtures/source_only_tests.yml b/tests/fixtures/source_only_tests.yml
+index 1975db7ebb5e15d05edc4a7b985ca7876380c493..cf135751c0a35fdf992e8b3c1e36ebf64bdfa7b3 100644
+--- a/tests/fixtures/source_only_tests.yml
++++ b/tests/fixtures/source_only_tests.yml
+@@ -31,3 +31,23 @@ attributes_2:
+         same:
+           data-hello: "world"
+           class: "hello-world-class hello-world-class-2"
++
++attributes_3:
++  component:
++    component_id: ui_patterns_test:test-component
++    props:
++      attributes:
++        source_id: attributes
++        source:
++          value: 'aria-label="Read more about [node:title]" target="_parent"'
++  entity:
++    title:
++      value: 'title_entity_1'
++    body:
++      value: 'value_text_1'
++  output:
++    props:
++      attributes_with_default:
++        same:
++          aria-label: "Read more about title_entity_1"
++          target: "_parent"
