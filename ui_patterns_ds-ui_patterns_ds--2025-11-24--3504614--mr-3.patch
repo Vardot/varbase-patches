@@ -1,0 +1,193 @@
+diff --git a/src/ContextProvider/DsFieldContext.php b/src/ContextProvider/DsFieldContext.php
+index 775ce1ae97594100e53fca7fcc481c4cfc42ac87..7fd509db6653e0bc0920250bc88e12bb2ba6d70d 100644
+--- a/src/ContextProvider/DsFieldContext.php
++++ b/src/ContextProvider/DsFieldContext.php
+@@ -48,7 +48,7 @@ class DsFieldContext implements ContextProviderInterface {
+       }
+     }
+     $context = new Context($context_definition, $values);
+-    $result['ui_patterns_ds.ds_field'] = $context;
++    $result['ui_patterns_ds:field'] = $context;
+     return $result;
+   }
+ 
+diff --git a/src/Plugin/DsFieldTemplate/Component.php b/src/Plugin/DsFieldTemplate/Component.php
+index c24f92a5cbcff74726146b095df528ce0961606f..8ae6c2f88d507b0b89e95d5e2ada1880c00992c3 100644
+--- a/src/Plugin/DsFieldTemplate/Component.php
++++ b/src/Plugin/DsFieldTemplate/Component.php
+@@ -4,6 +4,10 @@ namespace Drupal\ui_patterns_ds\Plugin\DsFieldTemplate;
+ 
+ use Drupal\Core\Form\FormState;
+ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
++use Drupal\Core\Plugin\Context\Context;
++use Drupal\Core\Plugin\Context\ContextDefinition;
++use Drupal\Core\Plugin\Context\EntityContext;
++use Drupal\Core\Routing\CurrentRouteMatch;
+ use Drupal\Core\StringTranslation\TranslatableMarkup;
+ use Drupal\ds\Plugin\DsFieldTemplate\DsFieldTemplateBase;
+ use Drupal\ds\Attribute\DsFieldTemplate;
+@@ -33,12 +37,15 @@ class Component extends DsFieldTemplateBase implements ContainerFactoryPluginInt
+    *   The plugin implementation definition.
+    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+    *   The request stack.
++   * @param \Drupal\Core\Routing\CurrentRouteMatch $currentRouteMatch
++   *   The current route match.
+    */
+   public function __construct(
+     array $configuration,
+     $plugin_id,
+     $plugin_definition,
+     private readonly RequestStack $requestStack,
++    private readonly CurrentRouteMatch $currentRouteMatch,
+   ) {
+     parent::__construct($configuration, $plugin_id, $plugin_definition);
+   }
+@@ -52,6 +59,7 @@ class Component extends DsFieldTemplateBase implements ContainerFactoryPluginInt
+       $plugin_id,
+       $plugin_definition,
+       $container->get('request_stack'),
++      $container->get('current_route_match'),
+     );
+   }
+ 
+@@ -64,6 +72,13 @@ class Component extends DsFieldTemplateBase implements ContainerFactoryPluginInt
+     $this->setComponentConfiguration($config);
+     // @todo Load correct context from the entity.
+     $context = [];
++    $context['ui_patterns_ds'] = new Context(ContextDefinition::create('string'), $this->getCurrentField());
++
++    $entity = $this->getEntity();
++    if ($entity) {
++      $context['entity'] = EntityContext::fromEntity($entity, 'Entity');
++    }
++
+     $form = array_merge(
+       $form,
+       $this->buildComponentsForm(
+diff --git a/src/Plugin/UiPatterns/Source/DsField.php b/src/Plugin/UiPatterns/Source/DsField.php
+index 979aae2ae03312afe09b4e38c001db6858aef87d..6c4fd5b08ee4f80bc16f353e65fd296f416431c5 100644
+--- a/src/Plugin/UiPatterns/Source/DsField.php
++++ b/src/Plugin/UiPatterns/Source/DsField.php
+@@ -4,6 +4,7 @@ declare(strict_types=1);
+ 
+ namespace Drupal\ui_patterns_ds\Plugin\UiPatterns\Source;
+ 
++use Drupal\Core\Plugin\Context\ContextDefinition;
+ use Drupal\Core\StringTranslation\TranslatableMarkup;
+ use Drupal\ui_patterns\Attribute\Source;
+ use Drupal\ui_patterns\SourcePluginBase;
+@@ -15,7 +16,12 @@ use Drupal\ui_patterns\SourcePluginBase;
+   id: 'ds_field',
+   label: new TranslatableMarkup('DS Feild'),
+   description: new TranslatableMarkup('Formatted display suite field.'),
+-  prop_types: ['slot']
++  prop_types: ['slot'],
++  context_definitions: [
++    'entity' => new ContextDefinition('entity', label: new TranslatableMarkup('Cotnent entity'), required: FALSE),
++    'ui_patterns_ds' => new ContextDefinition('any', label: new TranslatableMarkup('DS')),
++    'ui_patterns_ds:field' => new ContextDefinition('any', label: new TranslatableMarkup('Field group render array'), required: FALSE),
++  ]
+ )]
+ class DsField extends SourcePluginBase {
+ 
+diff --git a/ui_patterns_ds.module b/ui_patterns_ds.module
+index 40fe22296ffdc600a6f5343220a2ef3bbdfe231c..637e453a38d2e973f089baf52a7c2e949927354d 100755
+--- a/ui_patterns_ds.module
++++ b/ui_patterns_ds.module
+@@ -7,6 +7,8 @@
+ 
+ use Drupal\Core\Plugin\Context\EntityContext;
+ use Drupal\Core\Entity\EntityInterface;
++use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
++use Symfony\Component\DependencyInjection\ContainerInterface;
+ 
+ /**
+  * Implements hook_preprocess_hook().
+@@ -14,11 +16,86 @@ use Drupal\Core\Entity\EntityInterface;
+ function ui_patterns_ds_preprocess_field__component(&$vars) {
+   $ds_config = $vars['ds-config'];
+   if (!empty($ds_config['settings'])) {
+-    $vars['component'] = [
++    $component_element = [
+       '#type' => 'component',
+       '#component' => $ds_config['settings']['component_id'] ,
+       '#ui_patterns' => $ds_config['settings'],
+     ];
++
++    // Add entity context for proper token replacement in source plugins.
++    // The entity context is needed so that tokens like [plain:node:title]
++    // in attributes (e.g., aria-label) can be properly replaced.
++    $entity = NULL;
++
++    // Try to get entity from the element array (DS field template passes the entity)
++    if (isset($vars['element']['#entity']) && $vars['element']['#entity'] instanceof EntityInterface) {
++      $entity = $vars['element']['#entity'];
++    }
++    // Try to get entity from $vars directly
++    elseif (isset($vars['entity']) && $vars['entity'] instanceof EntityInterface) {
++      $entity = $vars['entity'];
++    }
++    // Try to get entity from the object array
++    elseif (isset($vars['object']) && $vars['object'] instanceof EntityInterface) {
++      $entity = $vars['object'];
++    }
++    // Try to get entity from parent element's parent  (for nested rendering)
++    elseif (isset($vars['element']['#parent']) && isset($vars['element']['#parent']['#entity']) && $vars['element']['#parent']['#entity'] instanceof EntityInterface) {
++      $entity = $vars['element']['#parent']['#entity'];
++    }
++    // Try to get entity from items (for field value rendering in views)
++    elseif (isset($vars['items']) && is_array($vars['items']) && !empty($vars['items'])) {
++      // In field rendering within views, try to get entity from parent render context
++      if (isset($vars['_theme']) && $vars['_theme'] === 'field') {
++        // Try parent element structure
++        if (isset($vars['element']['#object']) && $vars['element']['#object'] instanceof EntityInterface) {
++          $entity = $vars['element']['#object'];
++        }
++      }
++    }
++    // Try to get entity from parent context (walk up render tree)
++    if (!$entity && isset($vars['element'])) {
++      $parent = $vars['element'];
++      // Walk up the render tree looking for an #entity
++      for ($i = 0; $i < 5; $i++) {
++        if (isset($parent['#entity']) && $parent['#entity'] instanceof EntityInterface) {
++          $entity = $parent['#entity'];
++          break;
++        }
++        if (isset($parent['#object']) && $parent['#object'] instanceof EntityInterface) {
++          $entity = $parent['#object'];
++          break;
++        }
++        if (isset($parent['#parent'])) {
++          $parent = $parent['#parent'];
++        } else {
++          break;
++        }
++      }
++    }
++    // Try to get entity from route match context (for non-view pages)
++    if (!$entity) {
++      try {
++        $route_match = \Drupal::service('current_route_match');
++        if ($route_match) {
++          $entity = $route_match->getParameter('node');
++          if (!($entity instanceof EntityInterface)) {
++            $entity = NULL;
++          }
++        }
++      } catch (\Exception $e) {
++        // If service not available, continue without entity
++      }
++    }
++
++    if ($entity) {
++      if (!isset($component_element['#source_contexts'])) {
++        $component_element['#source_contexts'] = [];
++      }
++      $component_element['#source_contexts']['entity'] = EntityContext::fromEntity($entity);
++    }
++
++    $vars['component'] = $component_element;
+   }
+ }
+ 
