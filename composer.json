@@ -193,7 +193,7 @@
       },
       "drupal/ui_patterns": {
         "Issue #3496209: Add token replacement support to AttributesWidget using new centralized token and normalizer services from SourcePluginBase":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns--2025-10-01--3496209--mr-378.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns--2025-11-24--3496209--mr-378.patch"
       },
       "drupal/dashboard": {
         "Issue #3528064: Add support for Layout Builder Restrictions":
