@@ -1,0 +1,41 @@
+diff --git a/src/Attribute/ResourceFieldEnhancer.php b/src/Attribute/ResourceFieldEnhancer.php
+index f409d52..96d93fa 100644
+--- a/src/Attribute/ResourceFieldEnhancer.php
++++ b/src/Attribute/ResourceFieldEnhancer.php
+@@ -13,6 +13,16 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
+ #[\Attribute(\Attribute::TARGET_CLASS)]
+ class ResourceFieldEnhancer extends Plugin {
+ 
++  /**
++   * The human-readable name of the formatter type.
++   */
++  public readonly TranslatableMarkup $label;
++
++  /**
++   * A short description of the formatter type.
++   */
++  public readonly TranslatableMarkup $description;
++
+   /**
+    * Constructs a ResourceFieldEnhancer attribute.
+    *
+@@ -26,11 +36,15 @@ class ResourceFieldEnhancer extends Plugin {
+    *   The name of modules that are required for this Field Enhancer to be usable.
+    */
+   public function __construct(
+-    public readonly string $id,
+-    public readonly TranslatableMarkup $label,
+-    public readonly TranslatableMarkup $description,
+-    public readonly array $dependencies = [],
++    string $id,
++    TranslatableMarkup $label,
++    TranslatableMarkup $description,
++    array $dependencies = [],
+   ) {
++    parent::__construct($id);
++    $this->label = $label;
++    $this->description = $description;
++    $this->dependencies = $dependencies;
+   }
+ 
+ }
