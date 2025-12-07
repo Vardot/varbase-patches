@@ -1,0 +1,13 @@
+diff --git a/src/Hook/TrashHandler/RedirectTrashHandler.php b/src/Hook/TrashHandler/RedirectTrashHandler.php
+index 174793fcad23dab8f360ff108df35bc4f91a8fb4..b1f20d86bbb06c26cfafda8517f9e41f84cdd389 100644
+--- a/src/Hook/TrashHandler/RedirectTrashHandler.php
++++ b/src/Hook/TrashHandler/RedirectTrashHandler.php
+@@ -24,7 +24,7 @@ class RedirectTrashHandler extends DefaultTrashHandler {
+ 
+     // Set a random hash value for deleted redirects in order to allow new ones
+     // to be created with the same source URL.
+-    if (!$entity->get('deleted')->isEmpty()) {
++    if ($entity->hasField('deleted') && !$entity->get('deleted')->isEmpty()) {
+       $entity->set('hash', 'deleted-' . $entity->uuid());
+     }
+   }
