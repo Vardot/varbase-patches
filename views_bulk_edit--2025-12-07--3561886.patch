@@ -1,0 +1,22 @@
+--- a/src/Plugin/Action/EditAction.php
++++ b/src/Plugin/Action/EditAction.php
+@@ -102,7 +102,7 @@ class EditAction extends ViewsBulkOperationsActionBase implements ContainerFact
+   /**
+    * {@inheritdoc}
+    */
+-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
++  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+     return $object->access('update', $account, $return_as_object);
+   }
+
+--- a/src/Plugin/Action/ModifyEntityValues.php
++++ b/src/Plugin/Action/ModifyEntityValues.php
+@@ -279,7 +279,7 @@ class ModifyEntityValues extends ViewsBulkOperationsActionBase implements Conta
+   /**
+    * {@inheritdoc}
+    */
+-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
++  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+     $access = $object->access('update', $account, TRUE);
+     return $return_as_object ? $access : $access->isAllowed();
+   }
