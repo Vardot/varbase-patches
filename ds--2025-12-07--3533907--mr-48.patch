@@ -1,0 +1,13 @@
+diff --git a/src/Form/FieldDeleteForm.php b/src/Form/FieldDeleteForm.php
+index 9ed332b6c55c1949f11acc00daa315cbefc84dae..ec788d033a988a331db4e1227f1f673e4a5a89b0 100644
+--- a/src/Form/FieldDeleteForm.php
++++ b/src/Form/FieldDeleteForm.php
+@@ -74,7 +74,7 @@ class FieldDeleteForm extends ConfirmFormBase implements ContainerInjectionInter
+   /**
+    * {@inheritdoc}
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, Request $request = NULL, $field_key = '') {
++  public function buildForm(array $form, FormStateInterface $form_state, ?Request $request = NULL, $field_key = '') {
+     $config = $this->config('ds.field.' . $field_key);
+     $this->field = $config->get();
+ 
