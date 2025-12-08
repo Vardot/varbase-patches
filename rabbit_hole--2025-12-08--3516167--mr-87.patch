@@ -1,0 +1,90 @@
+diff --git a/src/BehaviorInvoker.php b/src/BehaviorInvoker.php
+index fbdcaf722e8aaa2f836ae21ecbbabf458d196070..a4984761cdcca3593ebc144ccaa3f96a13417db3 100644
+--- a/src/BehaviorInvoker.php
++++ b/src/BehaviorInvoker.php
+@@ -98,7 +98,7 @@ class BehaviorInvoker implements BehaviorInvokerInterface {
+   /**
+    * {@inheritdoc}
+    */
+-  public function processEntity(ContentEntityInterface $entity, Response $current_response = NULL) {
++  public function processEntity(ContentEntityInterface $entity, ?Response $current_response = NULL) {
+     $plugin = $this->getBehaviorPlugin($entity);
+ 
+     if ($plugin === NULL) {
+diff --git a/src/BehaviorInvokerInterface.php b/src/BehaviorInvokerInterface.php
+index c2e312e4553ac2df26634a5852c428fbfa7d24b3..5a6c46c242bdea819bc519e7f6fd0eecb0f8a227 100644
+--- a/src/BehaviorInvokerInterface.php
++++ b/src/BehaviorInvokerInterface.php
+@@ -49,6 +49,6 @@ interface BehaviorInvokerInterface {
+    * @return \Symfony\Component\HttpFoundation\Response|null
+    *   A response or NULL if the response is unchanged.
+    */
+-  public function processEntity(ContentEntityInterface $entity, Response $current_response = NULL);
++  public function processEntity(ContentEntityInterface $entity, ?Response $current_response = NULL);
+ 
+ }
+diff --git a/src/BehaviorSettingsManager.php b/src/BehaviorSettingsManager.php
+index 3e8a3d45025f9c5d729ed967479cc37811762f26..389957401037931d0bcff9279e601f9f0be47cc0 100644
+--- a/src/BehaviorSettingsManager.php
++++ b/src/BehaviorSettingsManager.php
+@@ -82,7 +82,7 @@ class BehaviorSettingsManager implements BehaviorSettingsManagerInterface {
+   /**
+    * {@inheritdoc}
+    */
+-  public function saveBehaviorSettings(array $settings, $entity_type_id, $bundle = NULL): void {
++  public function saveBehaviorSettings(array $settings, $entity_type_id, ?string $bundle = NULL): void {
+     $config = BehaviorSettings::loadByEntityTypeBundle($entity_type_id, $bundle);
+     foreach ($settings as $key => $setting) {
+       $config->set($key, $setting);
+diff --git a/src/Form/RabbitHoleEntityTypeSettingsForm.php b/src/Form/RabbitHoleEntityTypeSettingsForm.php
+index 7206959b7f4599cb53633c9f3a75a7d0a18e43a6..90eeb92388902a1310626dcb4f12f168c4ceaeeb 100644
+--- a/src/Form/RabbitHoleEntityTypeSettingsForm.php
++++ b/src/Form/RabbitHoleEntityTypeSettingsForm.php
+@@ -94,7 +94,7 @@ class RabbitHoleEntityTypeSettingsForm extends ConfigFormBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, $entity_type_id = NULL): array {
++  public function buildForm(array $form, FormStateInterface $form_state, ?string $entity_type_id = NULL): array {
+     try {
+       $this->entityType = $this->entityTypeManager->getDefinition($entity_type_id);
+     }
+diff --git a/src/Plugin/RabbitHoleBehaviorPlugin/AccessDenied.php b/src/Plugin/RabbitHoleBehaviorPlugin/AccessDenied.php
+index d6d0442b00c09d3227733e61111cd2c8e2081db0..e063df569e21ee9ec8669e6191c74d5692b22cb1 100644
+--- a/src/Plugin/RabbitHoleBehaviorPlugin/AccessDenied.php
++++ b/src/Plugin/RabbitHoleBehaviorPlugin/AccessDenied.php
+@@ -20,7 +20,7 @@ class AccessDenied extends RabbitHoleBehaviorPluginBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function performAction(EntityInterface $entity, Response $current_response = NULL) {
++  public function performAction(EntityInterface $entity, ?Response $current_response = NULL) {
+     throw new AccessDeniedHttpException();
+   }
+ 
+diff --git a/src/Plugin/RabbitHoleBehaviorPlugin/PageNotFound.php b/src/Plugin/RabbitHoleBehaviorPlugin/PageNotFound.php
+index 9a8c0e5b7def47c843b208bdc4ae477216d4854c..65d8a125a670218a8b9a0f86117e3bf4224a63cb 100644
+--- a/src/Plugin/RabbitHoleBehaviorPlugin/PageNotFound.php
++++ b/src/Plugin/RabbitHoleBehaviorPlugin/PageNotFound.php
+@@ -20,7 +20,7 @@ class PageNotFound extends RabbitHoleBehaviorPluginBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function performAction(EntityInterface $entity, Response $current_response = NULL) {
++  public function performAction(EntityInterface $entity, ?Response $current_response = NULL) {
+     throw new NotFoundHttpException();
+   }
+ 
+diff --git a/src/Plugin/RabbitHoleBehaviorPlugin/PageRedirect.php b/src/Plugin/RabbitHoleBehaviorPlugin/PageRedirect.php
+index 58845472fdceef565ff6f3e6ae143c7007809b2f..f89a38d5e89f8104f0736c7822b817bb90f206d8 100644
+--- a/src/Plugin/RabbitHoleBehaviorPlugin/PageRedirect.php
++++ b/src/Plugin/RabbitHoleBehaviorPlugin/PageRedirect.php
+@@ -103,7 +103,7 @@ class PageRedirect extends RabbitHoleBehaviorPluginBase implements ContainerFact
+   /**
+    * {@inheritdoc}
+    */
+-  public function performAction(EntityInterface $entity, Response $current_response = NULL) {
++  public function performAction(EntityInterface $entity, ?Response $current_response = NULL) {
+     $target = $this->getActionTarget($entity);
+     $response_code = $this->getActionResponseCode($entity);
+ 
