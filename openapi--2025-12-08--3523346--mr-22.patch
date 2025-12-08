@@ -1,0 +1,17 @@
+diff --git a/src/Controller/OpenApiListController.php b/src/Controller/OpenApiListController.php
+index e1424184ec637e13cc54e18788870cb0bcd6b62c..97f09ae5afa780d024be489414504fd32c22183f 100644
+--- a/src/Controller/OpenApiListController.php
++++ b/src/Controller/OpenApiListController.php
+@@ -31,10 +31,10 @@ class OpenApiListController extends ControllerBase {
+    *
+    * @param \Drupal\Component\Plugin\PluginManagerInterface $openapi_generator_manager
+    *   The current openapi generator plugin manager instance.
+-   * @param ?\Drupal\Component\Plugin\PluginManagerInterface $openapi_ui_manager
++   * @param ?\Drupal\Component\Plugin\PluginManagerInterface|null $openapi_ui_manager
+    *   ui library plugin manager instance. NULL if the module is not enabled.
+    */
+-  public function __construct(PluginManagerInterface $openapi_generator_manager, PluginManagerInterface $openapi_ui_manager = NULL) {
++  public function __construct(PluginManagerInterface $openapi_generator_manager, ?PluginManagerInterface $openapi_ui_manager = NULL) {
+     $this->openapiGeneratorManager = $openapi_generator_manager;
+     $this->openapiUiManager = $openapi_ui_manager;
+   }
