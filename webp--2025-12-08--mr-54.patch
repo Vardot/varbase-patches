@@ -1,0 +1,47 @@
+diff --git a/src/Controller/FileDownloadController.php b/src/Controller/FileDownloadController.php
+index 4851ad3547edc0f49530577a41bd9e0fadbdb9e6..7c2d75cfc1a5e4b6739ecb8de10ef77faf3e0d55 100644
+--- a/src/Controller/FileDownloadController.php
++++ b/src/Controller/FileDownloadController.php
+@@ -47,14 +47,14 @@ class FileDownloadController extends ControllerBase {
+   /**
+    * Constructs a FileDownloadController object.
+    *
+-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface|null $streamWrapperManager
+-   *   The stream wrapper manager.
+    * @param \Drupal\webp\Webp $webp
+    *   WebP driver.
+    * @param \Drupal\Core\Image\ImageFactory $image_factory
+    *   The image factory.
++   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface|null $streamWrapperManager
++   *   The stream wrapper manager.
+    */
+-  public function __construct(StreamWrapperManagerInterface $streamWrapperManager = NULL, Webp $webp, ImageFactory $image_factory) {
++  public function __construct(Webp $webp, ImageFactory $image_factory, ?StreamWrapperManagerInterface $streamWrapperManager = NULL) {
+     if (!$streamWrapperManager) {
+       @trigger_error('Calling FileDownloadController::__construct() without the $streamWrapperManager argument is deprecated in drupal:8.8.0. The $streamWrapperManager argument will be required in drupal:9.0.0. See https://www.drupal.org/node/3035273', E_USER_DEPRECATED);
+       $streamWrapperManager = \Drupal::service('stream_wrapper_manager');
+@@ -70,9 +70,9 @@ class FileDownloadController extends ControllerBase {
+    */
+   public static function create(ContainerInterface $container) {
+     return new static(
+-      $container->get('stream_wrapper_manager'),
+       $container->get('webp.webp'),
+-      $container->get('image.factory')
++      $container->get('image.factory'),
++      $container->get('stream_wrapper_manager')
+     );
+   }
+ 
+diff --git a/src/Controller/ImageStyleDownloadController.php b/src/Controller/ImageStyleDownloadController.php
+index d51af485ecb0e1bd8c6caf20a22def53230da1de..f54d3c6c93d0872ef7c8cf1ccbf950f832baffdb 100644
+--- a/src/Controller/ImageStyleDownloadController.php
++++ b/src/Controller/ImageStyleDownloadController.php
+@@ -62,7 +62,7 @@ class ImageStyleDownloadController extends FileDownloadController {
+    * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface|null $stream_wrapper_manager
+    *   The stream wrapper manager.
+    */
+-  public function __construct(LockBackendInterface $lock, ImageFactory $image_factory, Webp $webp, StreamWrapperManagerInterface $stream_wrapper_manager = NULL) {
++  public function __construct(LockBackendInterface $lock, ImageFactory $image_factory, Webp $webp, ?StreamWrapperManagerInterface $stream_wrapper_manager = NULL) {
+     parent::__construct($stream_wrapper_manager);
+     $this->lock = $lock;
+     $this->imageFactory = $image_factory;
