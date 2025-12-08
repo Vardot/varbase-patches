@@ -1,0 +1,22 @@
+diff --git a/src/Controller/ParagraphsPreviewController.php b/src/Controller/ParagraphsPreviewController.php
+index 3fe50c4359bd1dfacf483569185664adef997835..b7ce695f04be80b76c05b9f7659ed6dc1ed51f32 100644
+--- a/src/Controller/ParagraphsPreviewController.php
++++ b/src/Controller/ParagraphsPreviewController.php
+@@ -102,7 +102,7 @@ class ParagraphsPreviewController extends ControllerBase {
+    * @return \Drupal\Core\Entity\EntityInterface
+    *   The parent entity if found else the form entity.
+    */
+-  public function findParentEntity(Paragraph $paragraph, array $field_parents, FormStateInterface $form_state, EntityInterface $form_entity = NULL) {
++  public function findParentEntity(Paragraph $paragraph, array $field_parents, FormStateInterface $form_state, ?EntityInterface $form_entity = NULL) {
+     if (in_array('subform', $field_parents, TRUE)) {
+       // Traverse up to find the parent.
+       foreach (array_reverse($field_parents, TRUE) as $i => $element_key) {
+@@ -143,7 +143,7 @@ class ParagraphsPreviewController extends ControllerBase {
+    * @return array|null
+    *   A render array for the field.
+    */
+-  public function paragraphsPreviewRenderParentField(Paragraph $paragraph, $parent_field_name, ContentEntityBase $parent_entity = NULL) {
++  public function paragraphsPreviewRenderParentField(Paragraph $paragraph, $parent_field_name, ?ContentEntityBase $parent_entity = NULL) {
+     if (!isset($parent_entity)) {
+       $parent_entity = $paragraph->getParentEntity();
+     }
