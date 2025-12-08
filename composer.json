@@ -69,7 +69,9 @@
       },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
-        "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
+        "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch",
+        "fix: #3470061 [PHP 8.4] Fix implicitly nullable type declarations":
+        "https://git.drupalcode.org/project/default_content/-/commit/b85c0192af51841518bddd9ecfa5077b1d0f720a.diff"
       },
       "drupal/gin": {
         "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme":
