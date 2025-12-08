@@ -246,6 +246,10 @@
       "drupal/config_ignore": {
         "fix: #3561884 Implicit nullable Request parameter for PHP 8.4 compatibility in Config Ignore":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/config_ignore--2025-12-07--3561884.patch"
+      },
+      "drupal/webp": {
+        "fix: #3561953 PHP 8.4 implicit nullable & constructor parameter order issues in WebP FileDownloadController":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webp--2025-12-08--mr-54.patch"
       }
     }
   }
