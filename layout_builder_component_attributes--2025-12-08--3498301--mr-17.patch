@@ -1,0 +1,31 @@
+diff --git a/src/Form/ManageComponentAttributesForm.php b/src/Form/ManageComponentAttributesForm.php
+index de265cc8c562c5b7e5bfb320e9e88e55818beca6..95ca68a8b53b03da3024f5b1f4ad6c07b0d6a266 100644
+--- a/src/Form/ManageComponentAttributesForm.php
++++ b/src/Form/ManageComponentAttributesForm.php
+@@ -95,17 +95,22 @@ class ManageComponentAttributesForm extends FormBase {
+    *   An associative array containing the structure of the form.
+    * @param \Drupal\Core\Form\FormStateInterface $form_state
+    *   The current state of the form.
+-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
++   * @param \Drupal\layout_builder\SectionStorageInterface|null $section_storage
+    *   The section storage being configured.
+-   * @param int $delta
++   * @param ?int $delta
+    *   The original delta of the section.
+-   * @param string $uuid
++   * @param ?string $uuid
+    *   The UUID of the block being updated.
+    *
+    * @return array
+    *   The form array.
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface $section_storage = NULL, $delta = NULL, $uuid = NULL) {
++  public function buildForm(
++    array $form,
++    FormStateInterface $form_state,
++    ?SectionStorageInterface $section_storage = NULL,
++    ?int $delta = NULL,
++    ?string $uuid = NULL) {
+     $parameters = array_slice(func_get_args(), 2);
+     foreach ($parameters as $parameter) {
+       if (is_null($parameter)) {
