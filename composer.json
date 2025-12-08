@@ -161,7 +161,9 @@
       },
       "drupal/layout_builder_perms": {
         "Issue #3502237: Fix type error in layout builder perms access manager logger channel factory with LoggerChannelFactoryInterface ":
-        "https://www.drupal.org/files/issues/2025-01-25/layout_builder_perms--2025-01-25--3502237--mr-25.patch"
+        "https://www.drupal.org/files/issues/2025-01-25/layout_builder_perms--2025-01-25--3502237--mr-25.patch",
+        "fix: #3562020 PHP 8.4 implicit nullable parameters across Layout Builder Advanced Permissions":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_builder_perms--2025-12-08--3562020--mr-28.patch"
       },
       "drupal/cl_server": {
         "Issue #3456661: Update Drupal core to ^10.3 and ^11 and drop the use of the SDC experimental module":
