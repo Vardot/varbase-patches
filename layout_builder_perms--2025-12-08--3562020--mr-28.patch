@@ -1,0 +1,56 @@
+diff --git a/src/Access/AccessManager.php b/src/Access/AccessManager.php
+index cfdc3940bfb774becb43acb88cef08cdec023a8d..cd4a045fa488f316f573cc0060da0a45b936ff45 100644
+--- a/src/Access/AccessManager.php
++++ b/src/Access/AccessManager.php
+@@ -84,7 +84,7 @@ class AccessManager implements AccessManagerInterface {
+   /**
+    * {@inheritdoc}
+    */
+-  public function access(string $operation, RouteMatchInterface $route_match = NULL, SectionStorageInterface $section_storage = NULL, AccountInterface $account = NULL, $return_as_object = FALSE) {
++  public function access(string $operation, ?RouteMatchInterface $route_match = NULL, ?SectionStorageInterface $section_storage = NULL, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+     if (NULL === $account) {
+       $account = $this->currentUser;
+     }
+@@ -146,7 +146,7 @@ class AccessManager implements AccessManagerInterface {
+    * @param \Drupal\layout_builder\SectionStorageInterface|null $section_storage
+    *   (optional) The section storage for the layout that is being edited.
+    */
+-  protected function setPluginContext(ContextAwarePluginInterface $plugin, string $operation, RouteMatchInterface $route_match = NULL, SectionStorageInterface $section_storage = NULL): void {
++  protected function setPluginContext(ContextAwarePluginInterface $plugin, string $operation, ?RouteMatchInterface $route_match = NULL, ?SectionStorageInterface $section_storage = NULL): void {
+     // Pass in the operation.
+     try {
+       // The getContextDefinition() method will throw a ContextException when
+@@ -224,7 +224,7 @@ class AccessManager implements AccessManagerInterface {
+    * @param \Drupal\layout_builder\SectionStorageInterface|null $section_storage
+    *   (optional) The section storage for the layout that is being edited.
+    */
+-  protected function getLayoutFromRouteMatch(RouteMatchInterface $route_match, SectionStorageInterface $section_storage = NULL) {
++  protected function getLayoutFromRouteMatch(RouteMatchInterface $route_match, ?SectionStorageInterface $section_storage = NULL) {
+     switch ($route_match->getRouteName()) {
+       // When inserting a new section the layout type is determined by the
+       // plugin ID.
+diff --git a/src/AccessManagerInterface.php b/src/AccessManagerInterface.php
+index fd80f3a26d70aa2a04c71185f2b0d2eeea7f0a6d..a5ffa55645bc1e091e549e7fcc6fde0d2bb39008 100644
+--- a/src/AccessManagerInterface.php
++++ b/src/AccessManagerInterface.php
+@@ -41,6 +41,6 @@ interface AccessManagerInterface {
+    * @return \Drupal\Core\Access\AccessResultInterface|bool
+    *   The result of the combined access checks.
+    */
+-  public function access(string $operation, RouteMatchInterface $route_match = NULL, SectionStorageInterface $section_storage = NULL, AccountInterface $account = NULL, $return_as_object = FALSE);
++  public function access(string $operation, ?RouteMatchInterface $route_match = NULL, ?SectionStorageInterface $section_storage = NULL, ?AccountInterface $account = NULL, $return_as_object = FALSE);
+ 
+ }
+diff --git a/src/Plugin/SectionStorage/OverridesSectionStorage.php b/src/Plugin/SectionStorage/OverridesSectionStorage.php
+index f9a5f0b1cc0caae21c81bdbbfeae105e13dacbdb..d9c8ef02ca0c52165c4efba1de4f6f0aec6132aa 100644
+--- a/src/Plugin/SectionStorage/OverridesSectionStorage.php
++++ b/src/Plugin/SectionStorage/OverridesSectionStorage.php
+@@ -35,7 +35,7 @@ class OverridesSectionStorage extends OverridesSectionStorageBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function access($operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
++  public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+     $entity = $this->getEntity();
+     if ($account === NULL) {
+       $account = $this->currentUser;
