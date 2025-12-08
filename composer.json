@@ -155,7 +155,9 @@
       },
       "drupal/paragraphs_previewer": {
         "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch":
-        "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch"
+        "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch",
+        "fix: #3538671 PHP 8.4 compatibility with implicit nullable parameters in ParagraphsPreviewController":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs_previewer--2025-12-08--3538671--mr-5.patch"
       },
       "drupal/redirect": {
         "Issue #2879648: Redirects from aliased paths aren't triggered":
