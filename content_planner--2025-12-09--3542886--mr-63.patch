@@ -1,0 +1,52 @@
+diff --git a/modules/content_calendar/src/Form/SettingsForm.php b/modules/content_calendar/src/Form/SettingsForm.php
+index 8f781d3f386900805372cbc2a136a3348eec2d3c..ba77fd934c5c0faf093f4de3e22cc3238eaaff46 100644
+--- a/modules/content_calendar/src/Form/SettingsForm.php
++++ b/modules/content_calendar/src/Form/SettingsForm.php
+@@ -79,7 +79,7 @@ class SettingsForm extends ConfigFormBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, Request $request = NULL) {
++  public function buildForm(array $form, FormStateInterface $form_state, ?Request $request = NULL) {
+ 
+     // Get select options for content types.
+     $content_type_options = $this->getConfiguredContentTypes();
+diff --git a/modules/content_kanban/src/Form/SettingsForm.php b/modules/content_kanban/src/Form/SettingsForm.php
+index 40c72570e3dcc75f649eec4754e9d1c707e101dd..fe202ecab7b5c1a948a8bcf77b60de6b12433423 100644
+--- a/modules/content_kanban/src/Form/SettingsForm.php
++++ b/modules/content_kanban/src/Form/SettingsForm.php
+@@ -66,7 +66,7 @@ class SettingsForm extends ConfigFormBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, Request $request = NULL) {
++  public function buildForm(array $form, FormStateInterface $form_state, ?Request $request = NULL) {
+ 
+     // If the Content Calendar module is not enabled, set the use color setting
+     // to inactive.
+diff --git a/src/Form/DashboardBlockConfigForm.php b/src/Form/DashboardBlockConfigForm.php
+index bbc796998249a31fdd4cdf4e0c7f4f2df9331cb4..ae32598a329fef09510a8e63a5f28fa7c540d601 100644
+--- a/src/Form/DashboardBlockConfigForm.php
++++ b/src/Form/DashboardBlockConfigForm.php
+@@ -57,7 +57,7 @@ class DashboardBlockConfigForm extends ConfigFormBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, Request $request = NULL, $block_id = NULL) {
++  public function buildForm(array $form, FormStateInterface $form_state, ?Request $request = NULL, $block_id = NULL) {
+ 
+     // Get plugin definition.
+     $plugin_definition = $this->dashboardBlockPluginManager->getDefinition($block_id);
+diff --git a/src/Form/DashboardSettingsForm.php b/src/Form/DashboardSettingsForm.php
+index ab03ed9f7d357b1f51c128ca0ba80d6699de788f..0b5c95377a979ec42b89a5d1acbea370932babee 100644
+--- a/src/Form/DashboardSettingsForm.php
++++ b/src/Form/DashboardSettingsForm.php
+@@ -60,7 +60,7 @@ class DashboardSettingsForm extends ConfigFormBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, Request $request = NULL) {
++  public function buildForm(array $form, FormStateInterface $form_state, ?Request $request = NULL) {
+ 
+     // Get block configurations from settings.
+     $block_configurations = $this->dashboardSettingsService->getBlockConfigurations();
