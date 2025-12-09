@@ -1,0 +1,35 @@
+diff --git a/src/Asset/UnoptimizedAssetResolver.php b/src/Asset/UnoptimizedAssetResolver.php
+index 06e5fa3065a9718eb8b0a351a6994beec24f51ed..b1df053954fa4e1ff565ac0f3d58ff5c9120fde1 100644
+--- a/src/Asset/UnoptimizedAssetResolver.php
++++ b/src/Asset/UnoptimizedAssetResolver.php
+@@ -46,7 +46,7 @@ class UnoptimizedAssetResolver implements AssetResolverInterface {
+   /**
+    * @inheritDoc
+    */
+-  public function getCssAssets(AttachedAssetsInterface $assets, $optimize, LanguageInterface $language = NULL) {
++  public function getCssAssets(AttachedAssetsInterface $assets, $optimize, ?LanguageInterface $language = NULL) {
+     return $this->resolver->getCssAssets(
+       $assets,
+       $this->skipOptimization ? FALSE : $optimize,
+@@ -57,7 +57,7 @@ class UnoptimizedAssetResolver implements AssetResolverInterface {
+   /**
+    * @inheritDoc
+    */
+-  public function getJsAssets(AttachedAssetsInterface $assets, $optimize, LanguageInterface $language = NULL) {
++  public function getJsAssets(AttachedAssetsInterface $assets, $optimize, ?LanguageInterface $language = NULL) {
+     return $this->resolver->getJsAssets(
+       $assets,
+       $this->skipOptimization ? FALSE : $optimize,
+diff --git a/src/PathProcessor/AbsolutePathProcessor.php b/src/PathProcessor/AbsolutePathProcessor.php
+index ad9f6ef779da84cc7aef8e5e7a5f453f8258c14c..485a9c2f44e9714d940db304fb971b75956ea10c 100644
+--- a/src/PathProcessor/AbsolutePathProcessor.php
++++ b/src/PathProcessor/AbsolutePathProcessor.php
+@@ -15,7 +15,7 @@ class AbsolutePathProcessor implements OutboundPathProcessorInterface {
+   /**
+    * {@inheritdoc}
+    */
+-  public function processOutbound($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
++  public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
+     if (!$request) {
+       return $path;
+     }
