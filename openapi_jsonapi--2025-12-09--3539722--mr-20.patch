@@ -1,0 +1,13 @@
+diff --git a/src/Plugin/openapi/OpenApiGenerator/JsonApiGenerator.php b/src/Plugin/openapi/OpenApiGenerator/JsonApiGenerator.php
+index 7185ce24a0a9005a888177764106a7d7f0f6950b..53fd5846d60a611ec8063ec1fd495ad04bcb19fd 100644
+--- a/src/Plugin/openapi/OpenApiGenerator/JsonApiGenerator.php
++++ b/src/Plugin/openapi/OpenApiGenerator/JsonApiGenerator.php
+@@ -645,7 +645,7 @@ class JsonApiGenerator extends OpenApiGeneratorBase {
+   /**
+    * {@inheritdoc}
+    */
+-  protected function getEntityResponsesJsonApi($entity_type_id, $method, $bundle_name, $route_name, Route $route = NULL) {
++  protected function getEntityResponsesJsonApi($entity_type_id, $method, $bundle_name, $route_name, ?Route $route = NULL) {
+     $route_type = $this->getRoutTypeFromName($route_name);
+     if ($route_type === 'collection') {
+       if ($method === 'get') {
