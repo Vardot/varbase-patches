@@ -181,9 +181,7 @@
       },
       "drupal/ds": {
         "Issue #3507312: Fix array_unshift() Error in ds_theme_registry_alter() when running Field Group pre-process before ds_entity_view":
-        "https://www.drupal.org/files/issues/2025-02-18/ds--2025-02-18--3507312--mr-43.patch",
-        "Issue #3533907 : PHP 8.4 - Implicitly nullable via default value null deprecation":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ds--2025-12-07--3533907--mr-48.patch"
+        "https://www.drupal.org/files/issues/2025-02-18/ds--2025-02-18--3507312--mr-43.patch"
       },
       "drupal/social_auth_facebook": {
         "Issue #3507470: Fix fatal error for validateConfig() method signature mismatch":
