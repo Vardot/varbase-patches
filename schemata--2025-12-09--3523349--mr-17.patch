@@ -1,0 +1,40 @@
+diff --git a/schemata_json_schema/src/Normalizer/json/ComplexDataDefinitionNormalizer.php b/schemata_json_schema/src/Normalizer/json/ComplexDataDefinitionNormalizer.php
+index 868d9e7ea8577250a9ebd080f67dc1d8aad6e359..468d2abb8d0e092f789656d20ad303a60bde9a2b 100644
+--- a/schemata_json_schema/src/Normalizer/json/ComplexDataDefinitionNormalizer.php
++++ b/schemata_json_schema/src/Normalizer/json/ComplexDataDefinitionNormalizer.php
+@@ -48,13 +48,13 @@ class ComplexDataDefinitionNormalizer extends DataDefinitionNormalizer {
+    *
+    * @param \Drupal\Core\TypedData\ComplexDataDefinitionInterface $entity
+    *   The complex data definition to be checked.
+-   * @param array $context
++   * @param array|null $context
+    *   The current serializer context.
+    *
+    * @return bool
+    *   TRUE if it is a reference, FALSE otherwise.
+    */
+-  protected function isReferenceField(ComplexDataDefinitionInterface $entity, array $context = NULL) {
++  protected function isReferenceField(ComplexDataDefinitionInterface $entity, ?array $context = NULL) {
+     $main = $entity->getPropertyDefinition($entity->getMainPropertyName());
+     // @todo use an interface or API call instead of an object check.
+     return ($main instanceof DataReferenceTargetDefinition);
+diff --git a/schemata_json_schema/src/Normalizer/jsonapi/ComplexDataDefinitionNormalizer.php b/schemata_json_schema/src/Normalizer/jsonapi/ComplexDataDefinitionNormalizer.php
+index 50d29c55cf09ec1575e571e195253e3f6b42f45f..48707edddcc72d74a591417d3ce29ef39e37269d 100644
+--- a/schemata_json_schema/src/Normalizer/jsonapi/ComplexDataDefinitionNormalizer.php
++++ b/schemata_json_schema/src/Normalizer/jsonapi/ComplexDataDefinitionNormalizer.php
+@@ -53,13 +53,13 @@ class ComplexDataDefinitionNormalizer extends DataDefinitionNormalizer {
+    *
+    * @param \Drupal\Core\TypedData\ComplexDataDefinitionInterface $entity
+    *   The complex data definition to be checked.
+-   * @param array $context
++   * @param array|null $context
+    *   The current serializer context.
+    *
+    * @return bool
+    *   TRUE if it is a reference, FALSE otherwise.
+    */
+-  protected function isReferenceField(ComplexDataDefinitionInterface $entity, array $context = NULL) {
++  protected function isReferenceField(ComplexDataDefinitionInterface $entity, ?array $context = NULL) {
+     $main = $entity->getPropertyDefinition($entity->getMainPropertyName());
+     // @todo use an interface or API call instead of an object check.
+     return ($main instanceof DataReferenceTargetDefinition);
