@@ -1,0 +1,13 @@
+diff --git a/src/Form/LayoutBuilderForm.php b/src/Form/LayoutBuilderForm.php
+index b60a4ec35e41335ea3d0fb3a6bc61a8a8bdf55ac..578dd75fba4a2f3184fd695182e967130ee9c119 100644
+--- a/src/Form/LayoutBuilderForm.php
++++ b/src/Form/LayoutBuilderForm.php
+@@ -51,7 +51,7 @@ class LayoutBuilderForm extends EntityForm {
+   /**
+    * {@inheritdoc}
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface $section_storage = NULL) {
++  public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL) {
+     $form['layout_builder'] = [
+       '#type' => 'layout_builder',
+       '#section_storage' => $section_storage,
