@@ -1,0 +1,13 @@
+diff --git a/src/Form/ShieldSettingsForm.php b/src/Form/ShieldSettingsForm.php
+index bf43ffce19066f8c202cdfbfba29604bcd00bd7e..76b3695f774d872bea6d00fd843a09fa68d41485 100644
+--- a/src/Form/ShieldSettingsForm.php
++++ b/src/Form/ShieldSettingsForm.php
+@@ -43,7 +43,7 @@ class ShieldSettingsForm extends ConfigFormBase {
+    * @param \Drupal\key\Plugin\KeyPluginManager|null $keyTypeManager
+    *   The key plugin manager.
+    */
+-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $moduleHandler, KeyPluginManager $keyTypeManager = NULL) {
++  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $moduleHandler, ?KeyPluginManager $keyTypeManager = NULL) {
+     parent::__construct($config_factory, $typedConfigManager);
+     $this->moduleHandler = $moduleHandler;
+     $this->keyTypeManager = $keyTypeManager;
