@@ -298,6 +298,10 @@
       "drupal/ctools": {
         "fix: 3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple()":
         "https://git.drupalcode.org/project/ctools/-/commit/5a323c6e5072515148a54b4055e7db86a50f5111.diff"
+      },
+      "drupal/shield": {
+        "fix: #3562392 PHP 8.4 - Implicit nullable parameters for Shield":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/shield--2025-12-10--3562392--mr-30.patch"
       }
     }
   }
