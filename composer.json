@@ -79,7 +79,7 @@
         "Issue #3398040: Fix issue with changing between responsive views and Gin Toolbar over menus":
         "https://www.drupal.org/files/issues/2023-10-31/3398040-8.patch",
         "fix: #3560487 Gin Top Bar styling is fully gone in 11.3.x":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2025-12-18--3560487--mr-726.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2025-12-18--3560487--mr-728.patch",
         "fix: #3562873 Secondary admin toolbar not visible":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2025-12-18--3562873--mr-727.patch"
       },
