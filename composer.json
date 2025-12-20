@@ -137,7 +137,9 @@
         "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'":
         "https://www.drupal.org/files/issues/2023-01-05/3075067-19.patch",
         "Issue #3273160: Support inline blocks in layout":
-        "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch"
+        "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch",
+        "fix: #3562479 PHP 8.4 - Implicit nullable SectionStorageInterface parameter":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2025-12-10--3562479--mr-22.patch"
       },
       "drupal/layout_builder_blocks": {
         "Issue #3349066: Limit Layout Builder Blocks not to work in the dashboards route":
