@@ -238,6 +238,10 @@
       "drupal/google_analytics": {
         "fix: #3562288 PHP 8.4 - Implicit Nullable Parameters for Google Analytics":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/google_analytics--2025-12-09--3562288--mr-45.patch"
+      },
+      "drupal/schemata": {
+        "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemata--2025-12-09--3523349--mr-17.patch"
       }
     }
   }
