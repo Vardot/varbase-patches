@@ -231,6 +231,10 @@
         "fix: #3498301 PHP 8.4 compatibility implicit nullable SectionStorageInterface parameter":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_builder_component_attributes--2025-12-08--3498301--mr-17.patch"
       },
+      "neilime/php-css-lint": {
+        "fix: #3498301 PHP 8.4 compatibility to fix PHP 8.4 deprecation warning for implicit nullable parameter in CssLint Linter":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/php-css-lint--2025-12-21--3498301.patch"
+      },
       "drupal/openapi": {
         "fix: #3523346 PHP 8.4: Implicitly nullable parameter declarations deprecated":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi--2025-12-08--3523346--mr-22.patch"
