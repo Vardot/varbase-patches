@@ -1,0 +1,13 @@
+diff --git a/src/CssLint/Linter.php b/src/CssLint/Linter.php
+--- a/src/CssLint/Linter.php
++++ b/src/CssLint/Linter.php
+@@ -68,7 +68,7 @@ class Linter
+     /**
+      * Constructor
+      * @param \CssLint\Properties $oProperties (optional) an instance of the "\CssLint\Properties" helper
+      */
+-    public function __construct(\CssLint\Properties $oProperties = null)
++    public function __construct(?\CssLint\Properties $oProperties = null)
+     {
+         if ($oProperties) {
+             $this->setCssLintProperties($oProperties);
