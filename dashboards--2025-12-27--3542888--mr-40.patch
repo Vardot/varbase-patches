@@ -1,0 +1,129 @@
+diff --git a/src/Entity/Dashboard.php b/src/Entity/Dashboard.php
+index d8b1619a839a01b2ed7f4fb9032bbaad8ec56dd7..913e2996585784c7d45522757ab54249f1900bc0 100644
+--- a/src/Entity/Dashboard.php
++++ b/src/Entity/Dashboard.php
+@@ -205,7 +205,7 @@ class Dashboard extends ConfigEntityBase implements SectionListInterface {
+    * @return bool
+    *   True if user data is present.
+    */
+-  public function isOverridden(AccountInterface $account = NULL): bool {
++  public function isOverridden(?AccountInterface $account = NULL): bool {
+     if (!$account) {
+       $account = \Drupal::currentUser();
+     }
+diff --git a/src/Entity/DashboardViewBuilder.php b/src/Entity/DashboardViewBuilder.php
+index ad423c149217a7154142b7fe6ab9caeee2c2e024..5bcfca5ea0ade80f4da06aab7e7323022c259291 100644
+--- a/src/Entity/DashboardViewBuilder.php
++++ b/src/Entity/DashboardViewBuilder.php
+@@ -45,7 +45,7 @@ class DashboardViewBuilder extends EntityViewBuilder {
+   protected $moduleHandler;
+ 
+   /**
+-   * Constructs a new EntityViewBuilder.
++   * Constructs a new DashboardViewBuilder.
+    *
+    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+    *   The entity type definition.
+@@ -53,26 +53,26 @@ class DashboardViewBuilder extends EntityViewBuilder {
+    *   The entity repository service.
+    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+    *   The language manager.
+-   * @param \Drupal\Core\Theme\Registry $theme_registry
+-   *   The theme registry.
+-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+-   *   The entity display repository.
+    * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
+    *   Section storage handler.
+    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+    *   Module handler interface.
+    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+    *   Module config factory interface.
++   * @param \Drupal\Core\Theme\Registry|null $theme_registry
++   *   The theme registry (optional).
++   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface|null $entity_display_repository
++   *   The entity display repository (optional).
+    */
+   public function __construct(
+-    EntityTypeInterface $entity_type,
+-    EntityRepositoryInterface $entity_repository,
+-    LanguageManagerInterface $language_manager,
+-    Registry $theme_registry = NULL,
+-    EntityDisplayRepositoryInterface $entity_display_repository = NULL,
+-    SectionStorageManagerInterface $section_storage_manager,
+-    ModuleHandlerInterface $module_handler,
+-    ConfigFactoryInterface $config_factory,
++      EntityTypeInterface $entity_type,
++      EntityRepositoryInterface $entity_repository,
++      LanguageManagerInterface $language_manager,
++      SectionStorageManagerInterface $section_storage_manager,
++      ModuleHandlerInterface $module_handler,
++      ConfigFactoryInterface $config_factory,
++      ?Registry $theme_registry = NULL,
++      ?EntityDisplayRepositoryInterface $entity_display_repository = NULL
+   ) {
+     parent::__construct(
+       $entity_type,
+@@ -94,11 +94,11 @@ class DashboardViewBuilder extends EntityViewBuilder {
+       $entity_type,
+       $container->get('entity.repository'),
+       $container->get('language_manager'),
+-      $container->get('theme.registry'),
+-      $container->get('entity_display.repository'),
+       $container->get('plugin.manager.layout_builder.section_storage'),
+       $container->get('module_handler'),
+-      $container->get('config.factory')
++      $container->get('config.factory'),
++      $container->get('theme.registry'),
++      $container->get('entity_display.repository')
+     );
+   }
+ 
+@@ -109,8 +109,11 @@ class DashboardViewBuilder extends EntityViewBuilder {
+    *   Entity to display.
+    * @param string $view_mode
+    *   View mode.
+-   * @param string $langcode
++   * @param string|null $langcode
+    *   Language code.
++   *
++   * @return array
++   *   Render array.
+    */
+   public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
+     /**
+@@ -125,7 +128,8 @@ class DashboardViewBuilder extends EntityViewBuilder {
+ 
+     $cacheability = new CacheableMetadata();
+     $storage = $this->sectionStorageManager->findByContext($contexts, $cacheability);
+-    if (is_a($storage, UserDashboardSectionStorage::class)) {
++
++    if ($storage instanceof UserDashboardSectionStorage) {
+       $entity->loadOverrides();
+       $contexts[Dashboard::CONTEXT_TYPE] = $contexts['layout_builder.entity'] = EntityContext::fromEntity($entity);
+     }
+diff --git a/src/Plugin/SectionStorage/DashboardSectionStorage.php b/src/Plugin/SectionStorage/DashboardSectionStorage.php
+index 45410a0dde263bb70fed6f44a0a689fc4ec169a5..f464bd3ccc3f978dffa38815e3a0ce9838a73401 100644
+--- a/src/Plugin/SectionStorage/DashboardSectionStorage.php
++++ b/src/Plugin/SectionStorage/DashboardSectionStorage.php
+@@ -258,7 +258,7 @@ class DashboardSectionStorage extends SectionStorageBase implements ContainerFac
+   /**
+    * {@inheritdoc}
+    */
+-  public function access($operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
++  public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+     if (!$account) {
+       $account = $this->account;
+     }
+diff --git a/src/Plugin/SectionStorage/UserDashboardSectionStorage.php b/src/Plugin/SectionStorage/UserDashboardSectionStorage.php
+index 4790f6af46b0145e6f99eb3a192ce8c595e1cd54..2f191481f1b3bb8c84264cbba851da8a9930d777 100644
+--- a/src/Plugin/SectionStorage/UserDashboardSectionStorage.php
++++ b/src/Plugin/SectionStorage/UserDashboardSectionStorage.php
+@@ -98,7 +98,7 @@ class UserDashboardSectionStorage extends DashboardSectionStorage implements Tem
+   /**
+    * {@inheritdoc}
+    */
+-  public function access($operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
++  public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+     if (!$account) {
+       $account = $this->account;
+     }
