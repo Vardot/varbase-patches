@@ -266,6 +266,10 @@
       "drupal/password_policy": {
         "fix: #3516906 PHP 8.4 nullable types must be explicit":
         "https://git.drupalcode.org/project/password_policy/-/commit/999abf8501fd2878dc40b0b4db81315fed60cc03.diff"
+      },
+      "drupal/ui_patterns_settings": {
+        "fix: #3564894 PHP8.4 Deprecated notice":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches//ui_patterns_settings--2025-12-27--mr-58.patch"
       }
     }
   }
