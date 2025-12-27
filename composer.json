@@ -88,7 +88,9 @@
       },
       "drupal/rabbit_hole": {
         "Issue #3419073: Fix Return value must be of type bool fatal error":
-        "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch"
+        "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch",
+        "fix: #3516167 Multiple Implicit Nullable Parameters for PHP 8.4 Compatibility":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/rabbit_hole--2025-12-08--3516167--mr-87.patch"
       },
       "drupal/cl_block": {
         "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration":
