@@ -156,7 +156,9 @@
       },
       "drupal/page_manager": {
         "Issue #3438993: Some mandatory parameters are missing (machine_name, step) to generate a URL for route entity.page.devel_load":
-        "https://www.drupal.org/files/issues/2024-04-12/3438993-5.patch"
+        "https://www.drupal.org/files/issues/2024-04-12/3438993-5.patch",
+        "fix: #3536704 PHP 8.4 implicit nullable parameters":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/page_manager--2025-12-28--3536704--mr-46.patch"
       },
       "drupal/node_edit_protection": {
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
