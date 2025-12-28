@@ -1,0 +1,39 @@
+diff --git a/page_manager_ui/src/Form/VariantPluginAddBlockForm.php b/page_manager_ui/src/Form/VariantPluginAddBlockForm.php
+index bae19ff5c6f181c721692ea70f139d814df77e69..de3566e762d635c3276d54366a7460de064be9ad 100644
+--- a/page_manager_ui/src/Form/VariantPluginAddBlockForm.php
++++ b/page_manager_ui/src/Form/VariantPluginAddBlockForm.php
+@@ -62,7 +62,7 @@ class VariantPluginAddBlockForm extends VariantPluginConfigureBlockFormBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, $block_display = NULL, $block_id = NULL, Request $request = NULL) {
++  public function buildForm(array $form, FormStateInterface $form_state, $block_display = NULL, $block_id = NULL, ?Request $request = NULL) {
+     $form = parent::buildForm($form, $form_state, $block_display, $block_id);
+     $form['region']['#default_value'] = $request->query->get('region');
+     return $form;
+diff --git a/src/Entity/PageVariantViewBuilder.php b/src/Entity/PageVariantViewBuilder.php
+index 79fe928cc32ca0b9f90c5941d57d50dc32e8fc55..f123b83983cfafa852c897fab4412096895ccfa3 100644
+--- a/src/Entity/PageVariantViewBuilder.php
++++ b/src/Entity/PageVariantViewBuilder.php
+@@ -43,7 +43,7 @@ class PageVariantViewBuilder implements EntityViewBuilderInterface {
+   /**
+    * {@inheritdoc}
+    */
+-  public function resetCache(array $entities = NULL) {
++  public function resetCache(?array $entities = NULL) {
+     // Intentionally empty.
+   }
+ 
+diff --git a/src/Plugin/SectionStorage/PageManagerSectionStorage.php b/src/Plugin/SectionStorage/PageManagerSectionStorage.php
+index 9ad98e4be9275db045179c69eb091e885a587816..5e9c2e6fee297c05cfc9e038f6f8d7375d9e3144 100644
+--- a/src/Plugin/SectionStorage/PageManagerSectionStorage.php
++++ b/src/Plugin/SectionStorage/PageManagerSectionStorage.php
+@@ -203,7 +203,7 @@ class PageManagerSectionStorage extends SectionStorageBase implements ContainerF
+   /**
+    * {@inheritdoc}
+    */
+-  public function access($operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
++  public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+     $result = AccessResult::allowedIf($this->isLayoutBuilderEnabled())->addCacheableDependency($this);
+     return $return_as_object ? $result : $result->isAllowed();
+   }
