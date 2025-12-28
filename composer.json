@@ -160,6 +160,10 @@
         "fix: #3536704 PHP 8.4 implicit nullable parameters":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/page_manager--2025-12-28--3536704--mr-46.patch"
       },
+      "drupal/panels": {
+        "fix: #3534531 php 8.4 compatibility issue":
+        "https://git.drupalcode.org/project/panels/-/commit/55700b96188b96f75d07aeb2454cf3dc1b2a597a.diff"
+      },
       "drupal/node_edit_protection": {
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
