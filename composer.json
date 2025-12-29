@@ -314,6 +314,10 @@
       "drupal/password_policy": {
         "fix: #3516906 PHP 8.4 nullable types must be explicit":
         "https://git.drupalcode.org/project/password_policy/-/commit/999abf8501fd2878dc40b0b4db81315fed60cc03.diff"
+      },
+      "drupal/simple_oauth": {
+        "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2025-12-29--3565011--mr-203.patch"
       }
     }
   }
