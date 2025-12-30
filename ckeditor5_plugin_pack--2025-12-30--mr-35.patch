@@ -1,0 +1,13 @@
+diff --git a/modules/ckeditor5_plugin_pack_highlight/src/Service/HighlightCssFileCreator.php b/modules/ckeditor5_plugin_pack_highlight/src/Service/HighlightCssFileCreator.php
+index 4a41b2cde0768b77c007779a9c3709d80f56fb54..2502a12a7d351b21ed0a9562a9f728b95c481794 100644
+--- a/modules/ckeditor5_plugin_pack_highlight/src/Service/HighlightCssFileCreator.php
++++ b/modules/ckeditor5_plugin_pack_highlight/src/Service/HighlightCssFileCreator.php
+@@ -61,7 +61,7 @@ class HighlightCssFileCreator {
+    * @return bool
+    *   TRUE if the file was saved successfully, FALSE otherwise.
+    */
+-  public function saveHighlightCss(array $configuration, string $format, array $form = NULL, FormStateInterface $form_state = NULL): bool {
++  public function saveHighlightCss(array $configuration, string $format, ?array $form = NULL, ?FormStateInterface $form_state = NULL): bool {
+     $css = '';
+     if ($configuration['use_default_markers'] ?? TRUE) {
+       $css .= self::DEFAULT_CSS;
