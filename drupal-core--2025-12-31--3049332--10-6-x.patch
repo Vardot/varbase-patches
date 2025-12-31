@@ -1,0 +1,182 @@
+diff --git a/core/modules/layout_builder/src/Plugin/Block/InlineBlock.php b/core/modules/layout_builder/src/Plugin/Block/InlineBlock.php
+index a13bb8392d..50b59e63b3 100644
+--- a/core/modules/layout_builder/src/Plugin/Block/InlineBlock.php
++++ b/core/modules/layout_builder/src/Plugin/Block/InlineBlock.php
+@@ -14,6 +14,7 @@
+ use Drupal\Core\Form\SubformStateInterface;
+ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+ use Drupal\Core\Session\AccountInterface;
++use Psr\Log\LoggerInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ 
+ /**
+@@ -68,6 +69,13 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface,
+    */
+   protected $currentUser;
+ 
++  /**
++   * A logger instance.
++   *
++   * @var \Psr\Log\LoggerInterface
++   */
++  protected $logger;
++
+   /**
+    * Constructs a new InlineBlock.
+    *
+@@ -83,13 +91,20 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface,
+    *   The entity display repository.
+    * @param \Drupal\Core\Session\AccountInterface $current_user
+    *   The current user.
++   * @param \Psr\Log\LoggerInterface|null $logger
++   *   A logger instance.
+    */
+-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, AccountInterface $current_user) {
++  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, AccountInterface $current_user, ?LoggerInterface $logger = NULL) {
+     parent::__construct($configuration, $plugin_id, $plugin_definition);
+ 
+     $this->entityTypeManager = $entity_type_manager;
+     $this->entityDisplayRepository = $entity_display_repository;
+     $this->currentUser = $current_user;
++    if (!$logger) {
++      @trigger_error('The logger service must be passed to InlineBlock::__construct(). It was added in drupal:9.4.0 and will be required before drupal:11.0.0.', E_USER_DEPRECATED);
++      $logger = \Drupal::service('logger.channel.layout_builder');
++    }
++    $this->logger = $logger;
+     if (!empty($this->configuration['block_revision_id']) || !empty($this->configuration['block_serialized'])) {
+       $this->isNew = FALSE;
+     }
+@@ -105,7 +120,8 @@ public static function create(ContainerInterface $container, array $configuratio
+       $plugin_definition,
+       $container->get('entity_type.manager'),
+       $container->get('entity_display.repository'),
+-      $container->get('current_user')
++      $container->get('current_user'),
++      $container->get('logger.channel.layout_builder')
+     );
+   }
+ 
+@@ -207,7 +223,7 @@ protected function blockAccess(AccountInterface $account) {
+     if ($entity = $this->getEntity()) {
+       return $entity->access('view', $account, TRUE);
+     }
+-    return AccessResult::forbidden();
++    return AccessResult::allowedIfHasPermission($account, 'administer blocks');
+   }
+ 
+   /**
+@@ -215,14 +231,18 @@ protected function blockAccess(AccountInterface $account) {
+    */
+   public function build() {
+     $block = $this->getEntity();
++    if (!$block) {
++      return ['#markup' => $this->t('This block is broken or missing. You may be missing content or you might need to enable the original module.')];
++    }
+     return $this->entityTypeManager->getViewBuilder($block->getEntityTypeId())->view($block, $this->configuration['view_mode']);
+   }
+ 
+   /**
+    * Loads or creates the block content entity of the block.
+    *
+-   * @return \Drupal\block_content\BlockContentInterface
+-   *   The block content entity.
++   * @return \Drupal\block_content\BlockContentInterface|null
++   *   The block content entity, or NULL if a revision was specified but can not
++   *   be loaded.
+    */
+   protected function getEntity() {
+     if (!isset($this->blockContent)) {
+@@ -231,6 +251,9 @@ protected function getEntity() {
+       }
+       elseif (!empty($this->configuration['block_revision_id'])) {
+         $entity = $this->entityTypeManager->getStorage('block_content')->loadRevision($this->configuration['block_revision_id']);
++        if (!$entity) {
++          $this->logger->error('Unable to load inline block content entity with revision ID %vid.', ['%vid' => $this->configuration['block_revision_id']]);
++        }
+         $this->blockContent = $entity;
+       }
+       else {
+diff --git a/core/modules/layout_builder/tests/src/FunctionalJavascript/InlineBlockTest.php b/core/modules/layout_builder/tests/src/FunctionalJavascript/InlineBlockTest.php
+index 75b465d1a2..44e35216c2 100644
+--- a/core/modules/layout_builder/tests/src/FunctionalJavascript/InlineBlockTest.php
++++ b/core/modules/layout_builder/tests/src/FunctionalJavascript/InlineBlockTest.php
+@@ -25,6 +25,7 @@ class InlineBlockTest extends InlineBlockTestBase {
+    */
+   protected static $modules = [
+     'field_ui',
++    'dblog',
+   ];
+ 
+   /**
+@@ -390,11 +391,24 @@ public function testDeletion() {
+     $this->assertCount(1, $this->blockStorage->loadMultiple());
+     $default_block_id = $this->getLatestBlockEntityId();
+ 
++    // Create a third node.
++    $this->createNode([
++      'type' => 'bundle_with_section_field',
++      'title' => 'The node3 title',
++      'body' => [
++        [
++          'value' => 'The node3 body',
++        ],
++      ],
++    ]);
++
+     // Ensure the block shows up on node pages.
+     $this->drupalGet('node/1');
+     $assert_session->pageTextContains('The DEFAULT block body');
+     $this->drupalGet('node/2');
+     $assert_session->pageTextContains('The DEFAULT block body');
++    $this->drupalGet('node/3');
++    $assert_session->pageTextContains('The DEFAULT block body');
+ 
+     // Enable overrides.
+     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
+@@ -410,6 +424,10 @@ public function testDeletion() {
+     $node_2_block_id = $this->getLatestBlockEntityId();
+     $this->assertCount(3, $this->blockStorage->loadMultiple());
+ 
++    // Do not save the third layout, no additional block was created.
++    $this->drupalGet('node/3/layout');
++    $this->assertCount(3, $this->blockStorage->loadMultiple());
++
+     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
+     $this->clickLink('Manage layout');
+     $assert_session->addressEquals(static::FIELD_UI_PREFIX . '/display/default/layout');
+@@ -426,6 +444,19 @@ public function testDeletion() {
+     $this->assertCount(2, $this->blockStorage->loadMultiple());
+     $this->assertEmpty($usage->getUsage($default_block_id));
+ 
++    $this->drupalGet('node/3/layout');
++    $assert_session->pageTextNotContains('The DEFAULT block body');
++    $log = \Drupal::database()
++      ->select('watchdog', 'w')
++      ->fields('w', ['message', 'variables'])
++      ->orderBy('wid', 'DESC')
++      ->range(0, 1)
++      ->execute()
++      ->fetch();
++
++    $this->assertEquals('Unable to load inline block content entity with revision ID %vid.', $log->message);
++    $this->assertEquals($default_block_id, unserialize($log->variables)['%vid']);
++
+     $this->drupalGet('node/1/layout');
+     $assert_session->pageTextContains('The DEFAULT block body');
+ 
+@@ -456,11 +487,14 @@ public function testDeletion() {
+     $default_block2_id = $this->getLatestBlockEntityId();
+     $this->assertCount(2, $this->blockStorage->loadMultiple());
+ 
+-    // Delete the other node so bundle can be deleted.
++    // Delete the other nodes so the bundle can be deleted.
+     $this->assertNotEmpty($usage->getUsage($node_2_block_id));
+     $this->drupalGet('node/2/delete');
+     $page->pressButton('Delete');
+     $this->assertEmpty(Node::load(2));
++    $this->drupalGet('node/3/delete');
++    $page->pressButton('Delete');
++    $this->assertEmpty(Node::load(3));
+     $cron->run();
+     // Ensure entity block was deleted.
+     $this->assertEmpty($this->blockStorage->load($node_2_block_id));
