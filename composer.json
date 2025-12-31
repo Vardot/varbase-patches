@@ -42,8 +42,8 @@
         "https://www.drupal.org/files/issues/2023-11-21/3199.patch",
         "Issue #3302838: Fix PHP8.1+ Querying with NULL values results in warning mb_strtolower(): Passing null to parameter is deprecated":
         "https://www.drupal.org/files/issues/2023-07-05/3302838-38.patch",
-        "Issue #3049332: Fix PHP message: Error: Call to a member function getEntityTypeId() on null (Layout Builder)":
-        "https://www.drupal.org/files/issues/2024-01-09/drupal-core--2024-01-09--3049332-85.patch",
+        "Issue #3049332: Fix Log error + visual warning for missing or broken block":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-12-31--3049332--10-6-x.patch",
         "Issue #3046152: Video media needs playsinline & muted options":
         "https://www.drupal.org/files/issues/2024-06-20/drupal-core--2024-06-20--10-3-x--3046152-54--mr-8471.patch",
         "Issue #3080606: Reorder Layout Builder sections":
