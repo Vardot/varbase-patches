@@ -1,8 +1,8 @@
 diff --git a/simple_oauth.install b/simple_oauth.install
-index 9451119aafa31e26a1a28f82e3e9fbeb9eb73967..a38984321efbae500eff4a3f1f07a7e49144a02a 100644
+index 9451119aafa31e26a1a28f82e3e9fbeb9eb73967..041821d88f410bf64c89fb84941c7c6dcefc351e 100644
 --- a/simple_oauth.install
 +++ b/simple_oauth.install
-@@ -21,6 +21,70 @@ use Drupal\simple_oauth\Plugin\Oauth2GrantManager;
+@@ -21,6 +21,76 @@ use Drupal\simple_oauth\Plugin\Oauth2GrantManager;
  function simple_oauth_install() {
    // Create path alias for JWKS endpoint to support /.well-known/jwks.json.
    _simple_oauth_create_jwks_alias();
