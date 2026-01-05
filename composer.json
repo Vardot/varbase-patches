@@ -281,7 +281,7 @@
       },
       "drupal/simple_oauth": {
         "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2025-12-29--3565011--mr-203.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
       },
       "drupal/ckeditor5_plugin_pack": {
         "fix: #3565156 PHP 8.4 compatibility - implicit nullable parameter deprecations for CKEditor 5 Plugin Pack":
