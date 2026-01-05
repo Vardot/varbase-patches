@@ -1,0 +1,81 @@
+diff --git a/simple_oauth.install b/simple_oauth.install
+index 9451119aafa31e26a1a28f82e3e9fbeb9eb73967..a38984321efbae500eff4a3f1f07a7e49144a02a 100644
+--- a/simple_oauth.install
++++ b/simple_oauth.install
+@@ -21,6 +21,15 @@ use Drupal\simple_oauth\Plugin\Oauth2GrantManager;
+ function simple_oauth_install() {
+   // Create path alias for JWKS endpoint to support /.well-known/jwks.json.
+   _simple_oauth_create_jwks_alias();
++
++  // Install the oauth2_scope entity type during installation to prevent
++  // errors when other modules try to reference it during the installation process.
++  $type_manager = \Drupal::entityTypeManager();
++  $type_manager->clearCachedDefinitions();
++  if ($type_manager->hasDefinition('oauth2_scope')) {
++    $entity_type = $type_manager->getDefinition('oauth2_scope');
++    \Drupal::entityDefinitionUpdateManager()->installEntityType($entity_type);
++  }
++
++  // Install consumer entity fields from simple_oauth_update_8603() and simple_oauth_update_8608()
++  // to prevent database errors when the module is enabled during installation.
++  $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
++  $entity_type_id = 'consumer';
++  $provider = 'simple_oauth';
++
++  // Add grant_types field.
++  $grant_types_field = BaseFieldDefinition::create('list_string')
++    ->setLabel(new TranslatableMarkup('Grant types'))
++    ->setDescription(new TranslatableMarkup('Enabled grant types.'))
++    ->setRevisionable(TRUE)
++    ->setTranslatable(FALSE)
++    ->setRequired(TRUE)
++    ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
++  $entity_definition_update_manager->installFieldStorageDefinition('grant_types', $entity_type_id, $provider, $grant_types_field);
++
++  // Add scopes field.
++  $scopes_field = BaseFieldDefinition::create('oauth2_scope_reference')
++    ->setLabel(new TranslatableMarkup('Scopes'))
++    ->setDescription(new TranslatableMarkup('Here you can select scopes that would be the default scopes when authorizing.'))
++    ->setRevisionable(TRUE)
++    ->setTranslatable(FALSE)
++    ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
++  $entity_definition_update_manager->installFieldStorageDefinition('scopes', $entity_type_id, $provider, $scopes_field);
++
++  // Add automatic_authorization field.
++  $automatic_authorization_field = BaseFieldDefinition::create('boolean')
++    ->setLabel(new TranslatableMarkup('Automatic authorization'))
++    ->setDescription(new TranslatableMarkup('This will cause the authorization form to be skipped.'))
++    ->setRevisionable(TRUE)
++    ->setTranslatable(FALSE)
++    ->setDefaultValue(FALSE);
++  $entity_definition_update_manager->installFieldStorageDefinition('automatic_authorization', $entity_type_id, $provider, $automatic_authorization_field);
++
++  // Add remember_approval field.
++  $remember_approval_field = BaseFieldDefinition::create('boolean')
++    ->setLabel(new TranslatableMarkup('Remember previous approval'))
++    ->setDescription(new TranslatableMarkup('When enabled, if previous authorization request with the same scopes got approved, authorization will be automatically accepted.'))
++    ->setRevisionable(TRUE)
++    ->setTranslatable(FALSE)
++    ->setDefaultValue(TRUE);
++  $entity_definition_update_manager->installFieldStorageDefinition('remember_approval', $entity_type_id, $provider, $remember_approval_field);
++
++  // Add authorization_code_scopes field from simple_oauth_update_8608().
++  $authorization_code_scopes_field = BaseFieldDefinition::create('oauth2_scope_reference')
++    ->setLabel(new TranslatableMarkup('Authorization code scopes'))
++    ->setDescription(new TranslatableMarkup('This selection can be overridden by scopes passed as parameters to the authorization requests.'))
++    ->setDisplayOptions('view', [
++      'label' => 'inline',
++      'type' => 'oauth2_scope_reference_label',
++      'weight' => -4,
++    ])
++    ->setDisplayOptions('form', [
++      'type' => 'oauth2_scope_reference',
++      'weight' => -4,
++    ])
++    ->setRevisionable(TRUE)
++    ->setTranslatable(FALSE)
++    ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
++  $entity_definition_update_manager->installFieldStorageDefinition('authorization_code_scopes', $entity_type_id, $provider, $authorization_code_scopes_field);
+ }
+ 
+ /**
