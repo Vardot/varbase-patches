@@ -319,10 +319,6 @@
         "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
       },
-      "drupal/ckeditor5_plugin_pack": {
-        "fix: #3565156 PHP 8.4 compatibility - implicit nullable parameter deprecations for CKEditor 5 Plugin Pack":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor5_plugin_pack--2025-12-30--3565156--mr-35.patch"
-      },
       "openai-php/client": {
         "fix: PHP 8.4 compatibility - TypeError when API returns null for results array #725":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openai-php--client--2025-12-30--pr-725.patch"
