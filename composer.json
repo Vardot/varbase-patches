@@ -145,7 +145,7 @@
       },
       "drupal/layout_builder_blocks": {
         "Issue #3349066: Limit Layout Builder Blocks not to work in the dashboards route":
-        "https://www.drupal.org/files/issues/2025-06-22/layout_builder_blocks--2025-06-22--3349066--mr-5.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboard--2026-01-11--3528064--mr-63.patch"
       },
       "drupal/paragraphs": {
         "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]":
