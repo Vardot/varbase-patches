@@ -207,7 +207,7 @@
       },
       "drupal/dashboard": {
         "Issue #3528064: Add support for Layout Builder Restrictions":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboard--2025-08-31--3528064--mr-63.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboard--2026-01-11--3528064--mr-63.patch"
       },
       "drupal/modeler_api": {
         "Issue #3537810: Fix Circular Reference by Removing Autowire and Minimizing Dependencies in modeler_api.service":
