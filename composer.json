@@ -183,6 +183,10 @@
       "drupal/content_planner": {
         "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch"
+      },
+      "drupal/smart_trim": {
+        "fix: #3566575 Call to undefined function _token_field_label()":
+        "https://www.drupal.org/files/issues/2026-01-09/3566575-12.patch"
       }
     }
   }
