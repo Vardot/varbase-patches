@@ -1,0 +1,784 @@
+diff --git a/dashboard.services.yml b/dashboard.services.yml
+index 0f5dcd1edb6083a39b3fa9a69eb4ae28c9ede571..b9dbb9e152253375535816e5c9f3ceb7b600d38a 100644
+--- a/dashboard.services.yml
++++ b/dashboard.services.yml
+@@ -13,3 +13,10 @@ services:
+ 
+   dashboard.block_build_render_subscriber:
+     class: Drupal\dashboard\EventSubscriber\DashboardBlockBuildRenderSubscriber
++
++  Drupal\dashboard\Hook\FormIntegration:
++    class: Drupal\dashboard\Hook\FormIntegration
++
++  Drupal\dashboard\Form\FormAlter:
++    class: Drupal\dashboard\Form\FormAlter
++    arguments: ['@plugin.manager.layout_builder.section_storage', '@plugin.manager.block', '@plugin.manager.core.layout', '@context.handler']
+diff --git a/src/Form/FormAlter.php b/src/Form/FormAlter.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..bc4e4cd02874192cf47d7164e09cc25ed3666dcb
+--- /dev/null
++++ b/src/Form/FormAlter.php
+@@ -0,0 +1,424 @@
++<?php
++
++namespace Drupal\dashboard\Form;
++
++use Drupal\Core\Block\BlockManagerInterface;
++use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
++use Drupal\Core\DependencyInjection\DependencySerializationTrait;
++use Drupal\Core\Form\FormStateInterface;
++use Drupal\Core\Layout\LayoutPluginManagerInterface;
++use Drupal\Core\Plugin\Context\ContextHandlerInterface;
++use Drupal\Core\StringTranslation\StringTranslationTrait;
++use Drupal\dashboard\Entity\Dashboard;
++use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
++use Drupal\layout_builder_restrictions\Traits\PluginHelperTrait;
++use Symfony\Component\DependencyInjection\ContainerInterface;
++
++/**
++ * Supplement form UI to add setting for which blocks & layouts are available.
++ */
++class FormAlter implements ContainerInjectionInterface {
++
++  use DependencySerializationTrait;
++  use PluginHelperTrait;
++  use StringTranslationTrait;
++
++  /**
++   * The section storage manager.
++   *
++   * @var \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface
++   */
++  protected $sectionStorageManager;
++
++  /**
++   * The block manager.
++   *
++   * @var \Drupal\Core\Block\BlockManagerInterface
++   */
++  protected $blockManager;
++
++  /**
++   * The layout manager.
++   *
++   * @var \Drupal\Core\Layout\LayoutPluginManagerInterface
++   */
++  protected $layoutManager;
++
++  /**
++   * The context handler.
++   *
++   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface
++   */
++  protected $contextHandler;
++
++  /**
++   * FormAlter constructor.
++   *
++   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
++   *   The section storage manager.
++   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
++   *   The block manager.
++   * @param \Drupal\Core\Layout\LayoutPluginManagerInterface $layout_manager
++   *   The layout plugin manager.
++   * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $context_handler
++   *   The context handler.
++   */
++  public function __construct(
++    SectionStorageManagerInterface $section_storage_manager,
++    BlockManagerInterface $block_manager,
++    LayoutPluginManagerInterface $layout_manager,
++    ContextHandlerInterface $context_handler,
++  ) {
++    $this->sectionStorageManager = $section_storage_manager;
++    $this->blockManager = $block_manager;
++    $this->layoutManager = $layout_manager;
++    $this->contextHandler = $context_handler;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function create(ContainerInterface $container) {
++    return new static(
++      $container->get('plugin.manager.layout_builder.section_storage'),
++      $container->get('plugin.manager.block'),
++      $container->get('plugin.manager.core.layout'),
++      $container->get('context.handler')
++    );
++  }
++
++  /**
++   * The actual form elements.
++   */
++  public function alterEntityFormAllowedBlockCategories(&$form, FormStateInterface $form_state, $form_id) {
++    /** @var \Drupal\dashboard\Form\DashboardForm $dashboard_form */
++    $dashboard_form = $form_state->getFormObject();
++    /** @var \Drupal\dashboard\Entity\Dashboard $display */
++    $display = $dashboard_form->getEntity();
++    if ($display) {
++      $form['#entity_builders'][] = [$this, 'entityFormEntityBuild'];
++      $allowed_block_categories = $display->getThirdPartySetting('layout_builder_restrictions', 'allowed_block_categories', []);
++      $form['layout']['layout_builder_restrictions']['allowed_block_categories'] = [
++        '#title' => $this->t('Default restriction for new categories of blocks not listed below.'),
++        '#description_display' => 'before',
++        '#type' => 'radios',
++        '#options' => [
++          "allowed" => $this->t('Allow all blocks from newly available categories.'),
++          "restricted" => $this->t('Restrict all blocks from newly available categories.'),
++        ],
++        '#parents' => [
++          'layout_builder_restrictions',
++          'allowed_block_categories',
++        ],
++        '#default_value' => !empty($allowed_block_categories) ? "restricted" : "allowed",
++      ];
++    }
++  }
++
++  /**
++   * The actual form elements.
++   */
++  public function alterEntityForm(&$form, FormStateInterface $form_state, $form_id) {
++    /** @var \Drupal\dashboard\Form\DashboardForm $dashboard_form */
++    $dashboard_form = $form_state->getFormObject();
++    /** @var \Drupal\dashboard\Entity\Dashboard $entity */
++    $entity = $dashboard_form->getEntity();
++    if ($entity) {
++      $form['#entity_builders'][] = [$this, 'entityFormEntityBuild'];
++      // Block settings.
++      $form['layout']['layout_builder_restrictions']['allowed_blocks'] = [
++        '#type' => 'details',
++        '#title' => $this->t('Blocks available for placement (all layouts & regions)'),
++        '#states' => [
++          'disabled' => [
++            ':input[name="layout[enabled]"]' => ['checked' => FALSE],
++          ],
++          'invisible' => [
++            ':input[name="layout[enabled]"]' => ['checked' => FALSE],
++          ],
++        ],
++      ];
++      $third_party_settings = $entity->getThirdPartySetting('layout_builder_restrictions', 'entity_view_mode_restriction', []);
++      $whitelisted_blocks = (isset($third_party_settings['whitelisted_blocks'])) ? $third_party_settings['whitelisted_blocks'] : [];
++      $blacklisted_blocks = (isset($third_party_settings['blacklisted_blocks'])) ? $third_party_settings['blacklisted_blocks'] : [];
++      $restricted_categories = (isset($third_party_settings['restricted_categories'])) ? $third_party_settings['restricted_categories'] : [];
++      $allowed_block_categories = $entity->getThirdPartySetting('layout_builder_restrictions', 'allowed_block_categories', []);
++
++      foreach ($this->getBlockDefinitions() as $category => $data) {
++        $title = $data['label'];
++        if (!empty($data['translated_label'])) {
++          $title = $data['translated_label'];
++        }
++        $category_form = [
++          '#type' => 'fieldset',
++          '#title' => $title,
++          '#parents' => ['layout_builder_restrictions', 'allowed_blocks'],
++        ];
++        // Check whether this is a newly available category that has been
++        // restricted previously.
++        $category_is_restricted = (!empty($allowed_block_categories) && !in_array($category, $allowed_block_categories));
++        // The category is 'restricted' if it's already been specified as such,
++        // or if the default behavior for new categories indicate such.
++        if (in_array($category, array_keys($whitelisted_blocks))) {
++          $category_setting = 'whitelisted';
++        }
++        elseif (in_array($category, array_keys($blacklisted_blocks))) {
++          $category_setting = 'blacklisted';
++        }
++        elseif ($category_is_restricted) {
++          $category_setting = 'restrict_all';
++        }
++        elseif (in_array($category, $restricted_categories)) {
++          $category_setting = 'restrict_all';
++        }
++        else {
++          $category_setting = 'all';
++        }
++        $category_form['restriction_behavior'] = [
++          '#type' => 'radios',
++          '#options' => [
++            "all" => $this->t('Allow all existing & new %category blocks.', ['%category' => $data['label']]),
++            "restrict_all" => $this->t('Restrict all existing & new %category blocks.', ['%category' => $data['label']]),
++            "whitelisted" => $this->t('Allow specific %category blocks:', ['%category' => $data['label']]),
++            "blacklisted" => $this->t('Restrict specific %category blocks:', ['%category' => $data['label']]),
++          ],
++          '#default_value' => $category_setting,
++          '#parents' => [
++            'layout_builder_restrictions',
++            'allowed_blocks',
++            $category,
++            'restriction',
++          ],
++        ];
++        $category_form['available_blocks'] = [
++          '#type' => 'container',
++          '#states' => [
++            'invisible' => [
++              [':input[name="layout_builder_restrictions[allowed_blocks][' . $category . '][restriction]"]' => ['value' => "all"]],
++              [':input[name="layout_builder_restrictions[allowed_blocks][' . $category . '][restriction]"]' => ['value' => "restrict_all"]],
++            ],
++          ],
++        ];
++        foreach ($data['definitions'] as $block_id => $block) {
++          $enabled = FALSE;
++          if ($category_setting == 'whitelisted' && isset($whitelisted_blocks[$category]) && in_array($block_id, $whitelisted_blocks[$category])) {
++            $enabled = TRUE;
++          }
++          elseif ($category_setting == 'blacklisted' && isset($blacklisted_blocks[$category]) && in_array($block_id, $blacklisted_blocks[$category])) {
++            $enabled = TRUE;
++          }
++          $category_form['available_blocks'][$block_id] = [
++            '#type' => 'checkbox',
++            '#title' => $block['admin_label'],
++            '#default_value' => $enabled,
++            '#parents' => [
++              'layout_builder_restrictions',
++              'allowed_blocks',
++              $category,
++              'available_blocks',
++              $block_id,
++            ],
++          ];
++        }
++        if ($category == 'Custom blocks' || $category == 'Custom block types') {
++          $category_form['description'] = [
++            '#type' => 'container',
++            '#children' => $this->t('<p>In the event both <em>Custom Block Types</em> and <em>Custom Blocks</em> restrictions are enabled, <em>Custom Block Types</em> restrictions are disregarded.</p>'),
++            '#states' => [
++              'visible' => [
++                ':input[name="layout_builder_restrictions[allowed_blocks][' . $category . '][restriction]"]' => ['value' => "restricted"],
++              ],
++            ],
++          ];
++        }
++        $form['layout']['layout_builder_restrictions']['allowed_blocks'][$category] = $category_form;
++      }
++      // Layout settings.
++      $allowed_layouts = (isset($third_party_settings['allowed_layouts'])) ? $third_party_settings['allowed_layouts'] : [];
++      $layout_form = [
++        '#type' => 'details',
++        '#title' => $this->t('Layouts available for sections'),
++        '#tree' => TRUE,
++        '#parents' => ['layout_builder_restrictions', 'allowed_layouts'],
++        '#states' => [
++          'disabled' => [
++            ':input[name="layout[enabled]"]' => ['checked' => FALSE],
++          ],
++          'invisible' => [
++            ':input[name="layout[enabled]"]' => ['checked' => FALSE],
++          ],
++        ],
++      ];
++      $layout_form['layout_restriction'] = [
++        '#type' => 'radios',
++        '#options' => [
++          "all" => $this->t('Allow all existing & new layouts.'),
++          "restricted" => $this->t('Allow only specific layouts:'),
++        ],
++        '#default_value' => !empty($allowed_layouts) ? "restricted" : "all",
++      ];
++      $definitions = $this->getLayoutDefinitions();
++      foreach ($definitions as $plugin_id => $definition) {
++        $enabled = FALSE;
++        if (!empty($allowed_layouts) && in_array($plugin_id, $allowed_layouts)) {
++          $enabled = TRUE;
++        }
++        $layout_form['layouts'][$plugin_id] = [
++          '#type' => 'checkbox',
++          '#default_value' => $enabled,
++          '#description' => [
++            $definition->getIcon(60, 80, 1, 3),
++            [
++              '#type' => 'container',
++              '#children' => $definition->getLabel() . ' (' . $plugin_id . ')',
++            ],
++          ],
++          '#states' => [
++            'invisible' => [
++              ':input[name="layout_builder_restrictions[allowed_layouts][layout_restriction]"]' => ['value' => "all"],
++            ],
++          ],
++        ];
++      }
++      $form['layout']['layout_builder_restrictions']['allowed_layouts'] = $layout_form;
++    }
++  }
++
++  /**
++   * Save allowed blocks & layouts for the given entity view mode.
++   */
++  public function entityFormEntityBuild($entity_type_id, Dashboard $display, &$form, FormStateInterface &$form_state) {
++    $third_party_settings = $display->getThirdPartySetting('layout_builder_restrictions', 'entity_view_mode_restriction');
++    $block_restrictions = $this->setAllowedBlocks($form_state);
++    $third_party_settings['whitelisted_blocks'] = $block_restrictions['whitelisted'] ?? [];
++    $third_party_settings['blacklisted_blocks'] = $block_restrictions['blacklisted'] ?? [];
++    $third_party_settings['restricted_categories'] = $block_restrictions['restricted_categories'];
++    $third_party_settings['allowed_layouts'] = $this->setAllowedLayouts($form_state);
++    $allowed_block_categories = $this->setAllowedBlockCategories($form_state, $display);
++    // Save!
++    $display->setThirdPartySetting('layout_builder_restrictions', 'allowed_block_categories', $allowed_block_categories);
++    $display->setThirdPartySetting('layout_builder_restrictions', 'entity_view_mode_restriction', $third_party_settings);
++  }
++
++  /**
++   * Helper function to prepare saved allowed blocks.
++   *
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The form state.
++   *
++   * @return array
++   *   An array of layout names or empty.
++   */
++  protected function setAllowedBlocks(FormStateInterface $form_state) {
++    $categories = $form_state->getValue([
++      'layout_builder_restrictions',
++      'allowed_blocks',
++    ]);
++    $block_restrictions = [];
++    $block_restrictions['restricted_categories'] = [];
++    if (!empty($categories)) {
++      foreach ($categories as $category => $settings) {
++        $restriction_type = $settings['restriction'];
++        if (in_array($restriction_type, ['whitelisted', 'blacklisted'])) {
++          $block_restrictions[$restriction_type][$category] = [];
++          foreach ($settings['available_blocks'] as $block_id => $block_setting) {
++            if ($block_setting == '1') {
++              // Include only checked blocks.
++              $block_restrictions[$restriction_type][$category][] = $block_id;
++            }
++          }
++        }
++        elseif ($restriction_type === "restrict_all") {
++          $block_restrictions['restricted_categories'][] = $category;
++        }
++      }
++    }
++    return $block_restrictions;
++  }
++
++  /**
++   * Helper function to prepare saved allowed layouts.
++   *
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The form state.
++   *
++   * @return array
++   *   An array of layout names or empty.
++   */
++  protected function setAllowedLayouts(FormStateInterface $form_state) {
++    // Set allowed layouts.
++    $layout_restriction = $form_state->getValue([
++      'layout_builder_restrictions',
++      'allowed_layouts',
++      'layout_restriction',
++    ]);
++    $allowed_layouts = [];
++    if ($layout_restriction == 'restricted') {
++      $allowed_layouts = array_keys(array_filter($form_state->getValue([
++        'layout_builder_restrictions',
++        'allowed_layouts',
++        'layouts',
++      ])));
++    }
++    return $allowed_layouts;
++  }
++
++  /**
++   * Helper function to prepare saved block definition categories.
++   *
++   * @return array
++   *   An array of block category names or empty.
++   */
++  protected function setAllowedBlockCategories(FormStateInterface $form_state, Dashboard $display) {
++    // Set default for allowed block categories.
++    $block_category_default = $form_state->getValue([
++      'layout_builder_restrictions',
++      'allowed_block_categories',
++    ]);
++    if ($block_category_default == 'restricted') {
++      // Create a whitelist of categories whose blocks should be allowed.
++      // Newly available categories' blocks not in this list will be
++      // disallowed.
++      $allowed_block_categories = array_keys($this->getBlockDefinitions());
++    }
++    else {
++      // The UI choice indicates that all newly available categories'
++      // blocks should be allowed by default. Represent this in the schema
++      // as an empty array.
++      $allowed_block_categories = [];
++    }
++    return $allowed_block_categories;
++  }
++
++  /**
++   * Gets block definitions appropriate for an entity display.
++   *
++   * @return array[]
++   *   Keys are category names, and values are arrays of which the keys are
++   *   plugin IDs and the values are plugin definitions.
++   */
++  protected function getBlockDefinitions() {
++
++    $definitions = $this->blockManager()->getDefinitions();
++
++    /* @todo Provide a alter function for more providers. */
++    $allowedProvider = ['system', 'views', 'dashboard'];
++
++    foreach ($definitions as $key => $definition) {
++      if (!in_array($definition['provider'], $allowedProvider)) {
++        unset($definitions[$key]);
++      }
++    }
++
++    $grouped_definitions = $this->getDefinitionsByUntranslatedCategory($definitions);
++    // Create a new category of block_content blocks that meet the context.
++    foreach ($grouped_definitions as $category => $data) {
++      if (empty($data['definitions'])) {
++        unset($grouped_definitions[$category]);
++      }
++    }
++    ksort($grouped_definitions);
++    return $grouped_definitions;
++  }
++
++}
+diff --git a/src/Hook/FormIntegration.php b/src/Hook/FormIntegration.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..39a8cff1ea00e4314baeecbaab11cb25dc86ba97
+--- /dev/null
++++ b/src/Hook/FormIntegration.php
+@@ -0,0 +1,40 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\dashboard\Hook;
++
++use Drupal\Core\Extension\ModuleHandlerInterface;
++use Drupal\Core\Form\FormStateInterface;
++use Drupal\Core\Hook\Attribute\Hook;
++use Drupal\dashboard\Form\DashboardForm;
++use Drupal\dashboard\Form\FormAlter;
++
++/**
++ * Form integration hooks.
++ */
++class FormIntegration {
++
++  public function __construct(
++    protected ModuleHandlerInterface $moduleHandler,
++    protected FormAlter $formAlter,
++  ) {}
++
++  /**
++   * Implements hook_form_FORM_ID_alter() for the dashboard form.
++   */
++  #[Hook('form_dashboard_form_alter')]
++  public function dashboardFormAlter(&$form, FormStateInterface $form_state, $form_id): void {
++    if (!$this->moduleHandler->moduleExists('layout_builder_restrictions')) {
++      return;
++    }
++
++    if (!$form_state->getFormObject() instanceof DashboardForm) {
++      return;
++    }
++
++    $this->formAlter->alterEntityFormAllowedBlockCategories($form, $form_state, $form_id);
++    $this->formAlter->alterEntityForm($form, $form_state, $form_id);
++  }
++
++}
+diff --git a/src/LayoutBuilderRestrictionHelperTrait.php b/src/LayoutBuilderRestrictionHelperTrait.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..4cf9ea129caaeb02da0a78a1d0d7425486769e73
+--- /dev/null
++++ b/src/LayoutBuilderRestrictionHelperTrait.php
+@@ -0,0 +1,26 @@
++<?php
++
++namespace Drupal\dashboard;
++
++use Drupal\dashboard\Plugin\SectionStorage\DashboardSectionStorage;
++use Drupal\layout_builder\SectionStorageInterface;
++
++/**
++ * Simple helper trait.
++ */
++trait LayoutBuilderRestrictionHelperTrait {
++
++  /**
++   * Check if storage is a dashboard storage.
++   *
++   * @param \Drupal\layout_builder\SectionStorageInterface $section
++   *   Section storage.
++   *
++   * @return bool
++   *   Is is a dashboard storage.
++   */
++  public function isDashboardStorage(SectionStorageInterface $section): bool {
++    return $section instanceof DashboardSectionStorage;
++  }
++
++}
+diff --git a/src/Plugin/LayoutBuilderRestriction/DashboardsViewModeRestriction.php b/src/Plugin/LayoutBuilderRestriction/DashboardsViewModeRestriction.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..1a12e5a4dc661498a098ee5f251cf0752a00f074
+--- /dev/null
++++ b/src/Plugin/LayoutBuilderRestriction/DashboardsViewModeRestriction.php
+@@ -0,0 +1,255 @@
++<?php
++
++namespace Drupal\dashboard\Plugin\LayoutBuilderRestriction;
++
++use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
++use Drupal\Core\Database\Connection;
++use Drupal\Core\Extension\ModuleHandlerInterface;
++use Drupal\dashboard\LayoutBuilderRestrictionHelperTrait;
++use Drupal\layout_builder\SectionStorageInterface;
++use Drupal\layout_builder_restrictions\Plugin\LayoutBuilderRestrictionBase;
++use Drupal\layout_builder_restrictions\Traits\PluginHelperTrait;
++use Symfony\Component\DependencyInjection\ContainerInterface;
++
++// cspell:ignore Allowedin
++// Ignore keyword 'Allowedin' used in module 'layout_builder_restrictions'.
++/**
++ * Controls behavior of the per-view mode plugin.
++ *
++ * @LayoutBuilderRestriction(
++ *   id = "dashboards_view_mode_restriction",
++ *   title = @Translation("Dashboards View Mode"),
++ *   description = @Translation("Restrict blocks/layouts per entity view mode"),
++ * )
++ */
++class DashboardsViewModeRestriction extends LayoutBuilderRestrictionBase {
++
++  use PluginHelperTrait;
++  use LayoutBuilderRestrictionHelperTrait;
++
++  /**
++   * Module handler service.
++   *
++   * @var \Drupal\Core\Extension\ModuleHandlerInterface
++   */
++  protected $moduleHandler;
++
++  /**
++   * Database connection service.
++   *
++   * @var \Drupal\Core\Database\Connection
++   */
++  protected $database;
++
++  /**
++   * Constructs a Drupal\Component\Plugin\PluginBase object.
++   *
++   * @param array $configuration
++   *   A configuration array containing information about the plugin instance.
++   * @param string $plugin_id
++   *   The plugin_id for the plugin instance.
++   * @param mixed $plugin_definition
++   *   The plugin implementation definition.
++   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
++   *   The module handler.
++   * @param \Drupal\Core\Database\Connection $connection
++   *   The database connection.
++   */
++  public function __construct(
++    array $configuration,
++    $plugin_id,
++    $plugin_definition,
++    ModuleHandlerInterface $module_handler,
++    Connection $connection,
++  ) {
++    $this->configuration = $configuration;
++    $this->pluginId = $plugin_id;
++    $this->pluginDefinition = $plugin_definition;
++    $this->moduleHandler = $module_handler;
++    $this->database = $connection;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
++    return new static(
++      $configuration,
++      $plugin_id,
++      $plugin_definition,
++      $container->get('module_handler'),
++      $container->get('database'),
++    );
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function alterBlockDefinitions(array $definitions, array $context) {
++    // Respect restrictions on allowed blocks specified by the section storage.
++    if (isset($context['section_storage'])) {
++      if (!$this->isDashboardStorage($context['section_storage'])) {
++        return $definitions;
++      }
++      $default = $context['section_storage']->getContextValue('dashboard');
++      if ($default instanceof ThirdPartySettingsInterface) {
++        $third_party_settings = $default->getThirdPartySetting('layout_builder_restrictions', 'entity_view_mode_restriction', []);
++        $allowed_block_categories = $default->getThirdPartySetting('layout_builder_restrictions', 'allowed_block_categories', []);
++        $whitelisted_blocks = (isset($third_party_settings['whitelisted_blocks'])) ? $third_party_settings['whitelisted_blocks'] : [];
++        $blacklisted_blocks = (isset($third_party_settings['blacklisted_blocks'])) ? $third_party_settings['blacklisted_blocks'] : [];
++        $restricted_categories = (isset($third_party_settings['restricted_categories'])) ? $third_party_settings['restricted_categories'] : [];
++      }
++      else {
++        $whitelisted_blocks = [];
++        $blacklisted_blocks = [];
++        $restricted_categories = [];
++        $allowed_block_categories = [];
++      }
++
++      foreach ($definitions as $delta => $definition) {
++        if ($definition['id'] == 'field_block' || $definition['id'] == 'extra_field_block') {
++          unset($definitions[$delta]);
++        }
++      }
++
++      if (empty($third_party_settings)) {
++        // This entity has no restrictions. Look no further.
++        return $definitions;
++      }
++      foreach ($definitions as $delta => $definition) {
++        $original_delta = $delta;
++        $category = $this->getUntranslatedCategory($definition['category']);
++        // Custom blocks get special treatment.
++        if (in_array($category, $restricted_categories)) {
++          unset($definitions[$original_delta]);
++        }
++        elseif (in_array($category, array_keys($whitelisted_blocks))) {
++          if (!in_array($delta, $whitelisted_blocks[$category])) {
++            // The current block is not whitelisted. Remove it.
++            unset($definitions[$original_delta]);
++          }
++        }
++        elseif (in_array($category, array_keys($blacklisted_blocks))) {
++          if (in_array($delta, $blacklisted_blocks[$category])) {
++            // The current block is blacklisted. Remove it.
++            unset($definitions[$original_delta]);
++          }
++        }
++        elseif ($this->categoryIsRestricted($category, $allowed_block_categories)) {
++          unset($definitions[$original_delta]);
++        }
++      }
++    }
++    return $definitions;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function alterSectionDefinitions(array $definitions, array $context) {
++    // Respect restrictions on allowed layouts specified by section storage.
++    if (isset($context['section_storage'])) {
++      if ($this->isDashboardStorage($context['section_storage'])) {
++        $dashboard = $context['section_storage']->getContextValue('dashboard');
++        $third_party_settings = $dashboard->getThirdPartySetting('layout_builder_restrictions', 'entity_view_mode_restriction', []);
++        $allowed_layouts = (isset($third_party_settings['allowed_layouts'])) ? $third_party_settings['allowed_layouts'] : [];
++        // Filter blocks from entity-specific SectionStorage (i.e., UI).
++        if (!empty($allowed_layouts)) {
++          $definitions = array_intersect_key($definitions, array_flip($allowed_layouts));
++        }
++      }
++    }
++    return $definitions;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function blockAllowedinContext(SectionStorageInterface $section_storage, $delta_from, $delta_to, $region_to, $block_uuid, $preceding_block_uuid = NULL) {
++    if (!$this->isDashboardStorage($section_storage)) {
++      return TRUE;
++    }
++    /**
++     * @var \Drupal\dashboard\Entity\Dashboard $dashboard
++     * @var \Drupal\dashboard\Plugin\SectionStorage\DashboardSectionStorage $section_storage
++     */
++    $dashboard = $section_storage->getContextValue('dashboard');
++    $third_party_settings = $dashboard->getThirdPartySetting('layout_builder_restrictions', 'entity_view_mode_restriction', []);
++    if (empty($third_party_settings)) {
++      // This entity has no restrictions. Look no further.
++      return TRUE;
++    }
++    // There ARE restrictions. Start by assuming *this* block is not restricted.
++    $has_restrictions = FALSE;
++
++    $whitelisted_blocks = (isset($third_party_settings['whitelisted_blocks'])) ? $third_party_settings['whitelisted_blocks'] : [];
++    $blacklisted_blocks = (isset($third_party_settings['blacklisted_blocks'])) ? $third_party_settings['blacklisted_blocks'] : [];
++    $restricted_categories = (isset($third_party_settings['restricted_categories'])) ? $third_party_settings['restricted_categories'] : [];
++    $bundle = $dashboard->bundle();
++
++    // Get "from" section and layout id. (not needed?)
++    $section_from = $section_storage->getSection($delta_from);
++
++    // Get "to" section and layout id.
++    $section_to = $section_storage->getSection($delta_to);
++    $layout_id_to = $section_to->getLayoutId();
++
++    // Get block information.
++    $component = $section_from->getComponent($block_uuid)->toArray();
++    $block_id = $component['configuration']['id'];
++
++    // Load the plugin definition.
++    if ($definition = $this->blockManager()->getDefinition($block_id)) {
++      $category = $this->getUntranslatedCategory($definition['category']);
++      if (isset($whitelisted_blocks[$category]) || isset($blacklisted_blocks[$category]) || isset($restricted_categories[$category])) {
++        // If there is a restriction, assume this block is restricted.
++        // If the block is whitelisted or NOT blacklisted,
++        // the restriction will be removed, below.
++        $has_restrictions = TRUE;
++      }
++
++      if (!isset($restricted_categories[$category]) && !isset($whitelisted_blocks[$category]) && !isset($blacklisted_blocks[$category]) && $category != "Custom blocks") {
++        // No restrictions have been placed on this category.
++        $has_restrictions = FALSE;
++      }
++      else {
++        // Some type of restriction has been placed.
++        if (isset($whitelisted_blocks[$category])) {
++          // An explicitly whitelisted block means it's allowed.
++          if (in_array($block_id, $whitelisted_blocks[$category])) {
++            $has_restrictions = FALSE;
++          }
++        }
++        elseif (isset($blacklisted_blocks[$category])) {
++          // If absent from the blacklist, it's allowed.
++          if (!in_array($block_id, $blacklisted_blocks[$category])) {
++            $has_restrictions = FALSE;
++          }
++        }
++      }
++
++      if ($has_restrictions) {
++        return $this->t("There is a restriction on %block placement in the %layout %region region for %type content.", [
++          "%block" => $definition['admin_label'],
++          "%layout" => $layout_id_to,
++          "%region" => $region_to,
++          "%type" => $bundle,
++        ]);
++      }
++    }
++
++    // Default: this block is not restricted.
++    return TRUE;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function inlineBlocksAllowedinContext(SectionStorageInterface $section_storage, $delta, $region) {
++    if ($this->isDashboardStorage($section_storage)) {
++      return [];
++    }
++    return parent::inlineBlocksAllowedinContext($section_storage, $delta, $region);
++  }
++
++}
