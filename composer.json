@@ -14,7 +14,7 @@
     "drupal/core": "~11.3.0",
     "composer/installers": "~2",
     "oomphinc/composer-installers-extender": "~2",
-    "cweagans/composer-patches": "~2"
+    "cweagans/composer-patches": "~1.7.0 || ~2.0"
   },
   "extra": {
     "enable-patching": true,
