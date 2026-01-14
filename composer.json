@@ -14,9 +14,7 @@
     "drupal/core": "~11.3.0",
     "composer/installers": "~2",
     "oomphinc/composer-installers-extender": "~2",
-    "cweagans/composer-patches": "~1 || ~2",
-    "vardot/entity-definition-update-manager": "~1",
-    "vardot/module-installer-factory": "~1"
+    "cweagans/composer-patches": "~2"
   },
   "extra": {
     "enable-patching": true,
@@ -67,10 +65,6 @@
         "Issue 3544608: Fix Media Library: Selected media lost after pager navigation prevents insertion":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-09-03--mr-13141.patch"
       },
-      "drupal/default_content": {
-        "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
-        "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
-      },
       "drupal/gin": {
         "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2024-11-12--3325263.patch",
@@ -80,10 +74,6 @@
       "drupal/persistent_login": {
         "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles":
         "https://www.drupal.org/files/issues/persistent_login-user_task_permission-2899530-6.patch"
-      },
-      "drupal/update_helper": {
-        "Issue #3024165: [PATCH] Enhancements, Better messages for the unable to apply updates, drush command and removed the Mark all updates as successful on install":
-        "https://www.drupal.org/files/issues/2022-06-05/3024165-55.patch"
       },
       "drupal/diff": {
         "Issue #3348096: Fix Entity queries must explicitly set whether the query should be access checked or not in Diff":
@@ -104,12 +94,6 @@
         "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch",
         "fix: #3516167 Multiple Implicit Nullable Parameters for PHP 8.4 Compatibility":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/rabbit_hole--2025-12-08--3516167--mr-87.patch"
-      },
-      "drupal/cl_block": {
-        "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration":
-        "https://www.drupal.org/files/issues/2023-06-08/3365591-3.patch",
-        "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()":
-        "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
       },
       "drupal/embed": {
         "Issue #3517882: The namespace of EmbedCKEditor5PluginBase does not respect PSR4":
@@ -153,12 +137,6 @@
         "Issue #3090200: Paragraph access check using incorrect revision of its parent, leading to issues editing and viewing paragraphs when content moderation is involved.":
         "https://www.drupal.org/files/issues/2023-01-31/3084934-13_combine_3090200-22-update_0.patch"
       },
-      "drupal/paragraphs_previewer": {
-        "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch":
-        "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch",
-        "fix: #3538671 PHP 8.4 compatibility with implicit nullable parameters in ParagraphsPreviewController":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs_previewer--2025-12-08--3538671--mr-5.patch"
-      },
       "drupal/redirect": {
         "Issue #2879648: Redirects from aliased paths aren't triggered":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-09-04--2879648--mr-109.patch",
@@ -170,10 +148,6 @@
         "https://www.drupal.org/files/issues/2025-01-25/layout_builder_perms--2025-01-25--3502237--mr-25.patch",
         "fix: #3562020 PHP 8.4 implicit nullable parameters across Layout Builder Advanced Permissions":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_builder_perms--2025-12-08--3562020--mr-28.patch"
-      },
-      "drupal/cl_server": {
-        "Issue #3456661: Update Drupal core to ^10.3 and ^11 and drop the use of the SDC experimental module":
-        "https://www.drupal.org/files/issues/2024-06-25/cl_server--2024-06-25--3456661-9--mr-32.patch"
       },
       "drupal/node_edit_protection": {
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
@@ -239,12 +213,6 @@
         "Issue #3561886 : Implicit nullable AccountInterface parameters for PHP 8.4 compatibility in Views Bulk Edit":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-12-07--3561886.patch"
       },
-      "drupal/content_planner": {
-        "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch",
-        "fix: #3542886 PHP 8.4 Support fixes":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-12-09--3542886--mr-63.patch"
-      },
       "drupal/config_ignore": {
         "fix: #3561884 Implicit nullable Request parameter for PHP 8.4 compatibility in Config Ignore":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/config_ignore--2025-12-07--3561884.patch"
@@ -276,14 +244,6 @@
       "drupal/google_analytics": {
         "fix: #3562288 PHP 8.4 - Implicit Nullable Parameters for Google Analytics":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/google_analytics--2025-12-09--3562288--mr-45.patch"
-      },
-      "drupal/storybook": {
-        "fix: #3513496 Fix PHP 8.4 deprecations":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/storybook--2025-12-09--3513496--mr-23.patch"
-      },
-      "e0ipso/twig-storybook": {
-        "Twig Storybook - Support Twig 4.x with YieldReady #18":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/twig-storybook--2025-12-23--pr18.patch"
       },
       "drupal/schemata": {
         "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated":
