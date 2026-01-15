@@ -66,8 +66,8 @@
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-09-03--mr-13141.patch"
       },
       "drupal/recipe_installer_kit": {
-        "Add a patch for the Recipe Installer Kit library on Apply default recipes when recipe selection form is skipped #277":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/recipe_installer_kit--2026-01-15.patch"
+        "fix: #3567657 Default recipes not applied when RecipesForm is skipped due to empty optional recipes":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/recipe_installer_kit--2026-01-15--3567657--mr-19.patch"
       },
       "drupal/gin": {
         "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme":
