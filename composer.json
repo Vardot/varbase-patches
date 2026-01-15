@@ -177,10 +177,6 @@
         "Issue #3504614 Render field value in component using DS field source":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns_ds-ui_patterns_ds--2025-11-24--3504614--mr-3.patch"
       },
-      "drupal/dashboard": {
-        "Issue #3528064: Add support for Layout Builder Restrictions":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboard--2026-01-11--3528064--mr-63.patch"
-      },
       "drupal/modeler_api": {
         "Issue #3537810: Fix Circular Reference by Removing Autowire and Minimizing Dependencies in modeler_api.service":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/modeler_api--2025-11-09--3537810--1-0-x--drupal11-2.patch"
