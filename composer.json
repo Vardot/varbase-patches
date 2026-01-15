@@ -65,6 +65,10 @@
         "Issue 3544608: Fix Media Library: Selected media lost after pager navigation prevents insertion":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-09-03--mr-13141.patch"
       },
+      "drupal/recipe_installer_kit": {
+        "Add a patch for the Recipe Installer Kit library on Apply default recipes when recipe selection form is skipped #277":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/recipe_installer_kit--2026-01-15.patch"
+      },
       "drupal/gin": {
         "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2024-11-12--3325263.patch",
