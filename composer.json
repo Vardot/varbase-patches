@@ -281,10 +281,6 @@
         "fix: #3513496 Fix PHP 8.4 deprecations":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/storybook--2025-12-09--3513496--mr-23.patch"
       },
-      "e0ipso/twig-storybook": {
-        "Twig Storybook - Support Twig 4.x with YieldReady #18":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/twig-storybook--2025-12-23--pr18.patch"
-      },
       "drupal/schemata": {
         "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemata--2025-12-09--3523349--mr-17.patch"
