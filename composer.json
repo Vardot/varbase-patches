@@ -111,10 +111,6 @@
         "fix: #3562479 PHP 8.4 - Implicit nullable SectionStorageInterface parameter":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2025-12-10--3562479--mr-22.patch"
       },
-      "drupal/layout_builder_blocks": {
-        "Issue #3349066: Limit Layout Builder Blocks not to work in the dashboards route":
-        "https://www.drupal.org/files/issues/2025-06-22/layout_builder_blocks--2025-06-22--3349066--mr-5.patch"
-      },
       "drupal/paragraphs": {
         "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]":
         "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
