@@ -49,10 +49,6 @@
         "Issue 3544608: Fix Media Library: Selected media lost after pager navigation prevents insertion":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-09-03--mr-13141.patch"
       },
-      "drupal/recipe_installer_kit": {
-        "fix: #3567657 Default recipes not applied when RecipesForm is skipped due to empty optional recipes":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/recipe_installer_kit--2026-01-15--3567657--mr-19.patch"
-      },
       "drupal/drupal_cms_admin_ui": {
         "fix: #3568407 Remove obsolete automatic_updates_extensions from drupal_cms_admin_ui recipe":
         "https://git.drupalcode.org/project/drupal_cms_admin_ui/-/commit/1cf560b04a217362e7bbc6e3392a44555f360bb2.diff"
