@@ -1,0 +1,13 @@
+diff --git a/userprotect.module b/userprotect.module
+index d62b99b9c0..51e20b0a6b 100644
+--- a/userprotect.module
++++ b/userprotect.module
+@@ -118,7 +118,7 @@ function userprotect_user_access(UserInterface $entity, $op, AccountInterface $a
+  *
+  * @see userprotect_user_access()
+  */
+-function userprotect_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemList $items = NULL) {
++function userprotect_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemList $items = NULL) {
+   if (is_null($items)) {
+     // Sometimes no field item list is passed. In this case, there is nothing
+     // for userprotect to check.
