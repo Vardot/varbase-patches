@@ -205,7 +205,7 @@
       },
       "drupal/userprotect": {
         "Issue #3510800: (PHP 8.4) Fixed implicitly marking parameter $items as nullable is deprecated in userprotect_entity_field_access()":
-        "https://git.drupalcode.org/project/userprotect/-/commit/6b30212091b1cf0a3a2079cf77299feb92ab8955.diff"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/userprotect--2026-01-20--3510800--mr-11.patch"
       },
       "drupal/layout_builder_component_attributes": {
         "fix: #3498301 PHP 8.4 compatibility implicit nullable SectionStorageInterface parameter":
