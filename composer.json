@@ -48,8 +48,6 @@
         "https://www.drupal.org/files/issues/2024-11-07/TypeError_htmlspecialchars_ArgumentNustBeTypeString_ArrayGiven-3352384-62.patch",
         "Issue #3415961: [drupalMedia] Using the Insert Media button causes the window to scroll to the bottom of the page":
         "https://www.drupal.org/files/issues/2025-06-10/drupal-3415961-19.patch",
-        "Issue #3543210: Quick Edit Save Via Contextual Links Redirects to 404 Page":
-        "https://www.drupal.org/files/issues/2025-08-26/drupal-core-3543210-7.patch",
         "Issue 3544608: Fix Media Library: Selected media lost after pager navigation prevents insertion":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-09-03--mr-13141.patch"
       },
