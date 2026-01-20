@@ -57,7 +57,7 @@
         "Issue #3415961: [drupalMedia] Using the Insert Media button causes the window to scroll to the bottom of the page":
         "https://www.drupal.org/files/issues/2025-06-10/drupal-3415961-19.patch",
         "Issue #3543210: Quick Edit Save Via Contextual Links Redirects to 404 Page":
-        "https://www.drupal.org/files/issues/2025-08-26/drupal-core-3543210-7.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-20--3543210--mr-13088.patch",
         "Issue #3538500: Fix block plugin not found warnings during Drush installation of Varbase":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-08-30--3538500--drupal11x02x.patch",
         "Issue 3544608: Fix Media Library: Selected media lost after pager navigation prevents insertion":
