@@ -19,11 +19,6 @@
     "vardot/module-installer-factory": "~1"
   },
   "extra": {
-    "enable-patching": true,
-    "composer-exit-on-patch-failure": true,
-    "patchLevel": {
-      "drupal/core": "-p2"
-    },
     "patches": {
       "drupal/core": {
         "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal":
