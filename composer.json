@@ -17,11 +17,6 @@
     "cweagans/composer-patches": "~1.7.0 || ~2.0"
   },
   "extra": {
-    "enable-patching": true,
-    "composer-exit-on-patch-failure": true,
-    "patchLevel": {
-      "drupal/core": "-p2"
-    },
     "patches": {
       "drupal/core": {
         "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal":
