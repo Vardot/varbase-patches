@@ -12,3 +12,4 @@ index 243e907ccd3f..59579f334089 100644
 +      return Url::fromUserInput($destination);
      }
    }
+ 
