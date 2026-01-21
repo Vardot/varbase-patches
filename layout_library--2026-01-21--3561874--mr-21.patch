@@ -1,11 +1,28 @@
 diff --git a/src/Plugin/SectionStorage/Library.php b/src/Plugin/SectionStorage/Library.php
-index 8e66070..bf217d8 100644
+index a07fbcae..c3f25d12 100644
 --- a/src/Plugin/SectionStorage/Library.php
 +++ b/src/Plugin/SectionStorage/Library.php
-@@ -303,4 +303,17 @@ class Library extends SectionStorageBase implements ContainerFactoryPluginInterf
-     return $this->getContextValue('layout');
+@@ -17,6 +17,7 @@ use Drupal\Core\Url;
+ use Drupal\field_ui\FieldUI;
+ use Drupal\layout_builder\DefaultsSectionStorageInterface;
+ use Drupal\layout_builder\Entity\LayoutBuilderSampleEntityGenerator;
++use Drupal\layout_builder\SectionStorage\SupportAwareSectionStorageInterface;
+ use Drupal\layout_builder\Plugin\SectionStorage\SectionStorageBase;
+ use Drupal\layout_library\Entity\Layout;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+@@ -40,7 +41,7 @@ use Symfony\Component\Routing\RouteCollection;
+  *   },
+  * )
+  */
+-class Library extends SectionStorageBase implements ContainerFactoryPluginInterface, DefaultsSectionStorageInterface {
++class Library extends SectionStorageBase implements ContainerFactoryPluginInterface, DefaultsSectionStorageInterface, SupportAwareSectionStorageInterface {
+
+   /**
+    * Entity type manager.
+@@ -392,4 +393,17 @@ class Library extends SectionStorageBase implements ContainerFactoryPluginInterf
+     $this->notImplemented();
    }
- 
+
 +  /**
 +   * {@inheritdoc}
 +   */
