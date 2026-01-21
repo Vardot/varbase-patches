@@ -11,5 +11,3 @@ index c4bf7dd..6fe51d7 100644
        && (!$container->hasParameter('jsonapi_extras.base_path_override_disabled') || !$container->getParameter('jsonapi_extras.base_path_override_disabled'))
        && $event->getConfig()->getName() === 'jsonapi_extras.settings';
      if ($should_process) {
-
-
