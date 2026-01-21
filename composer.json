@@ -106,10 +106,6 @@
         "Issue #3531672:  Drupal 10.5/11.2 compatability (tooltip broken, cannot edit embedded entities)":
         "https://www.drupal.org/files/issues/2025-06-30/entity_embed--2025-06-30--3531672--mr-62.patch"
       },
-      "drupal/focal_point": {
-        "Issue #2906631: After changing focal point, image doesn't change until you click preview":
-        "https://www.drupal.org/files/issues/2024-02-21/2906631-27.patch"
-      },
       "drupal/layout_library": {
         "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
