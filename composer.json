@@ -126,7 +126,7 @@
       },
       "drupal/layout_library": {
         "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'":
-        "https://www.drupal.org/files/issues/2023-01-05/3075067-19.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
         "Issue #3273160: Support inline blocks in layout":
         "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch"
       },
