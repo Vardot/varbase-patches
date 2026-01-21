@@ -1,0 +1,26 @@
+diff --git a/src/Controller/OAuth2ControllerBase.php b/src/Controller/OAuth2ControllerBase.php
+index 19d8ae4..6cab0d3 100644
+--- a/src/Controller/OAuth2ControllerBase.php
++++ b/src/Controller/OAuth2ControllerBase.php
+@@ -112,7 +112,7 @@ public function __construct($module,
+                               OAuth2ManagerInterface $provider_manager,
+                               RequestStack $request,
+                               SocialAuthDataHandler $data_handler,
+-                              RendererInterface $renderer = NULL) {
++                              ?RendererInterface $renderer = NULL) {
+ 
+     $this->module = $module;
+     $this->pluginId = $plugin_id;
+diff --git a/src/Event/UserEvent.php b/src/Event/UserEvent.php
+index 7e667e0..139bba9 100644
+--- a/src/Event/UserEvent.php
++++ b/src/Event/UserEvent.php
+@@ -43,7 +43,7 @@ class UserEvent extends SocialAuthEventBase {
+    * @param \Drupal\social_auth\User\SocialAuthUserInterface|null $social_auth_user
+    *   The user's data passed by Social Auth.
+    */
+-  public function __construct(UserInterface $user, $plugin_id, SocialAuthUserInterface $social_auth_user = NULL) {
++  public function __construct(UserInterface $user, $plugin_id, ?SocialAuthUserInterface $social_auth_user = NULL) {
+     $this->user = $user;
+     $this->pluginId = $plugin_id;
+     $this->socialAuthUser = $social_auth_user;
