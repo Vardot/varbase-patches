@@ -159,8 +159,8 @@
         "https://www.drupal.org/files/issues/2025-02-18/social_auth_linkedin--2025-02-18--3507495--mr-10.patch"
       },
       "drupal/jsonapi_extras": {
-        "Issue #3508142: Fix installation error with JSON:API Extra in custom Drupal 11 profiles due to missing synthetic service `kernel`":
-        "https://www.drupal.org/files/issues/2025-02-21/jsonapi_extras--2025-02-21--3508142--mr-65.patch"
+        "fix: #3508142 installation error with JSON:API Extra in custom Drupal 11 profiles due to missing synthetic service kernel":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/jsonapi_extras--2026-01-21--3508142--mr-65.patch"
       },
       "drupal/block_class": {
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
