@@ -39,8 +39,8 @@
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-12-31--3049332--10-6-x.patch",
         "Issue #3046152: Video media needs playsinline & muted options":
         "https://www.drupal.org/files/issues/2024-06-20/drupal-core--2024-06-20--10-3-x--3046152-54--mr-8471.patch",
-        "Issue #3080606: Reorder Layout Builder sections":
-        "https://www.drupal.org/files/issues/2024-06-13/3080606-121.patch",
+        "feat: #3080606 add Reorder Layout Builder sections":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-21--3080606--10-6-x.patch",
         "Issue #3456176: 10.3 upgrade now missing status-message theme suggestions":
         "https://www.drupal.org/files/issues/2024-06-28/3456176-45-missing-status-messages-theme-suggestions.patch",
         "Issue #3457431: Saving text format generates validation warnings":
