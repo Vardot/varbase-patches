@@ -1,0 +1,22 @@
+diff --git a/src/Plugin/SectionStorage/Library.php b/src/Plugin/SectionStorage/Library.php
+index 8e66070..bf217d8 100644
+--- a/src/Plugin/SectionStorage/Library.php
++++ b/src/Plugin/SectionStorage/Library.php
+@@ -303,4 +303,17 @@ class Library extends SectionStorageBase implements ContainerFactoryPluginInterf
+     return $this->getContextValue('layout');
+   }
+ 
++  /**
++   * {@inheritdoc}
++   */
++  public function isSupported(string $entity_type_id, string $bundle, string $view_mode): bool {
++    $id = "$entity_type_id.$bundle.$view_mode";
++    $storage = $this->entityTypeManager->getStorage('entity_view_display');
++    $display = $storage->load($id);
++    if ($display) {
++      return (bool) $display->getThirdPartySetting('layout_library', 'enable');
++    }
++    return FALSE;
++  }
++
+ }
