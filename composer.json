@@ -230,7 +230,7 @@
       },
       "drupal/ui_patterns_settings": {
         "fix: #3564894 PHP8.4 Deprecated notice":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns_settings--2025-12-27--mr-58.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns_settings--2026-01-21--3564894.patch"
       },
       "drupal/dashboards": {
         "fix: #3542888 PHP 8.4 Support":
