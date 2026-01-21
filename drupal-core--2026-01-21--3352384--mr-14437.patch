@@ -1,0 +1,27 @@
+
+diff --git a/core/lib/Drupal/Component/Utility/Html.php b/core/lib/Drupal/Component/Utility/Html.php
+index 29f16edc861a..0d6ddb69741d 100644
+--- a/core/lib/Drupal/Component/Utility/Html.php
++++ b/core/lib/Drupal/Component/Utility/Html.php
+@@ -383,7 +383,7 @@ public static function escapeCdataElement(\DOMNode $node, $comment_start = '//',
+    * will convert "&eacute;" to "é", whereas Html::escape() will not convert "é"
+    * to "&eacute;".
+    *
+-   * @param string $text
++   * @param string|null $text
+    *   The text to decode entities in.
+    *
+    * @return string
+@@ -430,8 +430,8 @@ public static function decodeEntities(string $text): string {
+    *
+    * @ingroup sanitization
+    */
+-  public static function escape(string $text): string {
+-    return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
++  public static function escape(string|NULL $text): string {
++    return htmlspecialchars($text ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+   }
+ 
+   /**
+
+
