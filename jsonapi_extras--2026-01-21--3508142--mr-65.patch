@@ -2,7 +2,7 @@ diff --git a/src/EventSubscriber/ConfigSubscriber.php b/src/EventSubscriber/Conf
 index c4bf7dd..6fe51d7 100644
 --- a/src/EventSubscriber/ConfigSubscriber.php
 +++ b/src/EventSubscriber/ConfigSubscriber.php
-@@ -59,7 +59,7 @@ class ConfigSubscriber implements EventSubscriberInterface {
+@@ -50,7 +50,7 @@ class ConfigSubscriber implements EventSubscriberInterface {
    public function onSave(ConfigCrudEvent $event) {
      $container = \Drupal::getContainer();
      // It is problematic to rebuild the container during the installation.
