@@ -1,0 +1,15 @@
+diff --git a/src/EventSubscriber/ConfigSubscriber.php b/src/EventSubscriber/ConfigSubscriber.php
+index c4bf7dd..6fe51d7 100644
+--- a/src/EventSubscriber/ConfigSubscriber.php
++++ b/src/EventSubscriber/ConfigSubscriber.php
+@@ -59,7 +59,7 @@ class ConfigSubscriber implements EventSubscriberInterface {
+   public function onSave(ConfigCrudEvent $event) {
+     $container = \Drupal::getContainer();
+     // It is problematic to rebuild the container during the installation.
+-    $should_process = $container->getParameter('kernel.environment') !== 'install'
++    $should_process = (!defined('MAINTENANCE_MODE') || (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE !== 'install'))
+       && (!$container->hasParameter('jsonapi_extras.base_path_override_disabled') || !$container->getParameter('jsonapi_extras.base_path_override_disabled'))
+       && $event->getConfig()->getName() === 'jsonapi_extras.settings';
+     if ($should_process) {
+
+
