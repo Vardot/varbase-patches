@@ -1,0 +1,61 @@
+diff --git a/src/Plugin/PatternSettingTypeBase.php b/src/Plugin/PatternSettingTypeBase.php
+index 85e96f8..c609830 100644
+--- a/src/Plugin/PatternSettingTypeBase.php
++++ b/src/Plugin/PatternSettingTypeBase.php
+@@ -396,7 +396,7 @@ abstract class PatternSettingTypeBase extends PluginBase implements
+    *
+    * @param array $element
+    *   The form field.
+-   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   * @param \Drupal\Core\Form\FormStateInterface|null $form_state
+    *   The pattern definition.
+    * @param mixed $form
+    *   The form.
+@@ -406,7 +406,7 @@ abstract class PatternSettingTypeBase extends PluginBase implements
+    */
+   public static function formGroupProcess(
+     array &$element,
+-    FormStateInterface $form_state = NULL,
++    ?FormStateInterface $form_state = NULL,
+     &$form = []
+   ) {
+     if (isset($element['#pattern_setting_definition'])) {
+diff --git a/src/UiPatternsSettings.php b/src/UiPatternsSettings.php
+index dad1efe..f16ea8f 100644
+--- a/src/UiPatternsSettings.php
++++ b/src/UiPatternsSettings.php
+@@ -84,13 +84,13 @@ class UiPatternsSettings {
+    *   The variant.
+    * @param bool $preview
+    *   Is preview.
+-   * @param \Drupal\Core\Entity\EntityInterface $entity
++   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+    *   The entity of the pattern. Useful for dynamic settings.
+    *
+    * @return array
+    *   The processed settings.
+    */
+-  public static function preprocess($pattern_id, array $settings, $variant, $preview, EntityInterface $entity = NULL, &$element = NULL) {
++  public static function preprocess($pattern_id, array $settings, $variant, $preview, ?EntityInterface $entity = NULL, &$element = NULL) {
+     $processed_settings = [];
+     $definition = UiPatterns::getPatternDefinition($pattern_id);
+     $context = [];
+@@ -212,15 +212,15 @@ class UiPatternsSettings {
+    *
+    * @param \Drupal\ui_patterns\Definition\PatternDefinition $definition
+    *   The definition.
+-   * @param string $variant
++   * @param string|null $variant
+    *   The pattern variant.
+-   * @param string $name
++   * @param string|null $name
+    *   The configuration key.
+    *
+    * @return mixed
+    *   Setting pattern configuration.
+    */
+-  public static function getPatternConfiguration(PatternDefinition $definition, $variant = NULL, $name = NULL) {
++  public static function getPatternConfiguration(PatternDefinition $definition, ?string $variant = NULL, ?string $name = NULL) {
+     $additional = $definition->getAdditional();
+     $configuration = $additional['configuration'] ?? [];
+     // Check for variant configuration
