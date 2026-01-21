@@ -1,0 +1,13 @@
+diff --git a/core/lib/Drupal/Component/Utility/Html.php b/core/lib/Drupal/Component/Utility/Html.php
+index 17033452b38..df83c3c4b9d 100644
+--- a/core/lib/Drupal/Component/Utility/Html.php
++++ b/core/lib/Drupal/Component/Utility/Html.php
+@@ -222,7 +222,7 @@ public static function getUniqueId($id) {
+    * @see self::getUniqueId()
+    */
+   public static function getId($id) {
+-    $id = str_replace([' ', '_', '[', ']'], ['-', '-', '-', ''], mb_strtolower($id));
++    $id = $id ? str_replace([' ', '_', '[', ']'], ['-', '-', '-', ''], mb_strtolower($id)) : '';
+ 
+     // As defined in https://www.w3.org/TR/html4/types.html#type-name, HTML IDs can
+     // only contain letters, digits ([0-9]), hyphens ("-"), underscores ("_"),
