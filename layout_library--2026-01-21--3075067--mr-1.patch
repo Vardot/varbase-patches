@@ -1,0 +1,296 @@
+diff --git a/src/Entity/Layout.php b/src/Entity/Layout.php
+index 2ae196c1e706a5743cdc79d2aa0302e952548ec7..ba826f1bd83b643ecd2baea17d5d34002cea70b4 100644
+--- a/src/Entity/Layout.php
++++ b/src/Entity/Layout.php
+@@ -87,7 +87,9 @@ class Layout extends ConfigEntityBase implements SectionListInterface {
+   protected $layout = [];
+ 
+   /**
+-   * Gets value of targetEntityType.
++   * Alias of getTargetEntityTypeId().
++   *
++   * @todo refactor in favor of getTargetEntityTypeId() to align with core.
+    *
+    * @return string
+    *   Value of targetEntityType
+@@ -96,6 +98,16 @@ class Layout extends ConfigEntityBase implements SectionListInterface {
+     return $this->targetEntityType;
+   }
+ 
++  /**
++   * Gets value of targetEntityType.
++   *
++   * @return string
++   *   Value of targetEntityType
++   */
++  public function getTargetEntityTypeId() {
++    return $this->targetEntityType;
++  }
++
+   /**
+    * Gets value of targetBundle.
+    *
+diff --git a/src/Plugin/SectionStorage/Library.php b/src/Plugin/SectionStorage/Library.php
+index 8e6607073f0061f6ad42c282146084f0ebb83b92..a07fbcaeb273191b111ee7ceabd19f906cfc34ec 100644
+--- a/src/Plugin/SectionStorage/Library.php
++++ b/src/Plugin/SectionStorage/Library.php
+@@ -14,8 +14,10 @@ use Drupal\Core\Session\AccountInterface;
+ use Drupal\Core\StringTranslation\TranslatableMarkup;
+ use Drupal\Core\Url;
+ use Drupal\field_ui\FieldUI;
++use Drupal\layout_builder\DefaultsSectionStorageInterface;
+ use Drupal\layout_builder\Entity\LayoutBuilderSampleEntityGenerator;
+ use Drupal\layout_builder\Plugin\SectionStorage\SectionStorageBase;
++use Drupal\layout_library\Entity\Layout;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ use Symfony\Component\Routing\RouteCollection;
+ 
+@@ -36,7 +38,7 @@ use Symfony\Component\Routing\RouteCollection;
+  *   },
+  * )
+  */
+-class Library extends SectionStorageBase implements ContainerFactoryPluginInterface {
++class Library extends SectionStorageBase implements ContainerFactoryPluginInterface, DefaultsSectionStorageInterface {
+ 
+   /**
+    * Entity type manager.
+@@ -265,6 +267,12 @@ class Library extends SectionStorageBase implements ContainerFactoryPluginInterf
+     $is_library_enabled = FALSE;
+     $values = $this->getContextValues();
+ 
++    // Coming from a layout save, should always be applicable.
++    if (!is_null($values['entity']) && $values['entity'] instanceof Layout) {
++      $this->setContextValue('layout', $values['entity']);
++      return TRUE;
++    }
++
+     if (!is_null($values['layout'])) {
+       $cacheability->addCacheableDependency($values['layout']);
+ 
+@@ -303,4 +311,85 @@ class Library extends SectionStorageBase implements ContainerFactoryPluginInterf
+     return $this->getContextValue('layout');
+   }
+ 
++  /**
++   * {@inheritdoc}
++   */
++  public function isOverridable() {
++    return TRUE;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function isLayoutBuilderEnabled() {
++    return TRUE;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function getThirdPartySetting($module, $key, $default = NULL) {
++    return $this->getLayout()->getThirdPartySetting($module, $key, $default);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function setThirdPartySetting($module, $key, $value) {
++    $this->getLayout()->setThirdPartySetting($module, $key, $value);
++    return $this;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function getThirdPartySettings($module) {
++    return $this->getLayout()->getThirdPartySettings($module);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function unsetThirdPartySetting($module, $key) {
++    $this->getLayout()->unsetThirdPartySetting($module, $key);
++    return $this;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function getThirdPartyProviders() {
++    return $this->getLayout()->getThirdPartyProviders();
++  }
++
++  /**
++   * Helper to throw an exception for non implemented methods.
++   *
++   * @todo Refactor this once https://www.drupal.org/node/2985362 is complete.
++   */
++  protected function notImplemented() {
++    throw new \LogicException('Method not implemented');
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function setOverridable($overridable = TRUE) {
++    $this->notImplemented();
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function enableLayoutBuilder() {
++    $this->notImplemented();
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function disableLayoutBuilder() {
++    $this->notImplemented();
++  }
++
+ }
+diff --git a/tests/src/Kernel/InlineBlockTest.php b/tests/src/Kernel/InlineBlockTest.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..92db1bd4a21f8697afb9f47be57b923583811ac8
+--- /dev/null
++++ b/tests/src/Kernel/InlineBlockTest.php
+@@ -0,0 +1,135 @@
++<?php
++
++namespace Drupal\Tests\layout_library\Kernel;
++
++use Drupal\block_content\Entity\BlockContent;
++use Drupal\block_content\Entity\BlockContentType;
++use Drupal\KernelTests\KernelTestBase;
++use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
++use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
++use Drupal\layout_builder\Section;
++use Drupal\layout_builder\SectionComponent;
++use Drupal\layout_library\Entity\Layout;
++use Drupal\node\Entity\Node;
++use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
++
++/**
++ * Tests using inline blocks on layout templates.
++ *
++ * @group layout_library
++ */
++class InlineBlockTest extends KernelTestBase {
++
++  use ContentTypeCreationTrait;
++
++  /**
++   * {@inheritdoc}
++   */
++  protected static $modules = [
++    'block_content',
++    'field',
++    'layout_builder',
++    'layout_discovery',
++    'layout_library',
++    'node',
++    'system',
++    'text',
++    'user',
++  ];
++
++  /**
++   * {@inheritdoc}
++   */
++  protected function setUp(): void {
++    parent::setUp();
++    $this->installSchema('layout_builder', ['inline_block_usage']);
++    $this->installSchema('node', ['node_access']);
++    $this->installEntitySchema('block_content');
++    $this->installEntitySchema('user');
++    $this->installEntitySchema('node');
++    $this->installConfig('node');
++
++    $this->createContentType(['type' => 'dogs']);
++    $bundle = BlockContentType::create([
++      'id' => 'basic',
++      'label' => 'Basic block',
++      'revision' => 1,
++    ]);
++    $bundle->save();
++
++    // Enable layout builder on the content type.
++    $full_display = \Drupal::service('entity_display.repository')->getViewDisplay('node', 'dogs', 'full');
++    $this->assertInstanceOf(LayoutBuilderEntityViewDisplay::class, $full_display);
++    $full_display->enableLayoutBuilder()
++      ->setOverridable()
++      ->setThirdPartySetting('layout_library', 'enable', TRUE)
++      ->save();
++
++    $this->createLayoutTemplate();
++  }
++
++  /**
++   * Test that two nodes can be created with the same layout.
++   */
++  public function testUseLayout() {
++    Node::create([
++      'type' => 'dogs',
++      'title' => 'Test 1',
++      'layout_selection' => 'slim_pug',
++    ])->save();
++    Node::create([
++      'type' => 'dogs',
++      'title' => 'Test 2',
++      'layout_selection' => 'slim_pug',
++    ])->save();
++    $this->assertCount(1, BlockContent::loadMultiple());
++  }
++
++  /**
++   * Test that a layout override can be created from a selected layout.
++   */
++  public function testLayoutOverride() {
++    Node::create([
++      'type' => 'dogs',
++      'layout_selection' => 'slim_pug',
++      'title' => 'Test',
++    ])->save();
++    $node = Node::load(1);
++    $layout = $node->get('layout_selection')->entity;
++    $this->assertInstanceOf(Layout::class, $layout);
++    $node->set(OverridesSectionStorage::FIELD_NAME, $layout->getSections());
++    $node->save();
++    $this->assertCount(2, BlockContent::loadMultiple());
++  }
++
++  /**
++   * Create a new template with an inline block.
++   */
++  private function createLayoutTemplate(): void {
++    $layout = Layout::create([
++      'id' => 'slim_pug',
++      'label' => 'Slim Pug',
++      'targetEntityType' => 'node',
++      'targetBundle' => 'dogs',
++    ]);
++    $this->assertInstanceOf(Layout::class, $layout);
++
++    $block_content = BlockContent::create([
++      'type' => 'basic',
++      'label' => 'Inline block title',
++    ]);
++    $section_component = new SectionComponent('fake-uuid', 'content', [
++      'id' => 'inline_block:basic',
++      'label' => 'Inline block title',
++      'block_revision_id' => NULL,
++      'block_serialized' => serialize($block_content),
++      'label_display' => 'visible',
++      'provider' => 'layout_builder',
++      'view_mode' => 'full',
++      'context_mapping' => [],
++    ]);
++    $layout->appendSection(new Section('layout_onecol', [], [$section_component]));
++    $layout->save();
++  }
++
++}
