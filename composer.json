@@ -95,8 +95,8 @@
       "drupal/openapi_jsonapi": {
         "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined":
         "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch",
-        "Issue #3079209: Hide POST, PUT, and DELETE endpoints when JSON:API is configured to be read-only":
-        "https://www.drupal.org/files/issues/2020-12-21/only_add_read_route-methods_when_read_only_is_enabled_in_jsonapi_8.x_2.x-3079209-11.patch"
+        "feat: #3079209 Hide POST, PUT, and DELETE endpoints when JSON:API is configured to be read-only":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi_jsonapi--2026-01-22--10308347--mr-6.patch"
       },
       "drupal/entity_embed": {
         "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
