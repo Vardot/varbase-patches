@@ -214,7 +214,7 @@
       },
       "drupal/social_auth": {
         "fix: #3564906 PHP 8.4 compatibility - Implicit nullable parameter deprecations in Social Auth module":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2025-12-27--3564906--mr-38.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2026-01-21--3564906--mr-38.patch"
       },
       "drupal/simple_oauth": {
         "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
