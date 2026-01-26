@@ -1,0 +1,17 @@
+diff --git a/src/EventSubscriber/DefaultContentSubscriber.php b/src/EventSubscriber/DefaultContentSubscriber.php
+index 5ae4d835d..799fb9ceb 100644
+--- a/src/EventSubscriber/DefaultContentSubscriber.php
++++ b/src/EventSubscriber/DefaultContentSubscriber.php
+@@ -78,6 +78,11 @@ final class DefaultContentSubscriber implements EventSubscriberInterface {
+         \assert($component_source instanceof ComponentSourceInterface);
+         $inputs = $component_source->getDefaultExplicitInput();
+         foreach ($inputs as $prop_name => $input) {
++          // Skip inputs that are not arrays or don't have a sourceType.
++          // This can happen with block components that have simple configuration values.
++          if (!is_array($input) || !isset($input['sourceType'])) {
++            continue;
++          }
+           $prop_source = PropSource::parse($input);
+           // Only a static prop source will store a reference to a specific
+           // entity. Dynamic prop sources would store a reference to field on
+
