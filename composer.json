@@ -150,9 +150,7 @@
       },
       "drupal/trash": {
         "Issue #3491947: Add support for taxonomy terms":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/trash--2026-02-01--3491947--mr-71.patch",
-        "Issue #3561877 : RedirectTrashHandler should check if deleted field exists before accessing it to support Drupal ~11.3.0":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/trash--2025-12-07--3561877--mr-89.patch"
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/trash--2026-02-01--3491947--mr-71.patch"
       },
       "drupal/scheduler_content_moderation_integration": {
         "Issue #3543642: Fix duplicates bundles for cleaner output":
