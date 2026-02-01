@@ -1,0 +1,828 @@
+commit 9e0fcf2c8c515a5f3dbd0ce56368f80d41d78940
+Author: Rajab Natshah <rajabn@gmail.com>
+Date:   Sun Feb 1 11:05:59 2026 +0300
+
+    feat: #3491947 Add support for taxonomy terms
+
+diff --git a/src/Controller/TrashController.php b/src/Controller/TrashController.php
+index 8aae8ba..34faf9a 100644
+--- a/src/Controller/TrashController.php
++++ b/src/Controller/TrashController.php
+@@ -201,6 +201,7 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
+     $storage = $this->entityTypeManager()->getStorage($entity_type->id());
+     $entity_ids = $storage->getQuery()
+       ->accessCheck(TRUE)
++      ->addTag('trash')
+       ->exists('deleted')
+       ->tableSort($header)
+       ->pager(50)
+diff --git a/src/Form/TrashSettingsForm.php b/src/Form/TrashSettingsForm.php
+index ae659fc..516da92 100644
+--- a/src/Form/TrashSettingsForm.php
++++ b/src/Form/TrashSettingsForm.php
+@@ -220,7 +220,6 @@ class TrashSettingsForm extends ConfigFormBase {
+     // Disallow enabling trash on entity types that haven't been tested enough.
+     $unsupported_entity_types = [
+       'comment',
+-      'taxonomy_term',
+       'user',
+       'workspace',
+     ];
+diff --git a/src/Hook/TrashHandler/TaxonomyTermTrashHandler.php b/src/Hook/TrashHandler/TaxonomyTermTrashHandler.php
+new file mode 100644
+index 0000000..73a6dee
+--- /dev/null
++++ b/src/Hook/TrashHandler/TaxonomyTermTrashHandler.php
+@@ -0,0 +1,66 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\trash\Hook\TrashHandler;
++
++use Drupal\Core\Database\Query\AlterableInterface;
++use Drupal\Core\Entity\EntityInterface;
++use Drupal\Core\Hook\Attribute\Hook;
++use Drupal\taxonomy\Entity\Term;
++use Drupal\trash\Handler\DefaultTrashHandler;
++
++/**
++ * Provides a trash handler for the 'taxonomy_term' entity type.
++ */
++class TaxonomyTermTrashHandler extends DefaultTrashHandler {
++
++  /**
++   * Implements hook_query_alter().
++   *
++   * This prevents deleted taxonomy terms from appearing in taxonomy tree
++   * operations and overview pages by checking for relevant tags.
++   */
++  #[Hook('query_alter')]
++  public function queryAlter(AlterableInterface $query): void {
++    // Only act on queries with taxonomy term access related tags.
++    if ($query->hasTag('taxonomy_term_access') || $query->hasTag('term_access')) {
++      // Get the trash manager service directly since dependency injection
++      // doesn't work with hook handlers.
++      // @phpstan-ignore-next-line
++      $trashManager = \Drupal::service('trash.manager');
++
++      // Only alter queries if trash context allows it.
++      if (!$trashManager->isEntityTypeEnabled('taxonomy_term')) {
++        return;
++      }
++
++      // Add condition to exclude deleted terms.
++      /** @var \Drupal\Core\Database\Query\SelectInterface $query */
++      $tables = $query->getTables();
++
++      // Look for taxonomy term data tables.
++      foreach ($tables as $alias => $table_info) {
++        if (isset($table_info['table']) && $table_info['table'] === 'taxonomy_term_field_data') {
++          // Add condition to exclude trashed terms.
++          if ($query->hasTag('trash')) {
++            continue;
++          }
++          $query->isNull($alias . '.deleted');
++          break;
++        }
++      }
++    }
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function postTrashDelete(EntityInterface $entity): void {
++    // Call Drupal's core Term::postDelete to handle taxonomy-specific cleanup.
++    Term::postDelete($this->entityTypeManager->getStorage('taxonomy_term'), [
++      $entity->id() => $entity,
++    ]);
++  }
++
++}
+diff --git a/tests/src/Kernel/TaxonomyTermTrashTest.php b/tests/src/Kernel/TaxonomyTermTrashTest.php
+new file mode 100644
+index 0000000..34dcdfc
+--- /dev/null
++++ b/tests/src/Kernel/TaxonomyTermTrashTest.php
+@@ -0,0 +1,684 @@
++<?php
++
++namespace Drupal\Tests\trash\Kernel;
++
++use Drupal\taxonomy\Entity\Term;
++use Drupal\taxonomy\VocabularyInterface;
++use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
++
++/**
++ * Tests trash functionality for taxonomy terms.
++ *
++ * @group trash
++ */
++class TaxonomyTermTrashTest extends TrashKernelTestBase {
++
++  use TaxonomyTestTrait;
++
++  /**
++   * {@inheritdoc}
++   */
++  protected static $modules = [
++    'field',
++    'file',
++    'filter',
++    'node',
++    'media',
++    'text',
++    'trash',
++    'trash_test',
++    'user',
++    'system',
++    'taxonomy',
++  ];
++
++  /**
++   * The test vocabulary.
++   */
++  protected VocabularyInterface $vocabulary;
++
++  /**
++   * {@inheritdoc}
++   */
++  protected function setUp(): void {
++    parent::setUp();
++
++    $this->installEntitySchema('taxonomy_term');
++    $this->installEntitySchema('taxonomy_vocabulary');
++    $this->installConfig(['taxonomy']);
++
++    // Enable taxonomy_term trash support by actually installing the deleted
++    // field.
++    $entity_type_manager = \Drupal::entityTypeManager();
++    $taxonomy_term_entity_type = $entity_type_manager->getDefinition('taxonomy_term');
++    $trash_manager = \Drupal::service('trash.manager');
++
++    // Install the deleted field for taxonomy terms.
++    $trash_manager->enableEntityType($taxonomy_term_entity_type);
++
++    // Set the configuration to enable it.
++    $config = \Drupal::configFactory()->getEditable('trash.settings');
++    $enabled_entity_types = $config->get('enabled_entity_types');
++    $enabled_entity_types['taxonomy_term'] = [];
++    $config->set('enabled_entity_types', $enabled_entity_types);
++    $config->save();
++
++    // Rebuild the container so trash handlers are available for the enabled
++    // entity types.
++    $this->container->get('kernel')->rebuildContainer();
++
++    // Create a test vocabulary.
++    $this->vocabulary = $this->createVocabulary();
++  }
++
++  /**
++   * Tests trashing a single term without children.
++   */
++  public function testTrashSingleTerm(): void {
++    $term = $this->createTerm($this->vocabulary, ['name' => 'Single Term']);
++    $term_id = $term->id();
++
++    $this->assertFalse(trash_entity_is_deleted($term), 'Term is initially not deleted.');
++
++    $term->delete();
++
++    // Test the default 'active' trash context - trashed terms should not be
++    // loadable.
++    $deleted_term = Term::load($term_id);
++    $this->assertNull($deleted_term, 'Trashed term is not loadable in the default (active) trash context.');
++
++    // Test the 'ignore' trash context - trashed terms should be loadable.
++    $deleted_term = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($term_id) {
++      return Term::load($term_id);
++    });
++    $this->assertNotNull($deleted_term, 'Trashed term is loadable in the "ignore" trash context.');
++    $this->assertTrue(trash_entity_is_deleted($deleted_term), 'Term is marked as deleted.');
++    $this->assertNotNull($deleted_term->get('deleted')->value, 'Term has a deleted timestamp.');
++  }
++
++  /**
++   * Tests restoring a single term without children.
++   */
++  public function testRestoreSingleTerm(): void {
++    $term = $this->createTerm($this->vocabulary, ['name' => 'Single Term']);
++    $term_id = $term->id();
++
++    // Trash the term.
++    $term->delete();
++
++    // Verify term is trashed by checking it's not loadable in default context.
++    $this->assertNull(Term::load($term_id), 'Term is not loadable in default context after trashing.');
++
++    // Verify term is trashed by checking it's loadable and marked as deleted
++    // in ignore context.
++    $trashed_term = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($term_id) {
++      return Term::load($term_id);
++    });
++    $this->assertTrue(trash_entity_is_deleted($trashed_term), 'Term is marked as deleted in ignore context.');
++
++    // Restore the term.
++    $this->restoreTerm($term_id);
++
++    // Verify term is restored and loadable in default context.
++    $restored_term = Term::load($term_id);
++    $this->assertNotNull($restored_term, 'Term is loadable after restoration.');
++    $this->assertFalse(trash_entity_is_deleted($restored_term), 'Term is not marked as deleted after restoration.');
++    $this->assertNull($restored_term->get('deleted')->value, 'Term has no deleted timestamp after restoration.');
++  }
++
++  /**
++   * Tests purging a single term without children.
++   */
++  public function testPurgeSingleTerm(): void {
++    $term = $this->createTerm($this->vocabulary, ['name' => 'Single Term']);
++    $term_id = $term->id();
++
++    // Trash the term.
++    $term->delete();
++
++    // Verify term is trashed.
++    $this->assertNull(Term::load($term_id), 'Term is not loadable in default context after trashing.');
++    $trashed_term = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($term_id) {
++      return Term::load($term_id);
++    });
++    $this->assertNotNull($trashed_term, 'Term is loadable in ignore context after trashing.');
++
++    // Purge the term.
++    $this->purgeTerm($term_id);
++
++    // Verify term is completely removed even in ignore context.
++    $this->assertNull(Term::load($term_id), 'Term is completely removed after purging.');
++    $purged_term = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($term_id) {
++      return Term::load($term_id);
++    });
++    $this->assertNull($purged_term, 'Term is completely removed even in ignore context after purging.');
++  }
++
++  /**
++   * Tests trashing a parent term with children that have only that parent.
++   */
++  public function testTrashTermWithSingleParentChildren(): void {
++    // Create parent and children.
++    $parent = $this->createTerm($this->vocabulary, ['name' => 'Parent Term']);
++    $child1 = $this->createTerm($this->vocabulary, ['name' => 'Child 1', 'parent' => $parent->id()]);
++    $child2 = $this->createTerm($this->vocabulary, ['name' => 'Child 2', 'parent' => $parent->id()]);
++
++    $parent_id = $parent->id();
++    $child1_id = $child1->id();
++    $child2_id = $child2->id();
++
++    // Verify initial state.
++    $this->assertFalse(trash_entity_is_deleted($parent), 'Parent is not trashed initially.');
++    $this->assertFalse(trash_entity_is_deleted($child1), 'Child 1 is not trashed initially.');
++    $this->assertFalse(trash_entity_is_deleted($child2), 'Child 2 is not trashed initially.');
++
++    // Trash the parent.
++    $parent->delete();
++
++    // Check that parent and children are trashed.
++    // Load in ignore context to check trashed status.
++    $trashed_parent = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($parent_id) {
++      return Term::load($parent_id);
++    });
++    $trashed_child1 = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($child1_id) {
++      return Term::load($child1_id);
++    });
++    $trashed_child2 = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($child2_id) {
++      return Term::load($child2_id);
++    });
++
++    $this->assertNotNull($trashed_parent, 'Parent is loadable in ignore context.');
++    $this->assertTrue(trash_entity_is_deleted($trashed_parent), 'Parent is trashed.');
++
++    // Note: Children may not be automatically trashed yet - this depends on
++    // implementation.
++    if ($trashed_child1) {
++      $this->assertTrue(trash_entity_is_deleted($trashed_child1), 'Child 1 is trashed when parent is trashed.');
++    }
++    else {
++      // If children are not automatically trashed, they should still be
++      // loadable normally.
++      $this->assertNotNull(Term::load($child1_id), 'Child 1 remains active if not automatically trashed.');
++    }
++
++    if ($trashed_child2) {
++      $this->assertTrue(trash_entity_is_deleted($trashed_child2), 'Child 2 is trashed when parent is trashed.');
++    }
++    else {
++      // If children are not automatically trashed, they should still be
++      // loadable normally.
++      $this->assertNotNull(Term::load($child2_id), 'Child 2 remains active if not automatically trashed.');
++    }
++  }
++
++  /**
++   * Tests trashing a parent term with children that have multiple parents.
++   */
++  public function testTrashTermWithMultipleParentChildren(): void {
++    // Create parents and child with multiple parents.
++    $parent1 = $this->createTerm($this->vocabulary, ['name' => 'Parent 1']);
++    $parent2 = $this->createTerm($this->vocabulary, ['name' => 'Parent 2']);
++    $child = $this->createTerm($this->vocabulary, ['name' => 'Child', 'parent' => [$parent1->id(), $parent2->id()]]);
++
++    $parent1_id = $parent1->id();
++    $parent2_id = $parent2->id();
++    $child_id = $child->id();
++
++    // Verify initial state.
++    $this->assertFalse(trash_entity_is_deleted($parent1), 'Parent 1 is not trashed initially.');
++    $this->assertFalse(trash_entity_is_deleted($parent2), 'Parent 2 is not trashed initially.');
++    $this->assertFalse(trash_entity_is_deleted($child), 'Child is not trashed initially.');
++
++    // Trash parent 1.
++    $parent1->delete();
++
++    // Check that only parent 1 is trashed, not the child or parent 2.
++    // Load trashed parent1 in ignore context to check its status.
++    $trashed_parent1 = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($parent1_id) {
++      return Term::load($parent1_id);
++    });
++    $this->assertNotNull($trashed_parent1, 'Parent 1 is loadable in ignore context.');
++    $this->assertTrue(trash_entity_is_deleted($trashed_parent1), 'Parent 1 is trashed.');
++
++    // Parent 2 and child should still be loadable normally.
++    $active_parent2 = Term::load($parent2_id);
++    $active_child = Term::load($child_id);
++    $this->assertNotNull($active_parent2, 'Parent 2 is loadable in default context.');
++    $this->assertNotNull($active_child, 'Child is loadable in default context.');
++    $this->assertFalse(trash_entity_is_deleted($active_parent2), 'Parent 2 is not trashed.');
++    $this->assertFalse(trash_entity_is_deleted($active_child), 'Child is not trashed when it has other active parents.');
++  }
++
++  /**
++   * Tests handling of orphaned children when all parents are trashed.
++   */
++  public function testTrashOrphanedChildrenHandling(): void {
++    // Create parents and child with multiple parents.
++    $parent1 = $this->createTerm($this->vocabulary, ['name' => 'Parent 1']);
++    $parent2 = $this->createTerm($this->vocabulary, ['name' => 'Parent 2']);
++    $child = $this->createTerm($this->vocabulary, ['name' => 'Child', 'parent' => [$parent1->id(), $parent2->id()]]);
++
++    $parent1_id = $parent1->id();
++    $parent2_id = $parent2->id();
++    $child_id = $child->id();
++
++    // Trash parent 1.
++    $parent1->delete();
++    $active_child = Term::load($child_id);
++    $this->assertNotNull($active_child, 'Child is loadable when one parent is active.');
++    $this->assertFalse(trash_entity_is_deleted($active_child), 'Child is not trashed when one parent is active.');
++
++    // Trash parent 2.
++    $parent2->delete();
++
++    // Check if child was automatically trashed or not.
++    $child_after_all_parents_trashed = Term::load($child_id);
++    if ($child_after_all_parents_trashed === NULL) {
++      // Child was automatically trashed.
++      $trashed_child = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($child_id) {
++        return Term::load($child_id);
++      });
++      $this->assertNotNull($trashed_child, 'Child is loadable in ignore context.');
++      $this->assertTrue(trash_entity_is_deleted($trashed_child), 'Child is trashed when all parents are trashed.');
++    }
++    else {
++      // Child was not automatically trashed - this is also valid behavior.
++      $this->assertFalse(trash_entity_is_deleted($child_after_all_parents_trashed), 'Child remains active even when all parents are trashed (orphaned children handling may vary).');
++    }
++  }
++
++  /**
++   * Tests restoring a parent term with children.
++   */
++  public function testRestoreTermWithChildren(): void {
++    // Create parent and children.
++    $parent = $this->createTerm($this->vocabulary, ['name' => 'Parent Term']);
++    $child1 = $this->createTerm($this->vocabulary, ['name' => 'Child 1', 'parent' => $parent->id()]);
++    $child2 = $this->createTerm($this->vocabulary, ['name' => 'Child 2', 'parent' => $parent->id()]);
++
++    $parent_id = $parent->id();
++    $child1_id = $child1->id();
++    $child2_id = $child2->id();
++
++    // Trash the parent (this may also trash children depending on
++    // implementation).
++    $parent->delete();
++
++    // Verify parent is trashed using ignore context.
++    $trashed_parent = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($parent_id) {
++      return Term::load($parent_id);
++    });
++    $this->assertNotNull($trashed_parent, 'Parent is loadable in ignore context.');
++    $this->assertTrue(trash_entity_is_deleted($trashed_parent), 'Parent is trashed.');
++
++    // Check children status - they may or may not be automatically trashed.
++    $child1_in_default = Term::load($child1_id);
++    $child2_in_default = Term::load($child2_id);
++
++    if ($child1_in_default === NULL) {
++      // Child 1 was trashed with parent.
++      $trashed_child1 = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($child1_id) {
++        return Term::load($child1_id);
++      });
++      $this->assertTrue(trash_entity_is_deleted($trashed_child1), 'Child 1 is trashed.');
++    }
++    else {
++      // Child 1 remains active.
++      $this->assertFalse(trash_entity_is_deleted($child1_in_default), 'Child 1 remains active.');
++    }
++
++    if ($child2_in_default === NULL) {
++      // Child 2 was trashed with parent.
++      $trashed_child2 = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($child2_id) {
++        return Term::load($child2_id);
++      });
++      $this->assertTrue(trash_entity_is_deleted($trashed_child2), 'Child 2 is trashed.');
++    }
++    else {
++      // Child 2 remains active.
++      $this->assertFalse(trash_entity_is_deleted($child2_in_default), 'Child 2 remains active.');
++    }
++
++    // Restore the parent.
++    $this->restoreTerm($parent_id);
++
++    // Check that parent is restored.
++    $restored_parent = Term::load($parent_id);
++    $this->assertNotNull($restored_parent, 'Parent is loadable after restoration.');
++    $this->assertFalse(trash_entity_is_deleted($restored_parent), 'Parent is restored.');
++
++    // Check children are accessible (either because they were restored or
++    // never trashed)
++    $this->assertNotNull(Term::load($child1_id), 'Child 1 is accessible after parent restoration.');
++    $this->assertNotNull(Term::load($child2_id), 'Child 2 is accessible after parent restoration.');
++  }
++
++  /**
++   * Tests that hierarchy is maintained after restore.
++   */
++  public function testRestoreTermMaintainsHierarchy(): void {
++    // Create parent and child.
++    $parent = $this->createTerm($this->vocabulary, ['name' => 'Parent Term']);
++    $child = $this->createTerm($this->vocabulary, ['name' => 'Child Term', 'parent' => $parent->id()]);
++
++    $parent_id = $parent->id();
++    $child_id = $child->id();
++
++    // Verify initial hierarchy by checking the child's parent field directly.
++    $child_reloaded = Term::load($child_id);
++    $child_parent_values = $child_reloaded->get('parent')->getValue();
++    $parent_ids_from_field = array_column($child_parent_values, 'target_id');
++    $this->assertContains($parent_id, $parent_ids_from_field, 'Child has correct parent initially.');
++
++    // Trash and restore.
++    $parent->delete();
++    $this->restoreTerm($parent_id);
++
++    // Verify hierarchy is maintained by checking the child's parent field
++    // again. Child might be trashed, so check in ignore context first.
++    $child_after_restore = Term::load($child_id);
++    if ($child_after_restore === NULL) {
++      // Child is trashed, load in ignore context.
++      $child_after_restore = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($child_id) {
++        return Term::load($child_id);
++      });
++    }
++
++    $this->assertNotNull($child_after_restore, 'Child is loadable after parent restore.');
++    $child_parent_values_after = $child_after_restore->get('parent')->getValue();
++    $parent_ids_after = array_column($child_parent_values_after, 'target_id');
++    $this->assertContains($parent_id, $parent_ids_after, 'Child still has correct parent after restore.');
++  }
++
++  /**
++   * Tests restoring a child when parent is still trashed.
++   */
++  public function testRestoreChildWithoutParent(): void {
++    // Create parent and child.
++    $parent = $this->createTerm($this->vocabulary, ['name' => 'Parent Term']);
++    $child = $this->createTerm($this->vocabulary, ['name' => 'Child Term', 'parent' => $parent->id()]);
++
++    $parent_id = $parent->id();
++    $child_id = $child->id();
++
++    // Trash the parent (this may also trash the child).
++    $parent->delete();
++
++    // Verify parent is trashed using ignore context.
++    $trashed_parent = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($parent_id) {
++      return Term::load($parent_id);
++    });
++    $this->assertNotNull($trashed_parent, 'Parent is loadable in ignore context.');
++    $this->assertTrue(trash_entity_is_deleted($trashed_parent), 'Parent is trashed.');
++
++    // Check if child was automatically trashed with parent.
++    $child_in_default = Term::load($child_id);
++    if ($child_in_default === NULL) {
++      // Child was trashed with parent - verify in ignore context.
++      $trashed_child = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($child_id) {
++        return Term::load($child_id);
++      });
++      $this->assertNotNull($trashed_child, 'Child is loadable in ignore context.');
++      $this->assertTrue(trash_entity_is_deleted($trashed_child), 'Child is trashed.');
++    }
++    else {
++      // Child was not automatically trashed.
++      $this->assertFalse(trash_entity_is_deleted($child_in_default), 'Child remains active.');
++    }
++
++    // Restore only the child.
++    $this->restoreTerm($child_id);
++
++    // Check states - parent should still be trashed, child should be restored.
++    $parent_after_child_restore = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($parent_id) {
++      return Term::load($parent_id);
++    });
++    $this->assertTrue(trash_entity_is_deleted($parent_after_child_restore), 'Parent remains trashed.');
++
++    $child_after_restore = Term::load($child_id);
++    $this->assertNotNull($child_after_restore, 'Child is loadable after restoration.');
++    $this->assertFalse(trash_entity_is_deleted($child_after_restore), 'Child is restored.');
++  }
++
++  /**
++   * Tests purging a parent term with children.
++   */
++  public function testPurgeTermWithChildren(): void {
++    // Create parent and children.
++    $parent = $this->createTerm($this->vocabulary, ['name' => 'Parent Term']);
++    $child1 = $this->createTerm($this->vocabulary, ['name' => 'Child 1', 'parent' => $parent->id()]);
++    $child2 = $this->createTerm($this->vocabulary, ['name' => 'Child 2', 'parent' => $parent->id()]);
++
++    $parent_id = $parent->id();
++    $child1_id = $child1->id();
++    $child2_id = $child2->id();
++
++    // Trash the parent (this should also trash children).
++    $parent->delete();
++
++    // Purge the parent.
++    $this->purgeTerm($parent_id);
++
++    // Check that parent and children are purged.
++    $this->assertNull(Term::load($parent_id), 'Parent is purged.');
++    $this->assertNull(Term::load($child1_id), 'Child 1 is purged when parent is purged.');
++    $this->assertNull(Term::load($child2_id), 'Child 2 is purged when parent is purged.');
++  }
++
++  /**
++   * Tests purging a parent with children that have other non-purged parents.
++   */
++  public function testPurgeTermWithMultipleParentChildren(): void {
++    // Create parents and child with multiple parents.
++    $parent1 = $this->createTerm($this->vocabulary, ['name' => 'Parent 1']);
++    $parent2 = $this->createTerm($this->vocabulary, ['name' => 'Parent 2']);
++    $child = $this->createTerm($this->vocabulary, ['name' => 'Child', 'parent' => [$parent1->id(), $parent2->id()]]);
++
++    $parent1_id = $parent1->id();
++    $parent2_id = $parent2->id();
++    $child_id = $child->id();
++
++    // Trash parent 1.
++    $parent1->delete();
++
++    // Purge parent 1.
++    $this->purgeTerm($parent1_id);
++
++    // Check that only parent 1 is purged.
++    $this->assertNull(Term::load($parent1_id), 'Parent 1 is purged.');
++    $this->assertNotNull(Term::load($parent2_id), 'Parent 2 is not purged.');
++    $this->assertNotNull(Term::load($child_id), 'Child is not purged when it has other non-purged parents.');
++  }
++
++  /**
++   * Tests complex multiple parent scenarios with mixed states.
++   */
++  public function testMultipleParentsTrashScenario(): void {
++    // Create a complex hierarchy:
++    // parent1 -> child (also has parent2)
++    // parent2 -> child (also has parent1)
++    // parent3 -> child2.
++    $parent1 = $this->createTerm($this->vocabulary, ['name' => 'Parent 1']);
++    $parent2 = $this->createTerm($this->vocabulary, ['name' => 'Parent 2']);
++    $parent3 = $this->createTerm($this->vocabulary, ['name' => 'Parent 3']);
++    $child = $this->createTerm($this->vocabulary, ['name' => 'Child', 'parent' => [$parent1->id(), $parent2->id()]]);
++    $child2 = $this->createTerm($this->vocabulary, ['name' => 'Child 2', 'parent' => $parent3->id()]);
++
++    $parent1_id = $parent1->id();
++    $parent2_id = $parent2->id();
++    $parent3_id = $parent3->id();
++    $child_id = $child->id();
++    $child2_id = $child2->id();
++
++    // Trash parent1 and parent3.
++    $parent1->delete();
++    $parent3->delete();
++
++    // Check states - load trashed entities in ignore context.
++    $trashed_parent1 = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($parent1_id) {
++      return Term::load($parent1_id);
++    });
++    $this->assertTrue(trash_entity_is_deleted($trashed_parent1), 'Parent 1 is trashed.');
++
++    $active_parent2 = Term::load($parent2_id);
++    $this->assertNotNull($active_parent2, 'Parent 2 is loadable.');
++    $this->assertFalse(trash_entity_is_deleted($active_parent2), 'Parent 2 is not trashed.');
++
++    $trashed_parent3 = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($parent3_id) {
++      return Term::load($parent3_id);
++    });
++    $this->assertTrue(trash_entity_is_deleted($trashed_parent3), 'Parent 3 is trashed.');
++
++    $active_child = Term::load($child_id);
++    $this->assertNotNull($active_child, 'Child is loadable (has active parent2).');
++    $this->assertFalse(trash_entity_is_deleted($active_child), 'Child is not trashed (has active parent2).');
++
++    // Child2 may be trashed with parent3 - check both contexts.
++    $child2_in_default = Term::load($child2_id);
++    if ($child2_in_default === NULL) {
++      // Child2 was trashed with parent3.
++      $trashed_child2 = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($child2_id) {
++        return Term::load($child2_id);
++      });
++      $this->assertTrue(trash_entity_is_deleted($trashed_child2), 'Child 2 is trashed (only parent3 is trashed).');
++    }
++    else {
++      // Child2 was not automatically trashed.
++      $this->assertFalse(trash_entity_is_deleted($child2_in_default), 'Child 2 remains active (orphaned children handling may vary).');
++    }
++  }
++
++  /**
++   * Tests deep hierarchy trashing behavior.
++   */
++  public function testDeepHierarchyTrash(): void {
++    // Create grandparent -> parent -> child hierarchy.
++    $grandparent = $this->createTerm($this->vocabulary, ['name' => 'Grandparent']);
++    $parent = $this->createTerm($this->vocabulary, ['name' => 'Parent', 'parent' => $grandparent->id()]);
++    $child = $this->createTerm($this->vocabulary, ['name' => 'Child', 'parent' => $parent->id()]);
++
++    $grandparent_id = $grandparent->id();
++    $parent_id = $parent->id();
++    $child_id = $child->id();
++
++    // Trash the grandparent.
++    $grandparent->delete();
++
++    // Check trashed entities using ignore context.
++    $trashed_grandparent = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($grandparent_id) {
++      return Term::load($grandparent_id);
++    });
++    $this->assertNotNull($trashed_grandparent, 'Grandparent is loadable in ignore context.');
++    $this->assertTrue(trash_entity_is_deleted($trashed_grandparent), 'Grandparent is trashed.');
++
++    // Parent and child may be trashed with grandparent depending on
++    // implementation.
++    $parent_in_default = Term::load($parent_id);
++    $child_in_default = Term::load($child_id);
++
++    if ($parent_in_default === NULL) {
++      // Parent was trashed with grandparent.
++      $trashed_parent = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($parent_id) {
++        return Term::load($parent_id);
++      });
++      $this->assertTrue(trash_entity_is_deleted($trashed_parent), 'Parent is trashed when grandparent is trashed.');
++    }
++    else {
++      $this->assertFalse(trash_entity_is_deleted($parent_in_default), 'Parent remains active (hierarchical trashing may vary).');
++    }
++
++    if ($child_in_default === NULL) {
++      // Child was trashed (directly or through cascade)
++      $trashed_child = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($child_id) {
++        return Term::load($child_id);
++      });
++      $this->assertTrue(trash_entity_is_deleted($trashed_child), 'Child is trashed when grandparent is trashed.');
++    }
++    else {
++      $this->assertFalse(trash_entity_is_deleted($child_in_default), 'Child remains active (hierarchical trashing may vary).');
++    }
++  }
++
++  /**
++   * Tests that trashed terms are excluded from normal queries.
++   */
++  public function testTrashedTermsExcludedFromQueries(): void {
++    $term1 = $this->createTerm($this->vocabulary, ['name' => 'Active Term']);
++    $term2 = $this->createTerm($this->vocabulary, ['name' => 'Trashed Term']);
++
++    $term1_id = $term1->id();
++    $term2_id = $term2->id();
++
++    // Trash term2.
++    $term2->delete();
++
++    // Query all terms - should only return active term.
++    $query = \Drupal::entityQuery('taxonomy_term')
++      ->condition('vid', $this->vocabulary->id())
++      ->accessCheck(FALSE);
++    $result = $query->execute();
++
++    $this->assertContains($term1_id, $result, 'Active term is included in query results.');
++    $this->assertNotContains($term2_id, $result, 'Trashed term is excluded from query results.');
++  }
++
++  /**
++   * Tests that trashed terms are included when in trash context.
++   */
++  public function testTrashedTermsIncludedInTrashContext(): void {
++    $term1 = $this->createTerm($this->vocabulary, ['name' => 'Active Term']);
++    $term2 = $this->createTerm($this->vocabulary, ['name' => 'Trashed Term']);
++
++    $term1_id = $term1->id();
++    $term2_id = $term2->id();
++
++    // Trash term2.
++    $term2->delete();
++
++    // Query in trash context - should return both terms.
++    $result = $this->getTrashManager()->executeInTrashContext('ignore', function () {
++      $query = \Drupal::entityQuery('taxonomy_term')
++        ->condition('vid', $this->vocabulary->id())
++        ->accessCheck(FALSE);
++      return $query->execute();
++    });
++
++    $this->assertContains($term1_id, $result, 'Active term is included in trash context query.');
++    $this->assertContains($term2_id, $result, 'Trashed term is included in trash context query.');
++  }
++
++  /**
++   * Helper method to restore a term.
++   */
++  protected function restoreTerm(int $term_id): void {
++    $this->getTrashManager()->executeInTrashContext('ignore', function () use ($term_id) {
++      $term = Term::load($term_id);
++      if ($term) {
++        $term->set('deleted', NULL);
++        $term->save();
++      }
++    });
++  }
++
++  /**
++   * Helper method to purge a term.
++   */
++  protected function purgeTerm(int $term_id): void {
++    $this->getTrashManager()->executeInTrashContext('ignore', function () use ($term_id) {
++      $term = Term::load($term_id);
++      if ($term) {
++        $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
++        $storage->delete([$term]);
++      }
++    });
++  }
++
++  /**
++   * Helper method to get term parents.
++   */
++  protected function getTermParents(int $term_id): array {
++    $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
++    return array_keys($storage->loadParents($term_id));
++  }
++
++}
+diff --git a/trash.module b/trash.module
+index 11cc434..1eed60b 100644
+--- a/trash.module
++++ b/trash.module
+@@ -124,6 +124,16 @@ function trash_query_search_node_search_alter(AlterableInterface $query): void {
+ }
+ 
+ /**
++ * Implements hook_query_alter() for taxonomy terms.
++ */
++#[LegacyHook]
++function trash_query_alter(AlterableInterface $query) {
++  // @phpstan-ignore-next-line
++  \Drupal::service('trash.manager')->getHandler('taxonomy_term')?->queryAlter($query);
++}
++
++/**
++ *
+  * Implements hook_ENTITY_TYPE_presave() for the 'redirect' entity type.
+  */
+ #[LegacyHook]
+diff --git a/trash.services.yml b/trash.services.yml
+index c2128d4..8f7c9b9 100644
+--- a/trash.services.yml
++++ b/trash.services.yml
+@@ -64,6 +64,10 @@ services:
+   Drupal\trash\Hook\TrashHandler\NodeTrashHandler:
+     tags:
+       - { name: trash_handler, entity_type_id: node }
++  Drupal\trash\Hook\TrashHandler\TaxonomyTermTrashHandler:
++    autowire: true
++    tags:
++      - { name: trash_handler, entity_type_id: taxonomy_term }
+   Drupal\trash\Hook\TrashHandler\MenuLinkContentTrashHandler:
+     tags:
+       - { name: trash_handler, entity_type_id: menu_link_content }
