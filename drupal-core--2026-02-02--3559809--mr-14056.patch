@@ -1,0 +1,332 @@
+diff --git a/core/assets/schemas/v1/metadata-full.schema.json b/core/assets/schemas/v1/metadata-full.schema.json
+index 9c02292f406cc8823f5f35cb148bc1612b8a6044..f46bd3da3b85375f6679f0132e0dae36f5db8d92 100644
+--- a/core/assets/schemas/v1/metadata-full.schema.json
++++ b/core/assets/schemas/v1/metadata-full.schema.json
+@@ -18,6 +18,11 @@
+       "x-translation-context": {
+         "type": "string",
+         "title": "Translation Context"
++      },
++      "noUi": {
++        "type": "boolean",
++        "title": "Exclude prop from UI",
++        "description": "Use this property to exclude a prop from the UI while preserving its default value."
+       }
+     },
+     "slotDefinition": {
+diff --git a/core/assets/schemas/v1/metadata.schema.json b/core/assets/schemas/v1/metadata.schema.json
+index 8878d450f712388cda780143000302fcc2cd1a4f..41235294e2518c6e4856605c8d4db4d26c1f2071 100644
+--- a/core/assets/schemas/v1/metadata.schema.json
++++ b/core/assets/schemas/v1/metadata.schema.json
+@@ -18,6 +18,11 @@
+       "x-translation-context": {
+         "type": "string",
+         "title": "Translation Context"
++      },
++      "noUi": {
++        "type": "boolean",
++        "title": "Exclude prop from UI",
++        "description": "Use this property to exclude a prop from the UI while preserving its default value."
+       }
+     },
+     "slotDefinition": {
+diff --git a/core/lib/Drupal/Core/Theme/Component/ComponentMetadata.php b/core/lib/Drupal/Core/Theme/Component/ComponentMetadata.php
+index d355fac5800e8a962b74b96bdcf4fef705743848..928183178a8a4aaea1b3d28e963c6aa7246c9442 100644
+--- a/core/lib/Drupal/Core/Theme/Component/ComponentMetadata.php
++++ b/core/lib/Drupal/Core/Theme/Component/ComponentMetadata.php
+@@ -221,6 +221,46 @@ public function getThumbnailPath(): string {
+     return $this->thumbnailPath;
+   }
+ 
++  /**
++   * Gets the schema for UI, filtering out props marked with noUi.
++   *
++   * This method returns a copy of the schema with props that have
++   * noUi: true removed. These props are hidden from UI builders like
++   * Experience Builder, Layout Builder, or UI Patterns, while their
++   * default values are still applied during rendering.
++   *
++   * @return array|null
++   *   The filtered schema for UI, or NULL if no schema exists.
++   */
++  public function getSchemaForUi(): ?array {
++    if ($this->schema === NULL) {
++      return NULL;
++    }
++
++    $schema = $this->schema;
++    $properties = $schema['properties'] ?? [];
++    $required = $schema['required'] ?? [];
++
++    // Filter out properties with noUi: true.
++    $filtered_properties = array_filter(
++      $properties,
++      fn(array $prop_schema): bool => empty($prop_schema['noUi'])
++    );
++
++    // Also filter required array to only include visible props.
++    $filtered_required = array_values(array_intersect($required, array_keys($filtered_properties)));
++
++    $schema['properties'] = $filtered_properties;
++    if (!empty($filtered_required)) {
++      $schema['required'] = $filtered_required;
++    }
++    else {
++      unset($schema['required']);
++    }
++
++    return $schema;
++  }
++
+   /**
+    * Normalizes the value object.
+    *
+diff --git a/core/tests/Drupal/Tests/Core/Theme/Component/ComponentMetadataTest.php b/core/tests/Drupal/Tests/Core/Theme/Component/ComponentMetadataTest.php
+index 1ab7bd627b57bbd9d935757217444234e8e08a98..c784f9897d162fde6a5eb3448fab43689bdf80b3 100644
+--- a/core/tests/Drupal/Tests/Core/Theme/Component/ComponentMetadataTest.php
++++ b/core/tests/Drupal/Tests/Core/Theme/Component/ComponentMetadataTest.php
+@@ -511,4 +511,244 @@ public static function dataProviderMetadata(): array {
+     ];
+   }
+ 
++  /**
++   * Tests that getSchemaForUi() filters out props with noUi: true.
++   */
++  #[DataProvider('dataProviderSchemaForUi')]
++  public function testGetSchemaForUi(array $metadata_info, ?array $expected_ui_schema): void {
++    $metadata = new ComponentMetadata($metadata_info, 'foo/', FALSE);
++    $this->assertEquals($expected_ui_schema, $metadata->getSchemaForUi());
++  }
++
++  /**
++   * Data provider for the test testGetSchemaForUi.
++   *
++   * @return array[]
++   *   The batches of data.
++   */
++  public static function dataProviderSchemaForUi(): array {
++    return [
++      'no schema returns null' => [
++        [
++          'path' => 'foo/bar/component-name',
++          'id' => 'core:component-name',
++          'name' => 'Component Name',
++          'description' => 'Test component',
++          'group' => 'Test Group',
++        ],
++        NULL,
++      ],
++      'props without noUi are all visible' => [
++        [
++          'path' => 'foo/bar/component-name',
++          'id' => 'core:component-name',
++          'name' => 'Component Name',
++          'description' => 'Test component',
++          'group' => 'Test Group',
++          'props' => [
++            'type' => 'object',
++            'required' => ['title'],
++            'properties' => [
++              'title' => [
++                'type' => 'string',
++                'title' => 'Title',
++              ],
++              'description' => [
++                'type' => 'string',
++                'title' => 'Description',
++              ],
++            ],
++          ],
++        ],
++        [
++          'type' => 'object',
++          'required' => ['title'],
++          'additionalProperties' => FALSE,
++          'properties' => [
++            'title' => [
++              'type' => ['string', 'object'],
++              'title' => 'Title',
++            ],
++            'description' => [
++              'type' => ['string', 'object'],
++              'title' => 'Description',
++            ],
++          ],
++        ],
++      ],
++      'props with noUi: true are filtered out' => [
++        [
++          'path' => 'foo/bar/component-name',
++          'id' => 'core:component-name',
++          'name' => 'Component Name',
++          'description' => 'Test component',
++          'group' => 'Test Group',
++          'props' => [
++            'type' => 'object',
++            'required' => ['title'],
++            'properties' => [
++              'title' => [
++                'type' => 'string',
++                'title' => 'Title',
++              ],
++              'attributes' => [
++                'type' => 'object',
++                'title' => 'Attributes',
++                'noUi' => TRUE,
++                'default' => [],
++              ],
++              'utility_classes' => [
++                'type' => 'array',
++                'title' => 'Utility Classes',
++                'noUi' => TRUE,
++                'default' => [],
++              ],
++            ],
++          ],
++        ],
++        [
++          'type' => 'object',
++          'required' => ['title'],
++          'additionalProperties' => FALSE,
++          'properties' => [
++            'title' => [
++              'type' => ['string', 'object'],
++              'title' => 'Title',
++            ],
++          ],
++        ],
++      ],
++      'props with noUi: false are visible' => [
++        [
++          'path' => 'foo/bar/component-name',
++          'id' => 'core:component-name',
++          'name' => 'Component Name',
++          'description' => 'Test component',
++          'group' => 'Test Group',
++          'props' => [
++            'type' => 'object',
++            'properties' => [
++              'title' => [
++                'type' => 'string',
++                'title' => 'Title',
++                'noUi' => FALSE,
++              ],
++              'hidden_prop' => [
++                'type' => 'string',
++                'title' => 'Hidden Prop',
++                'noUi' => TRUE,
++              ],
++            ],
++          ],
++        ],
++        [
++          'type' => 'object',
++          'additionalProperties' => FALSE,
++          'properties' => [
++            'title' => [
++              'type' => ['string', 'object'],
++              'title' => 'Title',
++              'noUi' => FALSE,
++            ],
++          ],
++        ],
++      ],
++      'required array is filtered when noUi props are removed' => [
++        [
++          'path' => 'foo/bar/component-name',
++          'id' => 'core:component-name',
++          'name' => 'Component Name',
++          'description' => 'Test component',
++          'group' => 'Test Group',
++          'props' => [
++            'type' => 'object',
++            'required' => ['title', 'attributes'],
++            'properties' => [
++              'title' => [
++                'type' => 'string',
++                'title' => 'Title',
++              ],
++              'attributes' => [
++                'type' => 'object',
++                'title' => 'Attributes',
++                'noUi' => TRUE,
++                'default' => [],
++              ],
++            ],
++          ],
++        ],
++        [
++          'type' => 'object',
++          'required' => ['title'],
++          'additionalProperties' => FALSE,
++          'properties' => [
++            'title' => [
++              'type' => ['string', 'object'],
++              'title' => 'Title',
++            ],
++          ],
++        ],
++      ],
++      'required is removed when all required props have noUi' => [
++        [
++          'path' => 'foo/bar/component-name',
++          'id' => 'core:component-name',
++          'name' => 'Component Name',
++          'description' => 'Test component',
++          'group' => 'Test Group',
++          'props' => [
++            'type' => 'object',
++            'required' => ['attributes'],
++            'properties' => [
++              'title' => [
++                'type' => 'string',
++                'title' => 'Title',
++              ],
++              'attributes' => [
++                'type' => 'object',
++                'title' => 'Attributes',
++                'noUi' => TRUE,
++                'default' => [],
++              ],
++            ],
++          ],
++        ],
++        [
++          'type' => 'object',
++          'additionalProperties' => FALSE,
++          'properties' => [
++            'title' => [
++              'type' => ['string', 'object'],
++              'title' => 'Title',
++            ],
++          ],
++        ],
++      ],
++      'all props hidden leaves empty properties' => [
++        [
++          'path' => 'foo/bar/component-name',
++          'id' => 'core:component-name',
++          'name' => 'Component Name',
++          'description' => 'Test component',
++          'group' => 'Test Group',
++          'props' => [
++            'type' => 'object',
++            'properties' => [
++              'attributes' => [
++                'type' => 'object',
++                'title' => 'Attributes',
++                'noUi' => TRUE,
++              ],
++            ],
++          ],
++        ],
++        [
++          'type' => 'object',
++          'additionalProperties' => FALSE,
++          'properties' => [],
++        ],
++      ],
++    ];
++  }
++
+ }
