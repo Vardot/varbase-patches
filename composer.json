@@ -221,10 +221,6 @@
       "openai-php/client": {
         "fix: PHP 8.4 compatibility - TypeError when API returns null for results array #725":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openai-php--client--2025-12-30--pr-725.patch"
-      },
-      "drupal/canvas": {
-        "fix: #3569620 TypeError when exporting Canvas pages with block components in DefaultContentSubscriber":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-01-26--3569620--mr-508.patch"
       }
     }
   }
