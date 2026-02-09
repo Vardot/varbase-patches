@@ -200,7 +200,9 @@
       },
       "drupal/ctools": {
         "fix: 3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple()":
-        "https://git.drupalcode.org/project/ctools/-/commit/5a323c6e5072515148a54b4055e7db86a50f5111.diff"
+        "https://git.drupalcode.org/project/ctools/-/commit/5a323c6e5072515148a54b4055e7db86a50f5111.diff",
+        "fix: #3572317 ctools_views schema alter missing requiredKey for views_block mapping keys causes validation errors in Drupal Canvas":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ctools--2026-02-09--3572317--mr-85.patch"
       },
       "drupal/shield": {
         "fix: #3562392 PHP 8.4 - Implicit nullable parameters for Shield":
