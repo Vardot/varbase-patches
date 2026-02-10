@@ -1,0 +1,110 @@
+diff --git a/src/Controller/ViewModeDisplayController.php b/src/Controller/ViewModeDisplayController.php
+index b60da18cb9ae5c25d502725e570494b789713f35..171d530df561775d1fceaf258f411d13ea5aded0 100644
+--- a/src/Controller/ViewModeDisplayController.php
++++ b/src/Controller/ViewModeDisplayController.php
+@@ -7,11 +7,11 @@ namespace Drupal\canvas\Controller;
+ use Drupal\canvas\Entity\ContentTemplate;
+ use Drupal\Core\Cache\CacheableResponseInterface;
+ use Drupal\Core\Config\Entity\ConfigEntityInterface;
+-use Drupal\Core\Entity\EntityTypeManagerInterface;
+-use Drupal\Core\Form\FormBuilderInterface;
++use Drupal\Core\Entity\HtmlEntityFormController;
+ use Drupal\Core\Routing\LocalRedirectResponse;
+ use Drupal\Core\Routing\RouteMatchInterface;
+ use Drupal\Core\Url;
++use Symfony\Component\HttpFoundation\Request;
+ 
+ /**
+  * Controller for handling view mode display forms with content templates.
+@@ -19,8 +19,7 @@ use Drupal\Core\Url;
+ final class ViewModeDisplayController {
+ 
+   public function __construct(
+-    private readonly EntityTypeManagerInterface $entityTypeManager,
+-    private readonly FormBuilderInterface $formBuilder,
++    private readonly HtmlEntityFormController $entityFormController,
+   ) {
+   }
+ 
+@@ -39,7 +38,7 @@ final class ViewModeDisplayController {
+    * @return array<string, mixed>|\Drupal\Core\Cache\CacheableResponseInterface
+    *   A render array for the form or a redirect response.
+    */
+-  public function __invoke(string $entity_type_id, string $bundle, string $view_mode_name, RouteMatchInterface $route_match): array|CacheableResponseInterface {
++  public function __invoke(string $entity_type_id, string $bundle, string $view_mode_name, Request $request, RouteMatchInterface $route_match): array|CacheableResponseInterface {
+     $template = ContentTemplate::load("$entity_type_id.$bundle.$view_mode_name");
+ 
+     // Check if a ContentTemplate exists for this view mode and entity type.
+@@ -50,15 +49,8 @@ final class ViewModeDisplayController {
+       $response->addCacheableDependency($template);
+       return $response;
+     }
+-
+-    // Build the entity view display form.
+-    $form_object = $this->entityTypeManager
+-      ->getFormObject('entity_view_display', 'edit');
+-
+-    $entity = $form_object->getEntityFromRouteMatch($route_match, 'entity_view_display');
+-    $form_object->setEntity($entity);
+-
+-    return $this->formBuilder->getForm($form_object);
++    // Fallback to the standard view mode display form.
++    return $this->entityFormController->getContentResult($request, $route_match);
+   }
+ 
+ }
+diff --git a/tests/src/Functional/CanvasTemplateDisplayTest.php b/tests/src/Functional/CanvasTemplateDisplayTest.php
+index 46b5d1226666d7a4092541fa3a7eab039edd6805..638ab12367e2d340ddc70745ccd3c45622e1e7e2 100644
+--- a/tests/src/Functional/CanvasTemplateDisplayTest.php
++++ b/tests/src/Functional/CanvasTemplateDisplayTest.php
+@@ -9,6 +9,7 @@ use Drupal\canvas\Hook\ContentTemplateHooks;
+ use Drupal\Core\Config\Entity\ConfigEntityInterface;
+ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+ use Drupal\Core\Entity\EntityStorageInterface;
++use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+ use Drupal\node\NodeTypeInterface;
+ use Drupal\Tests\BrowserTestBase;
+ use Drupal\user\UserInterface;
+@@ -180,6 +181,42 @@ final class CanvasTemplateDisplayTest extends BrowserTestBase {
+ 
+   }
+ 
++  /**
++   * Tests that ViewModeDisplayController works with Layout Builder enabled.
++   *
++   * Ensures Canvas does not cause errors due to Layout Builder's alterations to
++   * view mode routes.
++   *
++   * @see https://drupal.org/i/3571881
++   * @see \Drupal\layout_builder\Routing\LayoutBuilderRoutes::onAlterRoutes
++   *
++   * #[CoversMethod(ViewModeDisplayController::class, '__invoke')]
++   */
++  public function testLayoutBuilderCompatibility(): void {
++    $bundle = 'page';
++    $this->container->get('module_installer')->install(['layout_builder']);
++    $this->resetAll();
++
++    // Refresh storage after module installation.
++    $this->viewDisplayStorage = $this->container->get('entity_type.manager')->getStorage('entity_view_display');
++
++    $this->createNodeType(['type' => $bundle]);
++    $this->createViewDisplay($bundle, 'teaser');
++
++    // Enable Layout Builder on the teaser view mode.
++    $teaser_display = $this->viewDisplayStorage->load("node.$bundle.teaser");
++    \assert($teaser_display instanceof LayoutBuilderEntityViewDisplay);
++    $teaser_display->enableLayoutBuilder()
++      ->setOverridable()
++      ->save();
++
++    // Visit teaser view mode, no Canvas template, enabled for Layout Builder.
++    // @see \Drupal\layout_builder\Form\LayoutBuilderEntityViewDisplayForm
++    $this->drupalGet("admin/structure/types/manage/$bundle/display/teaser");
++    $this->assertSession()->statusCodeEquals(200);
++    $this->assertSession()->pageTextNotContains('The website encountered an unexpected error');
++  }
++
+   /**
+    * Creates a view display for the given bundle and view mode.
+    */
