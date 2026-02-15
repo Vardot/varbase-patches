@@ -231,6 +231,10 @@
       "drupal/canvas": {
         "fix: #3571881 Fatal error on Manage Display page for non-Canvas view modes in Drupal CMS":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-02-10--3571881--mr-546.patch"
+      },
+      "drupal/drupal_cms_helper": {
+        "fix: #3573589 Activate Full Content view mode for all new content types":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal_cms_helper--2026-02-15--3573589-mr-806.patch"
       }
     }
   }
