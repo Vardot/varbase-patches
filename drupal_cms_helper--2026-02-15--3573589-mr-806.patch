@@ -1,0 +1,32 @@
+diff --git a/src/Hook/FormHooks.php b/src/Hook/FormHooks.php
+index 5e9814f..39ef4ad 100644
+--- a/src/Hook/FormHooks.php
++++ b/src/Hook/FormHooks.php
+@@ -94,12 +94,6 @@ final class FormHooks {
+     $bundle = $form['#bundle'];
+     $view_mode = $this->routeMatch->getParameter('view_mode_name');
+ 
+-    // For content, the "default" view mode is actually full. So we need to do
+-    // this dumb shim.
+-    if ($view_mode === 'default' && $entity_type_id === 'node') {
+-      $view_mode = 'full';
+-    }
+-
+     $template_exists = (bool) $this->templateStorage?->getQuery()
+       ->accessCheck(FALSE)
+       ->count()
+diff --git a/src/Hook/RenderHooks.php b/src/Hook/RenderHooks.php
+index b569d9f..81c9e9d 100644
+--- a/src/Hook/RenderHooks.php
++++ b/src/Hook/RenderHooks.php
+@@ -28,8 +28,9 @@ final class RenderHooks {
+   #[Hook('menu_local_tasks_alter')]
+   public function alterBuiltLocalTasks(array &$build, string $route_name): void {
+     if ($route_name === 'entity.node.canonical' || $route_name === 'entity.node.edit_form') {
+-      $url = Url::fromRoute('entity.entity_view_display.node.default', [
++      $url = Url::fromRoute('entity.entity_view_display.node.view_mode', [
+         'node_type' => $this->routeMatch->getParameter('node')?->getType(),
++        'view_mode_name' => 'full',
+       ]);
+       $build['tabs'][0]['entity.node.template'] = [
+         '#theme' => 'menu_local_task',
