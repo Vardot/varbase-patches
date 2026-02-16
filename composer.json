@@ -226,7 +226,7 @@
       },
       "drupal/schema_metatag": {
         "fix: #3552529 Problem with pivot in Drupal Canvas":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-02-09--3552529--mr-103.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schema_metatag--2026-02-09--3552529--mr-103.patch"
       },
       "drupal/canvas": {
         "fix: #3571881 Fatal error on Manage Display page for non-Canvas view modes in Drupal CMS":
