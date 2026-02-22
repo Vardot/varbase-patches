@@ -234,9 +234,7 @@
       },
       "drupal/drupal_cms_helper": {
         "fix: #3573589 Activate Full Content view mode for all new content types":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal_cms_helper--2026-02-15--3573589-mr-806.patch",
-        "fix: #3573739 Warning caused by new Canvas message":
-        "https://git.drupalcode.org/project/drupal_cms_helper/-/commit/ed6fa3855598687922004ff8f3514f4db791f146.diff"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal_cms_helper--2026-02-15--3573589-mr-806.patch"
       }
     }
   }
