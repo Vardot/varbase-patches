@@ -1,0 +1,13 @@
+diff --git a/recipe.yml b/recipe.yml
+index 2e9bf8b..2a9f39f 100644
+--- a/recipe.yml
++++ b/recipe.yml
+@@ -111,7 +111,7 @@ config:
+     update.settings:
+       simpleConfigUpdate:
+         check.disabled_extensions: true
+-    user.role.authenticated:
++    user.role.content_editor:
+       grantPermissions:
+         - 'access administration pages'
+         - 'access coffee'
