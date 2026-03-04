@@ -182,10 +182,6 @@
         "fix: #3561953 PHP 8.4 implicit nullable & constructor parameter order issues in WebP FileDownloadController":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webp--2025-12-08--mr-54.patch"
       },
-      "drupal/userprotect": {
-        "Issue #3510800: (PHP 8.4) Fixed implicitly marking parameter $items as nullable is deprecated in userprotect_entity_field_access()":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/userprotect--2026-01-20--3510800--mr-11.patch"
-      },
       "drupal/layout_builder_component_attributes": {
         "fix: #3498301 PHP 8.4 compatibility implicit nullable SectionStorageInterface parameter":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_builder_component_attributes--2025-12-08--3498301--mr-17.patch"
