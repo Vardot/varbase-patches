@@ -214,10 +214,6 @@
         "fix: #3562392 PHP 8.4 - Implicit nullable parameters for Shield":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/shield--2025-12-10--3562392--mr-30.patch"
       },
-      "drupal/statistics": {
-        "fix: #3562419 PHP 8.4 - Implicit nullable parameters for Statistics":
-        "https://git.drupalcode.org/project/statistics/-/commit/9ac77292cb1badd98c4808ef2cfef62caab410f8.diff"
-      },
       "drupal/password_policy": {
         "fix: #3516906 PHP 8.4 nullable types must be explicit":
         "https://git.drupalcode.org/project/password_policy/-/commit/999abf8501fd2878dc40b0b4db81315fed60cc03.diff"
