@@ -166,10 +166,6 @@
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
         "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
       },
-      "drupal/ui_patterns": {
-        "Issue #3496209: Add token replacement support to AttributesWidget using new centralized token and normalizer services from SourcePluginBase":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns--2025-11-24--3496209--mr-378.patch"
-      },
       "drupal/ui_patterns_ds-ui_patterns_ds": {
         "Issue #3504614 Render field value in component using DS field source":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns_ds-ui_patterns_ds--2025-11-24--3504614--mr-3.patch"
