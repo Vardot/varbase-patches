@@ -174,10 +174,6 @@
         "Issue #3528064: Add support for Layout Builder Restrictions":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboard--2026-01-11--3528064--mr-63.patch"
       },
-      "drupal/modeler_api": {
-        "Issue #3537810: Fix Circular Reference by Removing Autowire and Minimizing Dependencies in modeler_api.service":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/modeler_api--2025-11-09--3537810--1-0-x--drupal11-2.patch"
-      },
       "drupal/coffee": {
         "Issue #3535874: Add Navigation Top Bar integration for Coffee module in Drupal ~11.2.0 and Gin ~5.0":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/coffee--2025-07-30--3535874--mr-19.patch"
