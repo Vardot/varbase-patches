@@ -1,0 +1,27 @@
+diff --git a/src/Plugin/Network/FacebookAuth.php b/src/Plugin/Network/FacebookAuth.php
+index bd9536304232a30a1bf79a556756924a11b5e2ba..2e380405aa939cfbb703118f074d194d7cd6fbac 100644
+--- a/src/Plugin/Network/FacebookAuth.php
++++ b/src/Plugin/Network/FacebookAuth.php
+@@ -48,7 +48,9 @@ class FacebookAuth extends NetworkBase implements NetworkInterface {
+ 
+     /** @var \Drupal\social_auth_facebook\Settings\FacebookAuthSettings $settings */
+     $settings = $this->settings;
+-    if ($this->validateConfig($settings)) {
++    /** @var \Drupal\social_auth\Plugin\Network\NetworkInterface $network */
++    $network = $this->networkManager->createInstance($this->pluginId);
++    if ($this->validateConfig($network, $settings)) {
+       // All these settings are mandatory.
+       $league_settings = [
+         'clientId'          => $settings->getClientId(),
+@@ -71,9 +73,9 @@ class FacebookAuth extends NetworkBase implements NetworkInterface {
+   /**
+    * {@inheritdoc}
+    */
+-  protected function validateConfig(SettingsInterface $settings): bool {
++  protected function validateConfig(NetworkInterface $network, SettingsInterface $settings): bool {
+     $graph_version = $settings->getGraphVersion();
+-    if (!parent::validateConfig($settings) || !$graph_version) {
++    if (!parent::validateConfig($network, $settings) || !$graph_version) {
+       $this->loggerFactory
+         ->get('social_auth_facebook')
+         ->error('Define graph version on module settings.');
