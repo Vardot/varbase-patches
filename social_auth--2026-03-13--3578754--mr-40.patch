@@ -1,0 +1,16 @@
+diff --git a/src/Plugin/Network/NetworkBase.php b/src/Plugin/Network/NetworkBase.php
+index 360a78d363831bc2da497df91d8596b8489f3d1a..1c7a9bc6a421cdf03c0ec505e1445cdb0328556a 100755
+--- a/src/Plugin/Network/NetworkBase.php
++++ b/src/Plugin/Network/NetworkBase.php
+@@ -46,7 +46,10 @@ protected function initSdk(): mixed {
+       return new $class_name($league_settings);
+     }
+ 
+-    throw new SocialApiException('Module configuration validation failed -- verify client ID and secret settings.');
++    $this->loggerFactory
++      ->get($this->pluginId)
++      ->error('Module configuration validation failed -- verify client ID and secret settings.');
++    return FALSE;
+   }
+ 
+   /**
