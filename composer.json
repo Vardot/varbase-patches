@@ -46,7 +46,9 @@
         "Issue 3544608: Fix Media Library: Selected media lost after pager navigation prevents insertion":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-09-03--mr-13141.patch",
         "feat: #3559809 Add noUi support for SDC props to hide attributes and utility props from UI while preserving default values":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-02-02--3559809--mr-14056.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-02-02--3559809--mr-14056.patch",
+        "fix: #3581250 Handle field storage and update issues during Recipe installation":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-03-24--3581250--mr-15193.patch"
       },
       "drupal/persistent_login": {
         "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles":
