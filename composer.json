@@ -198,7 +198,9 @@
         "fix: #3516906 PHP 8.4 nullable types must be explicit":
         "https://git.drupalcode.org/project/password_policy/-/commit/999abf8501fd2878dc40b0b4db81315fed60cc03.diff",
         "fix: #3581203 Remove _core default_config_hash from password_policy field config":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/password_policy--2026-03-24--3581203--mr-113.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/password_policy--2026-03-24--3581203--mr-113.patch",
+        "fix: #3581229 Programmatically create Password Policy fields during module installation via Recipes":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/password_policy--2026-03-24--3581229--mr-114.patch"
       },
       "drupal/simple_oauth": {
         "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
