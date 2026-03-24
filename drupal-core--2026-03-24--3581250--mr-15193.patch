@@ -1,6 +1,8 @@
+diff --git a/core/lib/Drupal/Core/Config/ConfigInstaller.php b/core/lib/Drupal/Core/Config/ConfigInstaller.php
+index 8eff8f21554..2eb41234615 100644
 --- a/core/lib/Drupal/Core/Config/ConfigInstaller.php
 +++ b/core/lib/Drupal/Core/Config/ConfigInstaller.php
-@@ -419,7 +419,15 @@
+@@ -420,7 +420,15 @@ protected function createConfiguration($collection, array $config_to_create) {
          // creation. Updates of such configuration are allowed.
          if ($this->getActiveStorages($collection)->exists($name)) {
            $entity = $entity_storage->load($id);
@@ -17,7 +19,7 @@
          }
          else {
            $entity = $entity_storage->createFromStorageRecord($new_config->get());
-@@ -428,6 +436,15 @@
+@@ -430,6 +438,14 @@ protected function createConfiguration($collection, array $config_to_create) {
            if ($id !== $entity->id()) {
              throw new \LogicException(sprintf('The configuration name "%s" does not match the ID "%s"', $name, $entity->id()));
            }
@@ -32,12 +34,14 @@
          }
        }
        else {
+diff --git a/core/modules/field/src/Entity/FieldConfig.php b/core/modules/field/src/Entity/FieldConfig.php
+index c27ca0ef272..0344f33f778 100644
 --- a/core/modules/field/src/Entity/FieldConfig.php
 +++ b/core/modules/field/src/Entity/FieldConfig.php
-@@ -314,6 +314,16 @@
+@@ -314,6 +314,18 @@ public function getFieldStorageDefinition() {
          }
        }
-
+ 
 +      // Fallback: try loading field storage directly from config entity
 +      // storage. This handles cache timing issues during Recipe installation
 +      // where field storage configs have been saved to the database but
