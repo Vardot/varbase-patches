@@ -1,0 +1,97 @@
+--- a/src/Controller/ApiLayoutController.php	2026-03-25 02:12:19.000000000 +0300
++++ b/src/Controller/ApiLayoutController.php	2026-03-29 17:52:43.155210910 +0300
+@@ -307,7 +307,11 @@
+ 
+     // Update the entity & auto-save it. We might be updating a component
+     // instance version aside of the model itself.
+-    $this->updateComponentInstance($entity_to_patch, $componentInstanceUuid, $version, $model, $preview_entity);
++    // For per-entity canvas layouts, the entity itself is the host entity for
++    // field linking (EntityFieldPropSource). For ContentTemplate editing, the
++    // preview entity serves as the host.
++    $host_entity = $preview_entity ?? ($entity instanceof FieldableEntityInterface ? $entity : NULL);
++    $this->updateComponentInstance($entity_to_patch, $componentInstanceUuid, $version, $model, $host_entity);
+     $this->autoSaveManager->saveEntity($entity_to_patch, $clientInstanceId);
+ 
+     // Inform the UI of the updated reality.
+--- a/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php	2026-03-25 02:12:19.000000000 +0300
++++ b/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php	2026-03-29 17:52:43.155486720 +0300
+@@ -747,13 +747,20 @@
+     // Component config entity being created!)
+ 
+     // Get suggested non-static prop sources for component instances on
+-    // content templates.
++    // content templates and per-entity canvas layouts.
+     $suggestions = NULL;
++    $entity_data_definition_for_linking = NULL;
+     if ($entity instanceof ContentTemplate) {
++      $entity_data_definition_for_linking = $entity->getTargetEntityDataDefinition();
++    }
++    elseif ($entity instanceof \Drupal\Core\Entity\FieldableEntityInterface && $entity->getEntityTypeId() === 'node') {
++      $entity_data_definition_for_linking = \Drupal\Core\Entity\TypedData\EntityDataDefinition::create('node', $entity->bundle());
++    }
++    if ($entity_data_definition_for_linking !== NULL) {
+       $suggestions = PropSourceSuggester::structureSuggestionsForHierarchicalResponse($this->propSourceSuggester->suggest(
+         $this->getSourceSpecificComponentId(),
+         $this->getMetadata(),
+-        $entity->getTargetEntityDataDefinition(),
++        $entity_data_definition_for_linking,
+       ));
+     }
+ 
+@@ -800,7 +807,7 @@
+       $form[$sdc_prop_name] = $source->formTemporaryRemoveThisExclamationExclamationExclamation($widget, $sdc_prop_name, $is_required, $entity_object_for_field_widget, $form, $form_state);
+       $form[$sdc_prop_name]['#disabled'] = $disabled;
+ 
+-      if ($entity instanceof ContentTemplate) {
++      if ($entity_data_definition_for_linking !== NULL) {
+         $could_use_dynamic_prop_source = !empty($suggestions[$sdc_prop_name]);
+ 
+         // If the prop is already linked, replace the widget entirely. The
+@@ -814,7 +821,7 @@
+             '#sdc_prop_name' => $sdc_prop_name,
+             '#sdc_prop_label' => $label,
+             '#linked_prop_source' => $linked_prop_source,
+-            '#entity_data_definition' => $entity->getTargetEntityDataDefinition(),
++            '#entity_data_definition' => $entity_data_definition_for_linking,
+             '#field_link_suggestions' => $suggestions[$sdc_prop_name],
+             '#description' => $component_schema['properties'][$sdc_prop_name]['description'] ?? NULL,
+             '#is_required' => $is_required,
+@@ -847,7 +854,7 @@
+       }
+     }
+     $form['#attached']['canvas-transforms'] = $transforms;
+-    if ($entity instanceof ContentTemplate) {
++    if ($entity_data_definition_for_linking !== NULL) {
+       $form['#after_build'][] = [static::class, 'moveSuggestionsToLabel'];
+     }
+     return $form;
+--- a/src/Storage/ComponentTreeLoader.php	2026-03-25 02:12:19.000000000 +0300
++++ b/src/Storage/ComponentTreeLoader.php	2026-03-29 17:44:00.840266124 +0300
+@@ -15,11 +15,11 @@
+ /**
+  * Handles loading a component tree from entities.
+  */
+-final class ComponentTreeLoader {
++class ComponentTreeLoader {
+ 
+   public function __construct(
+-    private readonly EntityFieldManagerInterface $entityFieldManager,
+-    private readonly ModuleHandlerInterface $moduleHandler,
++    protected readonly EntityFieldManagerInterface $entityFieldManager,
++    protected readonly ModuleHandlerInterface $moduleHandler,
+   ) {}
+ 
+   /**
+--- a/ui/src/features/layout/layoutModelSlice.ts	2026-03-25 02:12:19.000000000 +0300
++++ b/ui/src/features/layout/layoutModelSlice.ts	2026-03-29 17:52:43.155724356 +0300
+@@ -768,8 +768,9 @@
+       // Do not provide a resolved value with the newly linked prop.
+       delete resolved[propName];
+ 
++      const editorFrameContext = selectEditorFrameContext(state.ui);
+       const valuePayload = {
+-        type: 'template' as EditorFrameContext,
++        type: editorFrameContext,
+         componentInstanceUuid: componentToUpdateId,
+         componentType: `${selectedComponentType}@${version}`,
+         model: {
