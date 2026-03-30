@@ -219,6 +219,10 @@
       "drupal/drupal_cms_admin_ui": {
         "fix: #3576540 Redirect non-admin authenticated users to their profile instead of Dashboard":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal_cms_admin_ui--2026-03-03--3576540.patch"
+      },
+      "drupal/canvas": {
+        "feat: #3567225 Support per-entity Canvas layouts with field linking and template copying":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-03-30--3567225.patch"
       }
     }
   }
