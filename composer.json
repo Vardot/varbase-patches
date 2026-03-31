@@ -220,10 +220,6 @@
         "fix: #3564894 PHP8.4 Deprecated notice":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns_settings--2026-01-21--3564894.patch"
       },
-      "drupal/dashboards": {
-        "fix: #3542888 PHP 8.4 Support":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboards--2026-01-21--3542888--mr-40.patch"
-      },
       "drupal/social_auth": {
         "fix: #3564906 PHP 8.4 compatibility - Implicit nullable parameter deprecations in Social Auth module":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2026-01-21--3564906--mr-38.patch"
