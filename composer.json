@@ -222,7 +222,7 @@
       },
       "drupal/canvas": {
         "feat: #3567225 Support per-entity Canvas layouts with field linking and template copying":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-03-30--3567225.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-02--3567225.patch"
       }
     }
   }
