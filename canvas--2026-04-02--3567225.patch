@@ -1,12 +1,17 @@
---- a/packages/types/src/DrupalSettings.ts
-+++ b/packages/types/src/DrupalSettings.ts
-@@ -40,6 +40,7 @@ export interface DrupalSettings {
+diff -ruN a/packages/types/src/DrupalSettings.ts b/packages/types/src/DrupalSettings.ts
+--- a/packages/types/src/DrupalSettings.ts	2026-04-02 06:14:28.405468349 +0300
++++ b/packages/types/src/DrupalSettings.ts	2026-04-02 06:14:34.892255165 +0300
+@@ -40,6 +40,7 @@
+     personalizationExtensionAvailable: boolean;
      // ⚠️ This is highly experimental and *will* be refactored.
      canvasAiMaxFileSize: number;
 +    hidePageDataPanel?: boolean;
    };
---- a/src/Controller/ApiLayoutController.php
-+++ b/src/Controller/ApiLayoutController.php
+   canvasData: {
+     v0: {
+diff -ruN a/src/Controller/ApiLayoutController.php b/src/Controller/ApiLayoutController.php
+--- a/src/Controller/ApiLayoutController.php	2026-04-02 06:14:28.410154699 +0300
++++ b/src/Controller/ApiLayoutController.php	2026-04-02 06:14:50.622499559 +0300
 @@ -307,7 +307,11 @@
  
      // Update the entity & auto-save it. We might be updating a component
@@ -20,8 +25,9 @@
      $this->autoSaveManager->saveEntity($entity_to_patch, $clientInstanceId);
  
      // Inform the UI of the updated reality.
---- a/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php
-+++ b/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php
+diff -ruN a/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php b/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php
+--- a/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php	2026-04-02 06:14:28.422192793 +0300
++++ b/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php	2026-04-02 06:15:13.995864214 +0300
 @@ -747,13 +747,20 @@
      // Component config entity being created!)
  
@@ -72,8 +78,9 @@
        $form['#after_build'][] = [static::class, 'moveSuggestionsToLabel'];
      }
      return $form;
---- a/src/Storage/ComponentTreeLoader.php
-+++ b/src/Storage/ComponentTreeLoader.php
+diff -ruN a/src/Storage/ComponentTreeLoader.php b/src/Storage/ComponentTreeLoader.php
+--- a/src/Storage/ComponentTreeLoader.php	2026-04-02 06:14:28.428760007 +0300
++++ b/src/Storage/ComponentTreeLoader.php	2026-04-02 06:15:25.129038513 +0300
 @@ -15,11 +15,11 @@
  /**
   * Handles loading a component tree from entities.
@@ -89,40 +96,19 @@
    ) {}
  
    /**
---- a/ui/src/components/UndoRedo.tsx
-+++ b/ui/src/components/UndoRedo.tsx
-@@ -65,13 +65,13 @@ const UndoRedo = () => {
-         disabled={!isUndoable}
-         aria-label="Undo"
-       >
--        <ResetIcon height="16" width="auto" />
-+        <ResetIcon height="16" width="16" />
-       </Button>
-       <Button
-         variant="ghost"
-         color="gray"
-         size="1"
-         className={styles.topBarButton}
-         onClick={() => dispatchRedo()}
-         disabled={!isRedoable}
-         aria-label="Redo"
-       >
-         <ResetIcon
-           height="16"
--          width="auto"
-+          width="16"
-           style={{ transform: 'scaleX(-1)' }}
-         />
-       </Button>
---- a/ui/src/components/form/components/drupal/LinkedFieldBox.tsx
-+++ b/ui/src/components/form/components/drupal/LinkedFieldBox.tsx
-@@ -11,8 +11,8 @@ import { findComponentByUuid } from '@/features/layout/layoutUtils';
+diff -ruN a/ui/src/components/form/components/drupal/LinkedFieldBox.tsx b/ui/src/components/form/components/drupal/LinkedFieldBox.tsx
+--- a/ui/src/components/form/components/drupal/LinkedFieldBox.tsx	2026-04-02 06:14:28.438526324 +0300
++++ b/ui/src/components/form/components/drupal/LinkedFieldBox.tsx	2026-04-02 06:15:50.687440088 +0300
+@@ -11,7 +11,7 @@
+ } from '@/features/layout/layoutModelSlice';
+ import { findComponentByUuid } from '@/features/layout/layoutUtils';
  import {
 -  EditorFrameContext,
 +  selectEditorFrameContext,
    selectSelectedComponentUuid,
  } from '@/features/ui/uiSlice';
-@@ -62,6 +62,7 @@ const LinkedFieldBox = ({
+ import { useGetComponentsQuery } from '@/services/componentAndLayout';
+@@ -61,6 +61,7 @@
    const [selectedComponentType, version] = (
      node ? (node.type as string) : 'noop'
    ).split('@');
@@ -130,32 +116,39 @@
    const [patchComponent] = useUpdateComponentMutation({
      fixedCacheKey: selectedComponentId,
    });
-@@ -79,7 +80,7 @@ const LinkedFieldBox = ({
+@@ -80,7 +81,7 @@
+     const default_values: DefaultValues = propData?.default_values || {};
      if (isEvaluatedComponentModel(selectedModel)) {
        patchComponent({
 -        type: EditorFrameContext.TEMPLATE,
 +        type: editorFrameContext,
          componentInstanceUuid: selectedComponentId,
          componentType: `${selectedComponentType}@${version}`,
---- a/ui/src/components/panel/ContextualPanel.tsx
-+++ b/ui/src/components/panel/ContextualPanel.tsx
-@@ -26,6 +26,7 @@ import {
+         model: {
+diff -ruN a/ui/src/components/panel/ContextualPanel.tsx b/ui/src/components/panel/ContextualPanel.tsx
+--- a/ui/src/components/panel/ContextualPanel.tsx	2026-04-02 06:14:28.441936741 +0300
++++ b/ui/src/components/panel/ContextualPanel.tsx	2026-04-02 06:16:23.302955328 +0300
+@@ -24,6 +24,7 @@
+   selectSelection,
  } from '@/features/ui/uiSlice';
  import useHidePanelClasses from '@/hooks/useHidePanelClasses';
 +import { getCanvasSettings } from '@/utils/drupal-globals';
-
+ 
  import type React from 'react';
-
-@@ -41,6 +42,9 @@ const ContextualPanel: React.FC = () => {
+ 
+@@ -38,6 +39,9 @@
+   const isTemplateContext = editorFrameContext === EditorFrameContext.TEMPLATE;
    const mainTabText = isTemplateContext ? 'Template data' : 'Page data';
-
+ 
 +  const hidePageDataPanel =
 +    getCanvasSettings()?.hidePageDataPanel === true ||
 +    /\/canvas\/editor\/node\/\d+/.test(window.location.pathname);
    const [activePanel, setActivePanel] = useState('pageData');
    const offRightClasses = useHidePanelClasses('right');
    const [hidePanel, setHidePanel] = useState(false);
-@@ -61,9 +65,13 @@ const ContextualPanel: React.FC = () => {
+@@ -59,12 +63,16 @@
+   }, [dispatch, selectedComponent, isMultiSelect]);
+ 
    useEffect(() => {
 -    if (isTemplateContext && !isMultiSelect && !selectedComponent) {
 +    if (
@@ -169,24 +162,31 @@
      }
 -  }, [selectedComponent, isMultiSelect, isTemplateContext]);
 +  }, [selectedComponent, isMultiSelect, isTemplateContext, hidePageDataPanel]);
-
-@@ -92,7 +100,7 @@ const ContextualPanel: React.FC = () => {
+ 
+   return (
+     <Box
+@@ -90,7 +98,7 @@
+             className={clsx(styles.tabRoot)}
+           >
              <Tabs.List justify="start" mx="4" size="1">
 -              {!isTemplateContext && (
 +              {!isTemplateContext && !hidePageDataPanel && (
                  <Tabs.Trigger
                    value="pageData"
                    data-testid="canvas-contextual-panel--page-data"
-@@ -171,7 +179,7 @@ const ContextualPanel: React.FC = () => {
+@@ -169,7 +177,7 @@
+                     <Outlet />
+                   </ErrorBoundary>
                  </Tabs.Content>
 -                {!isTemplateContext && (
 +                {!isTemplateContext && !hidePageDataPanel && (
                    <Tabs.Content
                      value={'pageData'}
                      forceMount={true}
---- a/ui/src/components/topbar/Topbar.tsx
-+++ b/ui/src/components/topbar/Topbar.tsx
-@@ -100,7 +100,7 @@ const Topbar = () => {
+diff -ruN a/ui/src/components/topbar/Topbar.tsx b/ui/src/components/topbar/Topbar.tsx
+--- a/ui/src/components/topbar/Topbar.tsx	2026-04-02 06:14:28.445048693 +0300
++++ b/ui/src/components/topbar/Topbar.tsx	2026-04-02 06:16:32.511101332 +0300
+@@ -100,7 +100,7 @@
                  <DropIcon
                    className={styles.drupalLogo}
                    height="24"
@@ -195,15 +195,42 @@
                  />
                </a>
              </Tooltip>
---- a/ui/src/features/editor/Editor.tsx
-+++ b/ui/src/features/editor/Editor.tsx
-@@ -29,6 +29,7 @@ import useEditorNavigation from '@/hooks/useEditorNavigation';
+diff -ruN a/ui/src/components/UndoRedo.tsx b/ui/src/components/UndoRedo.tsx
+--- a/ui/src/components/UndoRedo.tsx	2026-04-02 06:14:28.432696909 +0300
++++ b/ui/src/components/UndoRedo.tsx	2026-04-02 06:15:31.999146262 +0300
+@@ -65,7 +65,7 @@
+         disabled={!isUndoable}
+         aria-label="Undo"
+       >
+-        <ResetIcon height="16" width="auto" />
++        <ResetIcon height="16" width="16" />
+       </Button>
+       <Button
+         variant="ghost"
+@@ -78,7 +78,7 @@
+       >
+         <ResetIcon
+           height="16"
+-          width="auto"
++          width="16"
+           style={{ transform: 'scaleX(-1)' }}
+         />
+       </Button>
+diff -ruN a/ui/src/features/editor/Editor.tsx b/ui/src/features/editor/Editor.tsx
+--- a/ui/src/features/editor/Editor.tsx	2026-04-02 06:14:28.448198803 +0300
++++ b/ui/src/features/editor/Editor.tsx	2026-04-02 06:16:47.965346887 +0300
+@@ -27,6 +27,7 @@
+ import useEditorNavigation from '@/hooks/useEditorNavigation';
  import useReturnableLocation from '@/hooks/useReturnableLocation';
  import { useUndoRedo } from '@/hooks/useUndoRedo';
 +import { getCanvasSettings } from '@/utils/drupal-globals';
  import { getLayoutItem, setLayoutItem } from '@/utils/layoutStorage';
-
-@@ -90,7 +91,11 @@ const Editor: React.FC<EditorProps> = ({ context, disable = false }) => {
+ 
+ import styles from '@/features/editor/Editor.module.css';
+@@ -88,10 +89,14 @@
+   const { entityId, entityType, bundle, viewMode } = useParams();
+   const { navigateToTemplateEditor } = useEditorNavigation();
+ 
 +  const hidePageDataPanel =
 +    getCanvasSettings()?.hidePageDataPanel === true ||
 +    /\/canvas\/editor\/node\/\d+/.test(window.location.pathname);
@@ -213,21 +240,20 @@
 -    (isTemplateContext && !isMultiSelect && !selectedComponent);
 +    (isTemplateContext && !isMultiSelect && !selectedComponent) ||
 +    (hidePageDataPanel && !isMultiSelect && !selectedComponent);
---- a/ui/src/features/layout/layoutModelSlice.ts
-+++ b/ui/src/features/layout/layoutModelSlice.ts
-@@ -745,7 +745,6 @@ export const _linkPropToEntityValue =
-     const model = selectModel(state)[componentToUpdateId];
-     const componentMetadata = components[selectedComponentType];
--    console.log('[_linkPropToEntityValue] debug:', { propName, componentToUpdateId, selectedComponentType, version, hasModel: !!model, hasMetadata: !!componentMetadata, hasPropSource: !!(componentMetadata as PropSourceComponent)?.propSources?.[propName], newSource });
-     // Exit early if attempting to update a prop that does not exist.
-
-@@ -768,8 +767,8 @@ export const _linkPropToEntityValue =
+ 
+   const handleSidebarResize = useCallback((sizes: number[]) => {
+     if (sizes.length === 2) {
+diff -ruN a/ui/src/features/layout/layoutModelSlice.ts b/ui/src/features/layout/layoutModelSlice.ts
+--- a/ui/src/features/layout/layoutModelSlice.ts	2026-04-02 06:14:28.451853288 +0300
++++ b/ui/src/features/layout/layoutModelSlice.ts	2026-04-02 06:16:55.308463785 +0300
+@@ -768,8 +768,9 @@
        // Do not provide a resolved value with the newly linked prop.
        delete resolved[propName];
-
--      const editorFrameContext = selectEditorFrameContext(state.ui);
--      console.log('[_linkPropToEntityValue] dispatching PATCH:', { editorFrameContext, componentToUpdateId, selectedComponentType, version, source, resolved });
+ 
 +      const editorFrameContext = selectEditorFrameContext(state);
        const valuePayload = {
-         type: editorFrameContext,
+-        type: 'template' as EditorFrameContext,
++        type: editorFrameContext,
          componentInstanceUuid: componentToUpdateId,
+         componentType: `${selectedComponentType}@${version}`,
+         model: {
