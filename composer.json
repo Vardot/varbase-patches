@@ -140,10 +140,6 @@
         "Issue #3057250: Validation issue on adding url redirect":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-09-04--3057250--mr-133.patch"
       },
-      "drupal/page_manager": {
-        "fix: #3536704 PHP 8.4 implicit nullable parameters":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/page_manager--2025-12-28--3536704--mr-46.patch"
-      },
       "drupal/panels": {
         "fix: #3534531 php 8.4 compatibility issue":
         "https://git.drupalcode.org/project/panels/-/commit/55700b96188b96f75d07aeb2454cf3dc1b2a597a.diff"
