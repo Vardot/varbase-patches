@@ -146,10 +146,6 @@
         "Issue #3057250: Validation issue on adding url redirect":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-09-04--3057250--mr-133.patch"
       },
-      "drupal/page_manager": {
-        "Issue #3438993: Some mandatory parameters are missing (machine_name, step) to generate a URL for route entity.page.devel_load":
-        "https://www.drupal.org/files/issues/2024-04-12/3438993-5.patch"
-      },
       "drupal/node_edit_protection": {
         "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
         "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
