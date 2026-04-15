@@ -1,0 +1,13 @@
+diff --git a/src/Entity/Component.php b/src/Entity/Component.php
+index 8068be27ad9e686eb95abe56ce4e8fe69b18d342..2867ea16d0cef768d0bc0c35620739ed2001d5f7 100644
+--- a/src/Entity/Component.php
++++ b/src/Entity/Component.php
+@@ -223,7 +223,7 @@ final class Component extends VersionedConfigEntityBase implements ComponentInte
+           // TRICKY: race condition: when creating the fallback version, the
+           // `last_active_version` setting won't exist yet.
+           // @see ::setSettings()
+-          'slots' => \array_key_exists('last_active_version', $this->getSettings())
++          'slots' => \array_key_exists('last_active_version', $this->getSettings()) && isset($this->versioned_properties[$this->getSettings()['last_active_version']])
+             ? $this->versioned_properties[$this->getSettings()['last_active_version']]['fallback_metadata']['slot_definitions']
+             : [],
+           ...$this->getSettings(),
