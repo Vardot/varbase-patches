@@ -224,7 +224,9 @@
         "feat: #3567225 Support per-entity Canvas layouts with field linking and template copying":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-02--3567225.patch",
         "feat: #3584713 Add Allow Edit Global Regions permission to restrict editing of global page regions":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-14--3584713--mr-911.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-14--3584713--mr-911.patch",
+        "fix: #3584883 Undefined array key placeholder warning in Component::getSlotDefinitions() when versioned_properties lacks last_active_version key":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-15--3584883--mr-916.patch"
       }
     }
   }
