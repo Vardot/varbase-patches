@@ -1,0 +1,269 @@
+diff --git a/packages/types/src/DrupalSettings.ts b/packages/types/src/DrupalSettings.ts
+index 23765707..61f4a0c0 100644
+--- a/packages/types/src/DrupalSettings.ts
++++ b/packages/types/src/DrupalSettings.ts
+@@ -40,6 +40,7 @@ export interface DrupalSettings {
+     personalizationExtensionAvailable: boolean;
+     // ⚠️ This is highly experimental and *will* be refactored.
+     canvasAiMaxFileSize: number;
++    hidePageDataPanel?: boolean;
+   };
+   canvasData: {
+     v0: {
+diff --git a/src/Controller/ApiLayoutController.php b/src/Controller/ApiLayoutController.php
+index 12d50370..0e5e0aa0 100644
+--- a/src/Controller/ApiLayoutController.php
++++ b/src/Controller/ApiLayoutController.php
+@@ -307,7 +307,11 @@ final class ApiLayoutController {
+ 
+     // Update the entity & auto-save it. We might be updating a component
+     // instance version aside of the model itself.
+-    $this->updateComponentInstance($entity_to_patch, $componentInstanceUuid, $version, $model, $preview_entity);
++    // For per-entity canvas layouts, the entity itself is the host entity for
++    // field linking (EntityFieldPropSource). For ContentTemplate editing, the
++    // preview entity serves as the host.
++    $host_entity = $preview_entity ?? ($entity instanceof FieldableEntityInterface ? $entity : NULL);
++    $this->updateComponentInstance($entity_to_patch, $componentInstanceUuid, $version, $model, $host_entity);
+     $this->autoSaveManager->saveEntity($entity_to_patch, $clientInstanceId);
+ 
+     // Inform the UI of the updated reality.
+diff --git a/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php b/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php
+index d945fbfe..5f9921aa 100644
+--- a/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php
++++ b/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php
+@@ -747,13 +747,20 @@ abstract class GeneratedFieldExplicitInputUxComponentSourceBase extends Componen
+     // Component config entity being created!)
+ 
+     // Get suggested non-static prop sources for component instances on
+-    // content templates.
++    // content templates and per-entity canvas layouts.
+     $suggestions = NULL;
++    $entity_data_definition_for_linking = NULL;
+     if ($entity instanceof ContentTemplate) {
++      $entity_data_definition_for_linking = $entity->getTargetEntityDataDefinition();
++    }
++    elseif ($entity instanceof \Drupal\Core\Entity\FieldableEntityInterface && $entity->getEntityTypeId() === 'node') {
++      $entity_data_definition_for_linking = \Drupal\Core\Entity\TypedData\EntityDataDefinition::create('node', $entity->bundle());
++    }
++    if ($entity_data_definition_for_linking !== NULL) {
+       $suggestions = PropSourceSuggester::structureSuggestionsForHierarchicalResponse($this->propSourceSuggester->suggest(
+         $this->getSourceSpecificComponentId(),
+         $this->getMetadata(),
+-        $entity->getTargetEntityDataDefinition(),
++        $entity_data_definition_for_linking,
+       ));
+     }
+ 
+@@ -800,7 +807,7 @@ abstract class GeneratedFieldExplicitInputUxComponentSourceBase extends Componen
+       $form[$sdc_prop_name] = $source->formTemporaryRemoveThisExclamationExclamationExclamation($widget, $sdc_prop_name, $is_required, $entity_object_for_field_widget, $form, $form_state);
+       $form[$sdc_prop_name]['#disabled'] = $disabled;
+ 
+-      if ($entity instanceof ContentTemplate) {
++      if ($entity_data_definition_for_linking !== NULL) {
+         $could_use_dynamic_prop_source = !empty($suggestions[$sdc_prop_name]);
+ 
+         // If the prop is already linked, replace the widget entirely. The
+@@ -814,7 +821,7 @@ abstract class GeneratedFieldExplicitInputUxComponentSourceBase extends Componen
+             '#sdc_prop_name' => $sdc_prop_name,
+             '#sdc_prop_label' => $label,
+             '#linked_prop_source' => $linked_prop_source,
+-            '#entity_data_definition' => $entity->getTargetEntityDataDefinition(),
++            '#entity_data_definition' => $entity_data_definition_for_linking,
+             '#field_link_suggestions' => $suggestions[$sdc_prop_name],
+             '#description' => $component_schema['properties'][$sdc_prop_name]['description'] ?? NULL,
+             '#is_required' => $is_required,
+@@ -847,7 +854,7 @@ abstract class GeneratedFieldExplicitInputUxComponentSourceBase extends Componen
+       }
+     }
+     $form['#attached']['canvas-transforms'] = $transforms;
+-    if ($entity instanceof ContentTemplate) {
++    if ($entity_data_definition_for_linking !== NULL) {
+       $form['#after_build'][] = [static::class, 'moveSuggestionsToLabel'];
+     }
+     return $form;
+diff --git a/src/Storage/ComponentTreeLoader.php b/src/Storage/ComponentTreeLoader.php
+index 67887bd8..9adb416e 100644
+--- a/src/Storage/ComponentTreeLoader.php
++++ b/src/Storage/ComponentTreeLoader.php
+@@ -15,11 +15,11 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
+ /**
+  * Handles loading a component tree from entities.
+  */
+-final class ComponentTreeLoader {
++class ComponentTreeLoader {
+ 
+   public function __construct(
+-    private readonly EntityFieldManagerInterface $entityFieldManager,
+-    private readonly ModuleHandlerInterface $moduleHandler,
++    protected readonly EntityFieldManagerInterface $entityFieldManager,
++    protected readonly ModuleHandlerInterface $moduleHandler,
+   ) {}
+ 
+   /**
+diff --git a/ui/src/components/UndoRedo.tsx b/ui/src/components/UndoRedo.tsx
+index dd154838..4ec46c53 100644
+--- a/ui/src/components/UndoRedo.tsx
++++ b/ui/src/components/UndoRedo.tsx
+@@ -65,7 +65,7 @@ const UndoRedo = () => {
+         disabled={!isUndoable}
+         aria-label="Undo"
+       >
+-        <ResetIcon height="16" width="auto" />
++        <ResetIcon height="16" width="16" />
+       </Button>
+       <Button
+         variant="ghost"
+@@ -78,7 +78,7 @@ const UndoRedo = () => {
+       >
+         <ResetIcon
+           height="16"
+-          width="auto"
++          width="16"
+           style={{ transform: 'scaleX(-1)' }}
+         />
+       </Button>
+diff --git a/ui/src/components/form/components/drupal/LinkedFieldBox.tsx b/ui/src/components/form/components/drupal/LinkedFieldBox.tsx
+index 86a254d9..2255dd47 100644
+--- a/ui/src/components/form/components/drupal/LinkedFieldBox.tsx
++++ b/ui/src/components/form/components/drupal/LinkedFieldBox.tsx
+@@ -11,7 +11,7 @@ import {
+ } from '@/features/layout/layoutModelSlice';
+ import { findComponentByUuid } from '@/features/layout/layoutUtils';
+ import {
+-  EditorFrameContext,
++  selectEditorFrameContext,
+   selectSelectedComponentUuid,
+ } from '@/features/ui/uiSlice';
+ import { useGetComponentsQuery } from '@/services/componentAndLayout';
+@@ -61,6 +61,7 @@ const LinkedFieldBox = ({
+   const [selectedComponentType, version] = (
+     node ? (node.type as string) : 'noop'
+   ).split('@');
++  const editorFrameContext = useAppSelector(selectEditorFrameContext);
+   const [patchComponent] = useUpdateComponentMutation({
+     fixedCacheKey: selectedComponentId,
+   });
+@@ -80,7 +81,7 @@ const LinkedFieldBox = ({
+     const default_values: DefaultValues = propData?.default_values || {};
+     if (isEvaluatedComponentModel(selectedModel)) {
+       patchComponent({
+-        type: EditorFrameContext.TEMPLATE,
++        type: editorFrameContext,
+         componentInstanceUuid: selectedComponentId,
+         componentType: `${selectedComponentType}@${version}`,
+         model: {
+diff --git a/ui/src/components/panel/ContextualPanel.tsx b/ui/src/components/panel/ContextualPanel.tsx
+index f27b213e..ba416bd8 100644
+--- a/ui/src/components/panel/ContextualPanel.tsx
++++ b/ui/src/components/panel/ContextualPanel.tsx
+@@ -24,6 +24,7 @@ import {
+   selectSelection,
+ } from '@/features/ui/uiSlice';
+ import useHidePanelClasses from '@/hooks/useHidePanelClasses';
++import { getCanvasSettings } from '@/utils/drupal-globals';
+ 
+ import type React from 'react';
+ 
+@@ -38,6 +39,9 @@ const ContextualPanel: React.FC = () => {
+   const isTemplateContext = editorFrameContext === EditorFrameContext.TEMPLATE;
+   const mainTabText = isTemplateContext ? 'Template data' : 'Page data';
+ 
++  const hidePageDataPanel =
++    getCanvasSettings()?.hidePageDataPanel === true ||
++    /\/canvas\/editor\/node\/\d+/.test(window.location.pathname);
+   const [activePanel, setActivePanel] = useState('pageData');
+   const offRightClasses = useHidePanelClasses('right');
+   const [hidePanel, setHidePanel] = useState(false);
+@@ -59,12 +63,16 @@ const ContextualPanel: React.FC = () => {
+   }, [dispatch, selectedComponent, isMultiSelect]);
+ 
+   useEffect(() => {
+-    if (isTemplateContext && !isMultiSelect && !selectedComponent) {
++    if (
++      (isTemplateContext || hidePageDataPanel) &&
++      !isMultiSelect &&
++      !selectedComponent
++    ) {
+       setHidePanel(true);
+     } else {
+       setHidePanel(false);
+     }
+-  }, [selectedComponent, isMultiSelect, isTemplateContext]);
++  }, [selectedComponent, isMultiSelect, isTemplateContext, hidePageDataPanel]);
+ 
+   return (
+     <Box
+@@ -90,7 +98,7 @@ const ContextualPanel: React.FC = () => {
+             className={clsx(styles.tabRoot)}
+           >
+             <Tabs.List justify="start" mx="4" size="1">
+-              {!isTemplateContext && (
++              {!isTemplateContext && !hidePageDataPanel && (
+                 <Tabs.Trigger
+                   value="pageData"
+                   data-testid="canvas-contextual-panel--page-data"
+@@ -169,7 +177,7 @@ const ContextualPanel: React.FC = () => {
+                     <Outlet />
+                   </ErrorBoundary>
+                 </Tabs.Content>
+-                {!isTemplateContext && (
++                {!isTemplateContext && !hidePageDataPanel && (
+                   <Tabs.Content
+                     value={'pageData'}
+                     forceMount={true}
+diff --git a/ui/src/components/topbar/Topbar.tsx b/ui/src/components/topbar/Topbar.tsx
+index b0cc13f2..14025742 100644
+--- a/ui/src/components/topbar/Topbar.tsx
++++ b/ui/src/components/topbar/Topbar.tsx
+@@ -100,7 +100,7 @@ const Topbar = () => {
+                 <DropIcon
+                   className={styles.drupalLogo}
+                   height="24"
+-                  width="auto"
++                  width="24"
+                 />
+               </a>
+             </Tooltip>
+diff --git a/ui/src/features/editor/Editor.tsx b/ui/src/features/editor/Editor.tsx
+index f86ff1ff..64f08890 100644
+--- a/ui/src/features/editor/Editor.tsx
++++ b/ui/src/features/editor/Editor.tsx
+@@ -27,6 +27,7 @@ import {
+ import useEditorNavigation from '@/hooks/useEditorNavigation';
+ import useReturnableLocation from '@/hooks/useReturnableLocation';
+ import { useUndoRedo } from '@/hooks/useUndoRedo';
++import { getCanvasSettings } from '@/utils/drupal-globals';
+ import { getLayoutItem, setLayoutItem } from '@/utils/layoutStorage';
+ 
+ import styles from '@/features/editor/Editor.module.css';
+@@ -88,10 +89,14 @@ const Editor: React.FC<EditorProps> = ({ context, disable = false }) => {
+   const { entityId, entityType, bundle, viewMode } = useParams();
+   const { navigateToTemplateEditor } = useEditorNavigation();
+ 
++  const hidePageDataPanel =
++    getCanvasSettings()?.hidePageDataPanel === true ||
++    /\/canvas\/editor\/node\/\d+/.test(window.location.pathname);
+   const isTemplateContext = editorFrameContext === EditorFrameContext.TEMPLATE;
+   const isPanelHidden =
+     editorFrameMode === EditorFrameMode.INTERACTIVE ||
+-    (isTemplateContext && !isMultiSelect && !selectedComponent);
++    (isTemplateContext && !isMultiSelect && !selectedComponent) ||
++    (hidePageDataPanel && !isMultiSelect && !selectedComponent);
+ 
+   const handleSidebarResize = useCallback((sizes: number[]) => {
+     if (sizes.length === 2) {
+diff --git a/ui/src/features/layout/layoutModelSlice.ts b/ui/src/features/layout/layoutModelSlice.ts
+index ad079dec..e5aa9659 100644
+--- a/ui/src/features/layout/layoutModelSlice.ts
++++ b/ui/src/features/layout/layoutModelSlice.ts
+@@ -768,8 +768,9 @@ export const _linkPropToEntityValue =
+       // Do not provide a resolved value with the newly linked prop.
+       delete resolved[propName];
+ 
++      const editorFrameContext = selectEditorFrameContext(state);
+       const valuePayload = {
+-        type: 'template' as EditorFrameContext,
++        type: editorFrameContext,
+         componentInstanceUuid: componentToUpdateId,
+         componentType: `${selectedComponentType}@${version}`,
+         model: {
