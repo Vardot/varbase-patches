@@ -1,0 +1,21 @@
+diff --git a/src/Entity/VersionedConfigEntityBase.php b/src/Entity/VersionedConfigEntityBase.php
+--- a/src/Entity/VersionedConfigEntityBase.php
++++ b/src/Entity/VersionedConfigEntityBase.php
+@@ -52,7 +52,16 @@
+
+   public function loadVersion(string $version): static {
+     if ($version !== $this->loadedVersion) {
+-      $this->assertVersionExists($version);
++      if ($version !== $this->active_version && !\array_key_exists($version, $this->versioned_properties)) {
++        \Drupal::logger('canvas')->warning('Component version `@requested` not found for @entity_type `@id`, falling back to active version `@active`.', [
++          '@requested' => $version,
++          '@entity_type' => $this->getEntityTypeId(),
++          '@id' => $this->id(),
++          '@active' => $this->active_version,
++        ]);
++        $this->loadedVersion = $this->active_version;
++        return $this;
++      }
+       $this->loadedVersion = $version;
+     }
+     return $this;
