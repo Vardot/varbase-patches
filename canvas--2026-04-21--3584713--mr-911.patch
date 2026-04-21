@@ -1,5 +1,6 @@
---- a/canvas.module	2026-04-14 18:57:59.013636439 +0300
-+++ b/canvas.module	2026-04-14 18:58:25.545107996 +0300
+diff --git a/canvas.module b/canvas.module
+--- a/canvas.module
++++ b/canvas.module
 @@ -18,6 +18,9 @@
  use Drupal\canvas\Entity\Component;
  use Drupal\canvas\Plugin\Canvas\ComponentSource\GeneratedFieldExplicitInputUxComponentSourceBase;
@@ -7,7 +8,7 @@
 +use Drupal\Core\Entity\EntityInterface;
 +use Drupal\Core\Session\AccountInterface;
 +use Drupal\Core\Access\AccessResult;
- 
+
  /**
   * Provides allowed values for a 'list_*' field used in a StaticPropSource.
 @@ -116,3 +119,29 @@
@@ -40,8 +41,9 @@
 +  return AccessResult::forbidden('Editing global Canvas regions requires the "edit canvas global regions" permission.')
 +    ->cachePerPermissions();
 +}
---- a/canvas.permissions.yml	2026-04-14 18:57:59.013674326 +0300
-+++ b/canvas.permissions.yml	2026-04-14 18:58:32.220250503 +0300
+diff --git a/canvas.permissions.yml b/canvas.permissions.yml
+--- a/canvas.permissions.yml
++++ b/canvas.permissions.yml
 @@ -46,3 +46,8 @@
  publish auto-saves:
    title: 'Publish Drupal Canvas Content'
