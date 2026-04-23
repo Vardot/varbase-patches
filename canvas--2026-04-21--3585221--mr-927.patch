@@ -1,8 +1,9 @@
 diff --git a/src/Entity/VersionedConfigEntityBase.php b/src/Entity/VersionedConfigEntityBase.php
+index b403ff99..43ea4a6f 100644
 --- a/src/Entity/VersionedConfigEntityBase.php
 +++ b/src/Entity/VersionedConfigEntityBase.php
-@@ -52,7 +52,16 @@
-
+@@ -52,7 +52,16 @@ abstract class VersionedConfigEntityBase extends ConfigEntityBase implements Ver
+ 
    public function loadVersion(string $version): static {
      if ($version !== $this->loadedVersion) {
 -      $this->assertVersionExists($version);
