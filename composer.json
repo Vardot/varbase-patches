@@ -228,7 +228,9 @@
       },
       "drupal/content_lock": {
         "feat: #3544019 Form Actions Stay Cached and Disabled After Breaking Lock in Gin Admin Theme":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_lock--2026-04-23--3544019--mr-93.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_lock--2026-04-23--3544019--mr-93.patch",
+        "fix: #3568535 SQLSTATE[42S02]: Base table or view not found: 1146 Table db.sessions doesn't exist":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_lock--2026-04-23--3568535--mr-100.patch"
       }
     }
   }
