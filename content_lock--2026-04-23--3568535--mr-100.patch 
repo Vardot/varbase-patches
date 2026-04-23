@@ -1,0 +1,42 @@
+diff --git a/src/Hook/ContentLockHooks.php b/src/Hook/ContentLockHooks.php
+index d871ffe09c7b009984336e46f2e41b5b7bb75258..4a23806c36f5b26cfc97e1632535002a36e154d0 100644
+--- a/src/Hook/ContentLockHooks.php
++++ b/src/Hook/ContentLockHooks.php
+@@ -7,6 +7,7 @@ use Drupal\content_lock\ContentLock\ContentLockInterface;
+ use Drupal\Core\Access\AccessResult;
+ use Drupal\Core\Config\ConfigFactoryInterface;
+ use Drupal\Core\Database\Connection;
++use Drupal\Core\Database\DatabaseException;
+ use Drupal\Core\Datetime\DateFormatterInterface;
+ use Drupal\Core\Entity\EntityInterface;
+ use Drupal\Core\Entity\EntityTypeManagerInterface;
+@@ -235,17 +236,22 @@ class ContentLockHooks {
+    */
+   #[Hook('user_logout')]
+   public function userLogout(AccountInterface $account): void {
++    $session_count = FALSE;
+     // Only do the database check if the original drupal session manager is
+     // used. Otherwise, it's not sure if sessions table has correct data.
+     // @phpstan-ignore-next-line
+     if (\Drupal::service('session_handler.storage') instanceof SessionHandler) {
+-      $session_count = (int) $this->database->select('sessions')
+-        ->condition('uid', $account->id())
+-        ->countQuery()
+-        ->execute()->fetchField();
+-    }
+-    else {
+-      $session_count = FALSE;
++      // The session table may not exist yet, all queries against the sessions
++      // table must catch database exceptions.
++      try {
++        $session_count = (int) $this->database->select('sessions')
++          ->condition('uid', $account->id())
++          ->countQuery()
++          ->execute()->fetchField();
++      }
++      catch (DatabaseException $e) {
++        // We can ignore exceptions.
++      }
+     }
+     // Only remove all locks of user if it's the last session of the user.
+     if ($session_count === 1) {
