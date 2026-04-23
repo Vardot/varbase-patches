@@ -1,0 +1,20 @@
+diff --git a/src/ContentLock/ContentLock.php b/src/ContentLock/ContentLock.php
+index e96563621235e27da46613490c476c4256eac30f..fec40c47d2ade2ff2ee55957ccf35702b8e7d489 100644
+--- a/src/ContentLock/ContentLock.php
++++ b/src/ContentLock/ContentLock.php
+@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
+ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+ use Symfony\Component\HttpFoundation\Request;
+ use Symfony\Component\HttpFoundation\RequestStack;
++use Drupal\Core\Cache\Cache;
+ 
+ /**
+  * Class ContentLock.
+@@ -161,6 +162,7 @@ class ContentLock implements ContentLockInterface {
+     }
+     // Delete locking item from database.
+     $this->lockingDelete($entity, $form_op, $uid);
++    Cache::invalidateTags($entity->getCacheTags());
+ 
+     $event = new ContentLockReleaseEvent($entity->id(), $langcode, $form_op, $entity->getEntityTypeId());
+     $this->eventDispatcher->dispatch($event, ContentLockReleaseEvent::EVENT_NAME);
