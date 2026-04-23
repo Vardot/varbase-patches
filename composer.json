@@ -225,6 +225,10 @@
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-15--3584883--mr-916.patch",
         "feat: #3585221 Fall back to active version when stored component version is not available":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-21--3585221--mr-927.patch"
+      },
+      "drupal/content_lock": {
+        "feat: #3544019 Form Actions Stay Cached and Disabled After Breaking Lock in Gin Admin Theme":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_lock--2026-04-23--3544019--mr-93.patch"
       }
     }
   }
