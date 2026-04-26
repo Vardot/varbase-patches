@@ -136,9 +136,7 @@
       },
       "drupal/redirect": {
         "Issue #2879648: Redirects from aliased paths aren't triggered":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-09-04--2879648--mr-109.patch",
-        "Issue #3057250: Validation issue on adding url redirect":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-09-04--3057250--mr-133.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2025-09-04--2879648--mr-109.patch"
       },
       "drupal/panels": {
         "fix: #3534531 php 8.4 compatibility issue":
