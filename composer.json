@@ -144,10 +144,6 @@
         "Issue #3544584: Change default Change method to Replace the current value when configuring Modify field values action":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-09-03--3544584--mr-44.patch"
       },
-      "drupal/config_ignore": {
-        "fix: #3561884 Implicit nullable Request parameter for PHP 8.4 compatibility in Config Ignore":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/config_ignore--2025-12-07--3561884.patch"
-      },
       "drupal/webp": {
         "fix: #3561953 PHP 8.4 implicit nullable & constructor parameter order issues in WebP FileDownloadController":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webp--2026-04-15--3561953--mr-54.patch"
