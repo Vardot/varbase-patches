@@ -1,0 +1,24 @@
+--- a/src/EventSubscriber/DrimageSubscriber.php
++++ b/src/EventSubscriber/DrimageSubscriber.php
+@@ -148,6 +148,7 @@
+
+         // Force Drupal to stop processing the request.
+         $event->setResponse(new Response('Error generating image, missing source file.', 404));
++        return;
+       }
+
+       // Get the first (and presumably only) image entity.
+@@ -160,11 +161,12 @@
+
+         // Force Drupal to stop processing the request.
+         $event->setResponse(new Response('Error generating image, missing source file.', 404));
++        return;
+       }
+
+       try {
+         // Deliver the image.
+-        $this->drimageManager->image($event->getRequest(), (int) $width, (int) $height, (int) $images->id(), $iwc_id, $format);
++        $event->setResponse($this->drimageManager->image($event->getRequest(), (int) $width, (int) $height, (int) $images->id(), $iwc_id, $format));
+       }
+       catch (NotFoundHttpException $exception) {
+         // Force Drupal to stop processing the request.
