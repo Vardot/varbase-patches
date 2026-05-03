@@ -1,0 +1,13 @@
+diff --git a/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php b/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php
+index 0949a6477afeb7665f0694d991df310c0d3cabc8..a617b741e8844f94df2b28246d6558340f078f02 100644
+--- a/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php
++++ b/src/Plugin/Canvas/ComponentSource/GeneratedFieldExplicitInputUxComponentSourceBase.php
+@@ -1575,7 +1575,7 @@ abstract class GeneratedFieldExplicitInputUxComponentSourceBase extends Componen
+    * @return array<string, mixed>
+    */
+   protected static function stripNonStandardJsonSchemaKeys(array $schema): array {
+-    $keys_to_remove = ['meta:enum', 'x-translation-context'];
++    $keys_to_remove = ['meta:enum', 'x-translation-context', 'id'];
+     $schema = array_diff_key($schema, array_flip($keys_to_remove));
+     foreach ($schema as $key => $value) {
+       if (\is_array($value)) {
