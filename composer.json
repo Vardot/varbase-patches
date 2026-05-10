@@ -24,6 +24,11 @@
     "composer-plugin-api": "^2.0",
     "cweagans/composer-patches": "~1.7.0 || ~2.0"
   },
+  "autoload": {
+    "psr-4": {
+      "Vardot\\VarbasePatches\\": "src/"
+    }
+  },
   "extra": {
     "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
     "plugin-modifies-downloads": true,
@@ -239,11 +244,6 @@
         "fix: #3587334 Missing response and return handling in DrimageSubscriber image delivery":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drimage_improved--2026-04-28--3587334--mr-25.patch"
       }
-    }
-  },
-  "autoload": {
-    "psr-4": {
-      "Vardot\\VarbasePatches\\": "src/"
     }
   }
 }
