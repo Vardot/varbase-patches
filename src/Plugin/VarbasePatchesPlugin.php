@@ -41,6 +41,7 @@ class VarbasePatchesPlugin implements PluginInterface, EventSubscriberInterface,
     {
         return [
             \cweagans\Composer\Capability\Resolver\ResolverProvider::class => VarbaseResolverProvider::class,
+            \Composer\Plugin\Capability\CommandProvider::class => \Vardot\VarbasePatches\Capability\VarbaseCommandProvider::class,
         ];
     }
 
