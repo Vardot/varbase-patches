@@ -24,6 +24,11 @@
     "composer-plugin-api": "^2.0",
     "cweagans/composer-patches": "~1.7.0 || ~2.0"
   },
+  "autoload": {
+    "psr-4": {
+      "Vardot\\VarbasePatches\\": "src/"
+    }
+  },
   "extra": {
     "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
     "plugin-modifies-downloads": true,
@@ -253,11 +258,6 @@
         "fix: PHP 8.4 compatibility - TypeError when API returns null for results array #725":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openai-php--client--2025-12-30--pr-725.patch"
       }
-    }
-  },
-  "autoload": {
-    "psr-4": {
-      "Vardot\\VarbasePatches\\": "src/"
     }
   }
 }
