@@ -3,9 +3,9 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/vardot/varbase-patches.svg)](https://packagist.org/packages/vardot/varbase-patches)
 [![License](https://img.shields.io/packagist/l/vardot/varbase-patches.svg)](LICENSE)
 
-Composer plugin and curated patch list for [Varbase](https://www.drupal.org/project/varbase).
+List of needed patches for Varbase used packages with Composer Patches.
 
-Built on top of [`cweagans/composer-patches`](https://github.com/cweagans/composer-patches) v2 with three additions that v2 dropped or never had:
+Composer plugin and curated patch list for [Varbase](https://www.drupal.org/project/varbase). Built on top of [`cweagans/composer-patches`](https://github.com/cweagans/composer-patches) v2 with three additions that v2 dropped or never had:
 
 - **Wildcard** `ignore-dependency-patches` (e.g. `drupal/*`).
 - **Allowlist** `allowed-dependency-patches` — only listed packages contribute dependency-declared patches. Defaults to `["vardot/varbase-patches"]`.
@@ -57,14 +57,53 @@ Result: only patches declared by `vardot/varbase-patches` (and your project's ow
 
 The `patches` branch carries patch files only — do not require it.
 
-## Commands
+## Composer commands
 
-| Command                                | Alias       | Description                                                |
-|----------------------------------------|-------------|------------------------------------------------------------|
-| `composer varbase-patches:cleanup:patches`      | `var-ccup`  | Freeze MR URLs in root `extra.patches` to local files.     |
-| `composer varbase-patches:cleanup:patches-file` | `var-ccupf` | Freeze MR URLs in the file referenced by `extra.patches-file`. |
+The plugin registers two Composer commands to convert remote GitLab merge-request URLs in your patch lists into local timestamped `.patch` files under `./patches/`. They replace the Drush commands previously shipped in `varbase_core` (see [docs/migration-from-drush.md](docs/migration-from-drush.md)).
 
-These replace the Drush commands previously shipped in `varbase_core`. See [docs/migration-from-drush.md](docs/migration-from-drush.md).
+### Clean up the root `composer.json` file
+
+- **Name:** `varbase-patches:cleanup:patches`
+- **Aliases:** `var-ccup`
+- **Description:** Detects any merge request patches in the root `composer.json` `extra.patches` block, downloads them to the local `./patches/` folder with a timestamped filename, and updates the root `composer.json` to use the local patch file.
+
+```bash
+composer varbase-patches:cleanup:patches
+```
+
+or
+
+```bash
+composer var-ccup
+```
+
+### Clean up the external `patches-file` JSON file
+
+- **Name:** `varbase-patches:cleanup:patches-file`
+- **Aliases:** `var-ccupf`
+- **Description:** Detects any merge request patches in the JSON file referenced by `extra.patches-file`, downloads them to the local `./patches/` folder with a timestamped filename, and rewrites the patches-file JSON to use the local patch file.
+
+```bash
+composer varbase-patches:cleanup:patches-file
+```
+
+or
+
+```bash
+composer var-ccupf
+```
+
+### Filename convention
+
+```
+[package name]--[Date]--[issue number]--[MR number].patch
+```
+
+Examples:
+
+- `drupal-core--2026-05-10--3539178--mr-12890.patch`
+- `ctools--2026-05-10--3572317--mr-85.patch`
+- `redirect--2026-05-10--2879648--mr-109.patch`
 
 ## Documentation
 
