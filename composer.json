@@ -11,7 +11,6 @@
     "drupal patches"
   ],
   "license": "GPL-2.0-or-later",
-  "version": "11.0.x-dev",
   "type": "composer-plugin",
   "authors": [
     {
@@ -23,7 +22,7 @@
   "require": {
     "php": ">=8.1",
     "composer-plugin-api": "^2.0",
-    "cweagans/composer-patches": "~2.0"
+    "cweagans/composer-patches": "~1.7.0 || ~2.0"
   },
   "extra": {
     "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
