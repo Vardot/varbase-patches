@@ -93,6 +93,29 @@ or
 composer var-ccupf
 ```
 
+## Handling Varbase Patches Ignoring
+
+To exclude a specific patch declared by `vardot/varbase-patches` (e.g. when you want to replace it with an improved version, or skip it entirely), add a `patches-ignore` block to your root `composer.json`:
+
+```json
+{
+  "extra": {
+    "patches-ignore": {
+      "vardot/varbase-patches": {
+        "drupal/core": {
+          "Issue #2869592: Disabled update module shouldn't produce a status report warning":
+          "https://www.drupal.org/files/issues/2869592-remove-update-warning-7.patch"
+        }
+      }
+    }
+  }
+}
+```
+
+Schema: `{ "<source-pkg>": { "<target-pkg>": { "<description>": "<url>" } } }`. Matching is done by URL — the description string is informational. A flat array of URLs (`{ "<source-pkg>": { "<target-pkg>": ["<url>", ...] } }`) is also accepted.
+
+This is the v1-style `patches-ignore` from `cweagans/composer-patches`, restored by this plugin on top of v2.
+
 ### Filename convention
 
 ```
