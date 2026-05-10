@@ -1,8 +1,18 @@
 {
   "name": "vardot/varbase-patches",
   "description": "List of needed patches for Varbase used packages with Composer Patches.",
-  "keywords": ["composer", "patches", "composer patches", "varbase", "varbase patches", "drupal", "drupal patches"],
+  "keywords": [
+    "composer",
+    "patches",
+    "composer patches",
+    "varbase",
+    "varbase patches",
+    "drupal",
+    "drupal patches"
+  ],
   "license": "GPL-2.0-or-later",
+  "version": "9.2.x-dev",
+  "type": "composer-plugin",
   "authors": [
     {
       "name": "Vardot",
@@ -11,191 +21,139 @@
     }
   ],
   "require": {
-    "drupal/core": "~10.6.0",
-    "composer/installers": "~2",
-    "oomphinc/composer-installers-extender": "~2",
-    "cweagans/composer-patches": "~1 || ~2",
-    "vardot/entity-definition-update-manager": "~1",
-    "vardot/module-installer-factory": "~1"
+    "php": ">=8.1",
+    "composer-plugin-api": "^2.0",
+    "cweagans/composer-patches": "~2.0"
   },
   "extra": {
+    "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
+    "plugin-modifies-downloads": true,
+    "plugin-modifies-install-path": true,
     "patches": {
       "drupal/core": {
-        "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal":
-        "https://www.drupal.org/files/issues/2018-12-10/core--getDerivatives-Invalid-argument-foreach--2893892-11-d8.patch",
-        "Issue #3101231: Fix multilingual site's layout edit context issue with TypeError: Argument 1 passed to UrlHelper::buildQuery() must be of the type array, null given":
-        "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
-        "Issue #2741877: Nested modals don't work: opening a modal from a modal closes the original":
-        "https://www.drupal.org/files/issues/2025-02-16/drupal-core--2025-02-16--2741877--mr-11137.patch",
-        "Issue #3272720: Fix PHP8.1+ Deprecated function: hash(): Passing null to parameter #2 ($data) of type string is deprecated in generateFieldTableName":
-        "https://www.drupal.org/files/issues/2022-07-21/3272720-6.patch",
-        "Issue #3326684: Fix PHP8.1+ Deprecated function: mb_strtolower(): Passing null to parameter #1 ($string) of type string is deprecated":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-21--3326684--10-6-x.patch",
-        "Issue #3302838: Fix PHP8.1+ Querying with NULL values results in warning mb_strtolower(): Passing null to parameter is deprecated":
-        "https://www.drupal.org/files/issues/2023-07-05/3302838-38.patch",
-        "Issue #3049332: Fix PHP message: Error: Call to a member function getEntityTypeId() on null (Layout Builder)":
-        "https://www.drupal.org/files/issues/2024-01-09/drupal-core--2024-01-09--3049332-85.patch",
-        "Issue #3046152: Video media needs playsinline & muted options":
-        "https://www.drupal.org/files/issues/2024-06-20/drupal-core--2024-06-20--10-3-x--3046152-54--mr-8471.patch",
-        "feat: #3080606 add Reorder Layout Builder sections":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-21--3080606--10-6-x.patch",
-        "Issue #3456176: 10.3 upgrade now missing status-message theme suggestions":
-        "https://www.drupal.org/files/issues/2024-06-28/3456176-45-missing-status-messages-theme-suggestions.patch",
-        "Issue #3457431: Saving text format generates validation warnings":
-        "https://www.drupal.org/files/issues/2024-07-01/drupal-core--2024-07-01--3457431--mr-8608.patch",
-        "Issue #3459881: Fix TypeError: implode(): Argument #1 ($array) must be of type array, string given in implode() (line 537 of core/lib/Drupal/Core/Field/WidgetBase.php)":
-        "https://www.drupal.org/files/issues/2024-07-08/drupal-core--2024-07-08--3459881--mr-8697.patch",
-        "Issue #3431330: Add Action Method to Add a button plugin and settings into the Active toolbar in editor":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/distributions_recipes--2026-01-21--3431330--10-6-x.patch",
-        "Issue #3497061: Allow recipe input values in array keys":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-01-26--3497061--for-drupal-10-4-x.patch",
-        "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
-        "Issue #3538500: Fix block plugin not found warnings during Drush installation of Varbase":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-08-30--3538500--drupal10x05x.patch"
+        "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal": "https://www.drupal.org/files/issues/2018-12-10/core--getDerivatives-Invalid-argument-foreach--2893892-11-d8.patch",
+        "Issue #3101231: Fix multilingual site's layout edit context issue with TypeError: Argument 1 passed to UrlHelper::buildQuery() must be of the type array, null given": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
+        "Issue #2741877: Nested modals don't work: opening a modal from a modal closes the original": "https://www.drupal.org/files/issues/2025-02-16/drupal-core--2025-02-16--2741877--mr-11137.patch",
+        "Issue #3272720: Fix PHP8.1+ Deprecated function: hash(): Passing null to parameter #2 ($data) of type string is deprecated in generateFieldTableName": "https://www.drupal.org/files/issues/2022-07-21/3272720-6.patch",
+        "Issue #3326684: Fix PHP8.1+ Deprecated function: mb_strtolower(): Passing null to parameter #1 ($string) of type string is deprecated": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-21--3326684--10-6-x.patch",
+        "Issue #3302838: Fix PHP8.1+ Querying with NULL values results in warning mb_strtolower(): Passing null to parameter is deprecated": "https://www.drupal.org/files/issues/2023-07-05/3302838-38.patch",
+        "Issue #3049332: Fix PHP message: Error: Call to a member function getEntityTypeId() on null (Layout Builder)": "https://www.drupal.org/files/issues/2024-01-09/drupal-core--2024-01-09--3049332-85.patch",
+        "Issue #3046152: Video media needs playsinline & muted options": "https://www.drupal.org/files/issues/2024-06-20/drupal-core--2024-06-20--10-3-x--3046152-54--mr-8471.patch",
+        "feat: #3080606 add Reorder Layout Builder sections": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-21--3080606--10-6-x.patch",
+        "Issue #3456176: 10.3 upgrade now missing status-message theme suggestions": "https://www.drupal.org/files/issues/2024-06-28/3456176-45-missing-status-messages-theme-suggestions.patch",
+        "Issue #3457431: Saving text format generates validation warnings": "https://www.drupal.org/files/issues/2024-07-01/drupal-core--2024-07-01--3457431--mr-8608.patch",
+        "Issue #3459881: Fix TypeError: implode(): Argument #1 ($array) must be of type array, string given in implode() (line 537 of core/lib/Drupal/Core/Field/WidgetBase.php)": "https://www.drupal.org/files/issues/2024-07-08/drupal-core--2024-07-08--3459881--mr-8697.patch",
+        "Issue #3431330: Add Action Method to Add a button plugin and settings into the Active toolbar in editor": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/distributions_recipes--2026-01-21--3431330--10-6-x.patch",
+        "Issue #3497061: Allow recipe input values in array keys": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-01-26--3497061--for-drupal-10-4-x.patch",
+        "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
+        "Issue #3538500: Fix block plugin not found warnings during Drush installation of Varbase": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-08-30--3538500--drupal10x05x.patch"
       },
       "drupal/default_content": {
-        "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
-        "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
+        "Issue #3160146: Add Layout Builder Normalizer and Denormalize": "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
       },
       "drupal/persistent_login": {
-        "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles":
-        "https://www.drupal.org/files/issues/persistent_login-user_task_permission-2899530-6.patch"
+        "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles": "https://www.drupal.org/files/issues/persistent_login-user_task_permission-2899530-6.patch"
       },
       "drupal/update_helper": {
-        "Issue #3024165: [PATCH] Enhancements, Better messages for the unable to apply updates, drush command and removed the Mark all updates as successful on install":
-        "https://www.drupal.org/files/issues/2022-06-05/3024165-55.patch"
+        "Issue #3024165: [PATCH] Enhancements, Better messages for the unable to apply updates, drush command and removed the Mark all updates as successful on install": "https://www.drupal.org/files/issues/2022-06-05/3024165-55.patch"
       },
       "drupal/inline_entity_form": {
-        "Issue #2913571: Add a setting to enable/disable inline editing for existing entities":
-        "https://www.drupal.org/files/issues/2024-12-27/inline_entity_form--2024-12-27--2913571--mr-127.patch",
-        "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated":
-        "https://www.drupal.org/files/issues/2025-01-04/inline_entity_form--2025-01-04--mr-126.patch"
+        "Issue #2913571: Add a setting to enable/disable inline editing for existing entities": "https://www.drupal.org/files/issues/2024-12-27/inline_entity_form--2024-12-27--2913571--mr-127.patch",
+        "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated": "https://www.drupal.org/files/issues/2025-01-04/inline_entity_form--2025-01-04--mr-126.patch"
       },
       "drupal/entity_clone": {
-        "Issue #3388460: Fatal error on cloning a menu link (D10 site)":
-        "https://www.drupal.org/files/issues/2023-10-17/3388460-7.patch"
+        "Issue #3388460: Fatal error on cloning a menu link (D10 site)": "https://www.drupal.org/files/issues/2023-10-17/3388460-7.patch"
       },
       "drupal/rabbit_hole": {
-        "Issue #3419073: Fix Return value must be of type bool fatal error":
-        "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch"
+        "Issue #3419073: Fix Return value must be of type bool fatal error": "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch"
       },
       "drupal/cl_block": {
-        "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration":
-        "https://www.drupal.org/files/issues/2023-06-08/3365591-3.patch",
-        "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()":
-        "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
+        "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration": "https://www.drupal.org/files/issues/2023-06-08/3365591-3.patch",
+        "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()": "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
       },
       "drupal/ui_patterns_settings": {
-        "Issue #3414084: Fix UI Patterns Settings issue of TypeError: array_unshift(): Argument #1 ($array) must be of type array, null given in array_unshift() Caused by Deprecated Hooks in Drupal ~10.2.0":
-        "https://www.drupal.org/files/issues/2024-01-11/ui_patterns_settings--2023-12-17--3409221-3--mr-21--39e896da.patch"
+        "Issue #3414084: Fix UI Patterns Settings issue of TypeError: array_unshift(): Argument #1 ($array) must be of type array, null given in array_unshift() Caused by Deprecated Hooks in Drupal ~10.2.0": "https://www.drupal.org/files/issues/2024-01-11/ui_patterns_settings--2023-12-17--3409221-3--mr-21--39e896da.patch"
       },
       "drupal/openapi_jsonapi": {
-        "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined":
-        "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch",
-        "feat: #3079209 Hide POST, PUT, and DELETE endpoints when JSON:API is configured to be read-only":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi_jsonapi--2026-01-22--10308347--mr-6.patch"
+        "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined": "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch",
+        "feat: #3079209 Hide POST, PUT, and DELETE endpoints when JSON:API is configured to be read-only": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi_jsonapi--2026-01-22--10308347--mr-6.patch"
       },
       "drupal/entity_embed": {
-        "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
-        "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
-        "Issue #2679875: Inline Entity Form integration":
-        "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
+        "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor": "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
+        "Issue #2679875: Inline Entity Form integration": "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
       },
       "drupal/linkit": {
-        "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
-        "https://www.drupal.org/files/issues/2023-04-25/3158783-24.patch",
-        "Issue #3201405: Edit internal link and remove the URL breaks layout builder":
-        "https://www.drupal.org/files/issues/2021-03-03/3201405-2.patch"
+        "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor": "https://www.drupal.org/files/issues/2023-04-25/3158783-24.patch",
+        "Issue #3201405: Edit internal link and remove the URL breaks layout builder": "https://www.drupal.org/files/issues/2021-03-03/3201405-2.patch"
       },
       "drupal/lb_ux": {
-        "Issue #3173730: Remove the change of default for auto-submit controller on the existing route to have a better behavior when adding a new section":
-        "https://www.drupal.org/files/issues/2020-09-29/3173730-2.patch",
-        "Issue #3150012: Fix RuntimeException: Callable LayoutBuilderAccessCheck::access requires a value for the $section_storage argument":
-        "https://www.drupal.org/files/issues/2020-10-11/3150012-12_0.patch"
+        "Issue #3173730: Remove the change of default for auto-submit controller on the existing route to have a better behavior when adding a new section": "https://www.drupal.org/files/issues/2020-09-29/3173730-2.patch",
+        "Issue #3150012: Fix RuntimeException: Callable LayoutBuilderAccessCheck::access requires a value for the $section_storage argument": "https://www.drupal.org/files/issues/2020-10-11/3150012-12_0.patch"
       },
       "drupal/layout_library": {
-        "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
-        "Issue #3273160: Support inline blocks in layout":
-        "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch"
+        "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
+        "Issue #3273160: Support inline blocks in layout": "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch"
       },
       "drupal/paragraphs": {
-        "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]":
-        "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
-        "Issue #3138609: Fixe Field group support broken":
-        "https://www.drupal.org/files/issues/2020-06-03/3138609-24.patch",
-        "Issue #3090200: Paragraph access check using incorrect revision of its parent, leading to issues editing and viewing paragraphs when content moderation is involved.":
-        "https://www.drupal.org/files/issues/2023-01-31/3084934-13_combine_3090200-22-update_0.patch"
+        "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]": "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
+        "Issue #3138609: Fixe Field group support broken": "https://www.drupal.org/files/issues/2020-06-03/3138609-24.patch",
+        "Issue #3090200: Paragraph access check using incorrect revision of its parent, leading to issues editing and viewing paragraphs when content moderation is involved.": "https://www.drupal.org/files/issues/2023-01-31/3084934-13_combine_3090200-22-update_0.patch"
       },
       "drupal/paragraphs_previewer": {
-        "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch":
-        "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch", 
-        "fix: #3538671 PHP 8.4 compatibility with implicit nullable parameters in ParagraphsPreviewController":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs_previewer--2025-12-08--3538671--mr-5.patch"
+        "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch": "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch",
+        "fix: #3538671 PHP 8.4 compatibility with implicit nullable parameters in ParagraphsPreviewController": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs_previewer--2025-12-08--3538671--mr-5.patch"
       },
       "drupal/redirect": {
-        "Issue #2879648: Redirects from aliased paths aren't triggered":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-04-26--2879648--mr-109.patch"
+        "Issue #2879648: Redirects from aliased paths aren't triggered": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-04-26--2879648--mr-109.patch"
       },
       "drupal/panels": {
-        "fix: #3534531 php 8.4 compatibility issue":
-        "https://git.drupalcode.org/project/panels/-/commit/55700b96188b96f75d07aeb2454cf3dc1b2a597a.diff"
+        "fix: #3534531 php 8.4 compatibility issue": "https://git.drupalcode.org/project/panels/-/commit/55700b96188b96f75d07aeb2454cf3dc1b2a597a.diff"
       },
       "drupal/node_edit_protection": {
-        "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
-        "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
+        "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme": "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
       },
       "drupal/block_class": {
-        "Issue #3493849: Argument #1 ($array) must be of type array, string given":
-        "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
+        "Issue #3493849: Argument #1 ($array) must be of type array, string given": "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
       },
       "drupal/dropzonejs": {
-        "Issue #3542463: Fix TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in DropzoneJsUploadForm::validateUploadElement()":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dropzonejs--2025-08-21--3542463--mr-24.patch"
+        "Issue #3542463: Fix TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in DropzoneJsUploadForm::validateUploadElement()": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dropzonejs--2025-08-21--3542463--mr-24.patch"
       },
       "drupal/views_bulk_edit": {
-        "Issue #3544584: Change default Change method to Replace the current value when configuring Modify field values action":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-09-03--3544584--mr-44.patch"
+        "Issue #3544584: Change default Change method to Replace the current value when configuring Modify field values action": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-09-03--3544584--mr-44.patch"
       },
       "drupal/content_planner": {
-        "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch",
-        "fix: #3542886 PHP 8.4 Support fixes":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-12-09--3542886--mr-63.patch"
+        "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch",
+        "fix: #3542886 PHP 8.4 Support fixes": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-12-09--3542886--mr-63.patch"
       },
       "drupal/webp": {
-        "fix: #3561953 PHP 8.4 implicit nullable & constructor parameter order issues in WebP FileDownloadController":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webp--2026-04-15--3561953--mr-54.patch"
+        "fix: #3561953 PHP 8.4 implicit nullable & constructor parameter order issues in WebP FileDownloadController": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webp--2026-04-15--3561953--mr-54.patch"
       },
       "drupal/google_analytics": {
-        "fix: #3562288 PHP 8.4 - Implicit Nullable Parameters for Google Analytics":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/google_analytics--2025-12-09--3562288--mr-45.patch"
+        "fix: #3562288 PHP 8.4 - Implicit Nullable Parameters for Google Analytics": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/google_analytics--2025-12-09--3562288--mr-45.patch"
       },
       "drupal/layout_builder_component_attributes": {
-        "fix: #3498301 PHP 8.4 compatibility implicit nullable SectionStorageInterface parameter":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_builder_component_attributes--2025-12-08--3498301--mr-17.patch"
+        "fix: #3498301 PHP 8.4 compatibility implicit nullable SectionStorageInterface parameter": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_builder_component_attributes--2025-12-08--3498301--mr-17.patch"
       },
       "neilime/php-css-lint": {
-        "fix: #3498301 PHP 8.4 compatibility to fix PHP 8.4 deprecation warning for implicit nullable parameter in CssLint Linter":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/php-css-lint--2025-12-21--3498301.patch"
+        "fix: #3498301 PHP 8.4 compatibility to fix PHP 8.4 deprecation warning for implicit nullable parameter in CssLint Linter": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/php-css-lint--2025-12-21--3498301.patch"
       },
       "drupal/openapi": {
-        "fix: #3523346 PHP 8.4: Implicitly nullable parameter declarations deprecated":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi--2025-12-08--3523346--mr-22.patch"
+        "fix: #3523346 PHP 8.4: Implicitly nullable parameter declarations deprecated": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi--2025-12-08--3523346--mr-22.patch"
       },
       "drupal/schemata": {
-        "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemata--2025-12-09--3523349--mr-17.patch"
+        "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemata--2025-12-09--3523349--mr-17.patch"
       },
       "drupal/social_auth": {
-        "fix: #3564906 PHP 8.4 compatibility - Implicit nullable parameter deprecations in Social Auth module":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2026-01-21--3564906--mr-38.patch"
+        "fix: #3564906 PHP 8.4 compatibility - Implicit nullable parameter deprecations in Social Auth module": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2026-01-21--3564906--mr-38.patch"
       },
       "drupal/simple_oauth": {
-        "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
+        "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
       }
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Vardot\\VarbasePatches\\": "src/"
     }
   }
 }
