@@ -60,8 +60,27 @@ When `allowed-dependency-patches` is set to the default `["vardot/varbase-patche
 
 Drop specific patch URLs declared by a given dependency against a given target package. Restored from `cweagans/composer-patches` v1.
 
-- Type: nested object — `{ "<source-pkg>": { "<target-pkg>": ["<url>", ...] } }`
+- Type: nested object
 - Default: `{}`
+
+Two equivalent schemas are accepted. The v1-style description-keyed map (matches the format used in the upstream Varbase docs):
+
+```json
+{
+  "extra": {
+    "patches-ignore": {
+      "vardot/varbase-patches": {
+        "drupal/core": {
+          "Issue #2869592: Disabled update module shouldn't produce a status report warning":
+          "https://www.drupal.org/files/issues/2869592-remove-update-warning-7.patch"
+        }
+      }
+    }
+  }
+}
+```
+
+Or a flat array of URLs:
 
 ```json
 {
@@ -76,6 +95,8 @@ Drop specific patch URLs declared by a given dependency against a given target p
   }
 }
 ```
+
+Matching is done by URL string. The description (if you use the dict form) is informational only — `vardot/varbase-patches` and the consumer can disagree on the description and the URL still matches.
 
 ## Standard `cweagans/composer-patches` keys (still honored)
 
