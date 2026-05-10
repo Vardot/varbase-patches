@@ -24,6 +24,11 @@
     "composer-plugin-api": "^2.0",
     "cweagans/composer-patches": "~1.7.0 || ~2.0"
   },
+  "autoload": {
+    "psr-4": {
+      "Vardot\\VarbasePatches\\": "src/"
+    }
+  },
   "extra": {
     "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
     "plugin-modifies-downloads": true,
@@ -205,11 +210,6 @@
         "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
       }
-    }
-  },
-  "autoload": {
-    "psr-4": {
-      "Vardot\\VarbasePatches\\": "src/"
     }
   }
 }
