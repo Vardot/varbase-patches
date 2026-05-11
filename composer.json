@@ -22,7 +22,12 @@
   "require": {
     "php": ">=8.1",
     "composer-plugin-api": "^2.0",
-    "cweagans/composer-patches": "~1.7.0 || ~2.0"
+    "drupal/core": "~11.3.0",
+    "composer/installers": "~2",
+    "oomphinc/composer-installers-extender": "~2",
+    "cweagans/composer-patches": "~1 || ~2",
+    "vardot/entity-definition-update-manager": "~1",
+    "vardot/module-installer-factory": "~1"
   },
   "autoload": {
     "psr-4": {
