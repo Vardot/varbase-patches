@@ -34,8 +34,6 @@
   },
   "extra": {
     "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
-    "plugin-modifies-downloads": true,
-    "plugin-modifies-install-path": true,
     "patches": {
       "drupal/core": {
         "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal":
