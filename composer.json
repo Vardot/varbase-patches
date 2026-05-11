@@ -14,8 +14,6 @@
     }
   },
   "extra": {
-    "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
-    "plugin-modifies-downloads": true,
-    "plugin-modifies-install-path": true
+    "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin"
   }
 }
