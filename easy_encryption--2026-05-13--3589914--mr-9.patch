@@ -1,0 +1,13 @@
+diff --git a/modules/easy_encryption_admin/easy_encryption_admin.services.yml b/modules/easy_encryption_admin/easy_encryption_admin.services.yml
+index a3adaaf241220e179c450ad842e2ebef30f45861..34204eecfc1cd327ba74de3caff7514c5dc2faec 100644
+--- a/modules/easy_encryption_admin/easy_encryption_admin.services.yml
++++ b/modules/easy_encryption_admin/easy_encryption_admin.services.yml
+@@ -6,8 +6,6 @@ services:
+     class: Drupal\easy_encryption_admin\Access\PrivateKeyStorageMigratorAccessCheck
+     arguments:
+       - '@Drupal\easy_encryption\Sodium\PrivateKeyStorageMigrator'
+-    tags:
+-      - { name: access_check, applies_to: _custom_access }
+ 
+   logger.channel.easy_encryption_admin:
+     class: Drupal\Core\Logger\LoggerChannel
