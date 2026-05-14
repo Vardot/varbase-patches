@@ -130,7 +130,7 @@ Examples:
 
 ## Documentation
 
-- [Overview](docs/index.md)
+- [Overview](docs/README.md)
 - [Installation](docs/installation.md)
 - [Configuration](docs/configuration.md)
 - [Commands](docs/commands.md)
