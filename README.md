@@ -140,6 +140,15 @@ Examples:
 
 External: <https://docs.varbase.vardot.com/developers/varbase-patches>
 
+## AI assistant context
+
+This repository ships its own AI-assistant context so contributors get the same project conventions as core maintainers:
+
+- [`AGENTS.md`](AGENTS.md) — vendor-neutral entry point. Works with any AI coding assistant (Claude Code, Cursor, Codex, Aider, Continue.dev, Copilot Workspace, …).
+- [`CLAUDE.md`](CLAUDE.md) — Claude Code-specific entry point.
+- [`.claude/agents/varbase-patches.md`](.claude/agents/varbase-patches.md) — Claude sub-agent.
+- [`.claude/skills/composer-patches/SKILL.md`](.claude/skills/composer-patches/SKILL.md), [`.claude/skills/patch-management/SKILL.md`](.claude/skills/patch-management/SKILL.md) — Claude skills.
+
 ## Requirements
 
 - PHP `>=8.1`
