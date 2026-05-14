@@ -30,6 +30,17 @@ Drupal contrib modules sometimes ship `extra.patches` entries pointing at stale 
 - [Migration from Drush](migration-from-drush.md)
 - [Troubleshooting](troubleshooting.md)
 
+## AI assistant context (in-repo)
+
+This repository ships its own AI-assistant context so contributors get the same project conventions as core maintainers, without needing access to any internal tooling:
+
+- [`../AGENTS.md`](../AGENTS.md) — vendor-neutral entry point. Read this first regardless of which AI coding tool you use (Claude Code, Cursor, Codex, Aider, Continue.dev, Copilot Workspace, …). Captures the non-obvious constraints (late-activation rule, dual v1/v2 support, default-deny allowlist, filename convention).
+- [`../CLAUDE.md`](../CLAUDE.md) — Claude Code-specific entry point. Points at the sub-agent and skills below.
+- [`../.claude/agents/varbase-patches.md`](../.claude/agents/varbase-patches.md) — Claude sub-agent for installing, configuring, and troubleshooting `vardot/varbase-patches`.
+- [`../.claude/skills/composer-patches/SKILL.md`](../.claude/skills/composer-patches/SKILL.md) — `cweagans/composer-patches` v1 / v2 + this plugin's allowlist / wildcard ignore / `patches-ignore` extensions.
+- [`../.claude/skills/patch-management/SKILL.md`](../.claude/skills/patch-management/SKILL.md) — authoring, re-rolling, filename convention, and the Composer-native cleanup commands (`var-ccup` / `var-ccupf`).
+
+
 ## Patch filename convention
 
 ```
