@@ -248,6 +248,10 @@
       "drupal/easy_encryption": {
         "fix: #3589914 Remove global _custom_access registration from Easy Encryption admin access checker":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/easy_encryption--2026-05-13--3589914--mr-9.patch"
+      },
+      "drupal/gin": {
+        "fix: #3590827 Sticky form actions appear on node revision revert/delete confirm forms (incomplete exclusion pattern)":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2026-05-19--3590827--mp-787.patch"
       }
     }
   }
