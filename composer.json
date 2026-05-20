@@ -212,6 +212,10 @@
       "drupal/simple_oauth": {
         "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
+      },
+      "drupal/recaptcha": {
+        "fix: #3588269 Make Drupal8Post::submit() compatible with parent":
+        "https://git.drupalcode.org/project/recaptcha/-/commit/68b0f86d1e930ed78f795a97a2fc207be35b3260.diff"
       }
     }
   }
