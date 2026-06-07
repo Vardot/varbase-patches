@@ -1,0 +1,13 @@
+diff --git a/src/Plugin/Canvas/ComponentSource/JsonSchemaPropsComponentSourceBase.php b/src/Plugin/Canvas/ComponentSource/JsonSchemaPropsComponentSourceBase.php
+index 601aedae8872005fd60565853ddf31d301593faf..1d9862ea277ab4976470116c66b8f9fa85ba0ed2 100644
+--- a/src/Plugin/Canvas/ComponentSource/JsonSchemaPropsComponentSourceBase.php
++++ b/src/Plugin/Canvas/ComponentSource/JsonSchemaPropsComponentSourceBase.php
+@@ -1497,7 +1497,7 @@ abstract class JsonSchemaPropsComponentSourceBase extends ComponentSourceBase im
+    * @return array<string, mixed>
+    */
+   protected static function stripNonStandardJsonSchemaKeys(array $schema): array {
+-    $keys_to_remove = ['meta:enum', 'x-translation-context'];
++    $keys_to_remove = ['meta:enum', 'x-translation-context', 'id'];
+     $schema = array_diff_key($schema, array_flip($keys_to_remove));
+     foreach ($schema as $key => $value) {
+       if (\is_array($value)) {
