@@ -1,0 +1,144 @@
+diff --git a/config/schema/inline_entity_form.schema.yml b/config/schema/inline_entity_form.schema.yml
+index 2d7a8f2268497c4897672d4c0895e7ef74f0b279..d835a83306640a8d069d7739e07d873fe9c83009 100644
+--- a/config/schema/inline_entity_form.schema.yml
++++ b/config/schema/inline_entity_form.schema.yml
+@@ -22,6 +22,9 @@ field.widget.settings.inline_entity_form_simple:
+     allow_existing:
+       type: boolean
+       label: "Allow existing"
++    allow_edit:
++      type: boolean
++      label: "Allow editing of existing"
+     match_operator:
+       type: string
+       label: "Match operator"
+@@ -60,6 +63,9 @@ field.widget.settings.inline_entity_form_complex:
+     allow_existing:
+       type: boolean
+       label: "Allow existing"
++    allow_edit:
++      type: boolean
++      label: "Allow editing of existing"
+     match_operator:
+       type: string
+       label: "Match operator"
+diff --git a/src/Plugin/Field/FieldWidget/InlineEntityFormComplex.php b/src/Plugin/Field/FieldWidget/InlineEntityFormComplex.php
+index 6065d393e35a40ad6b68140bec869878722953a6..d6a14765675f7875d8907acd4e2c5c62b242749a 100644
+--- a/src/Plugin/Field/FieldWidget/InlineEntityFormComplex.php
++++ b/src/Plugin/Field/FieldWidget/InlineEntityFormComplex.php
+@@ -123,6 +123,7 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+       'removed_reference' => self::REMOVED_OPTIONAL,
+       'match_operator' => 'CONTAINS',
+       'allow_duplicate' => FALSE,
++      'allow_edit' => TRUE,
+     ];
+ 
+     return $defaults;
+@@ -163,6 +164,11 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+       '#title' => $this->t('Allow users to duplicate @label.', ['@label' => $labels['plural']]),
+       '#default_value' => $this->getSetting('allow_duplicate'),
+     ];
++    $element['allow_edit'] = [
++      '#type' => 'checkbox',
++      '#title' => $this->t('Allow users to edit existing @label.', ['@label' => $labels['plural']]),
++      '#default_value' => $this->getSetting('allow_edit'),
++    ];
+ 
+     $description = $this->t('Select whether a @child should be deleted altogether if removed as a reference here.<br />
+     <em>Delete always</em> is recommended whenever each @child is exclusively managed within a single @parent without creating new revisions.<br />
+@@ -213,6 +219,13 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+       $summary[] = $this->t('@label can not be duplicated.', ['@label' => $labels['plural']]);
+     }
+ 
++    if ($this->getSetting('allow_edit')) {
++      $summary[] = $this->t('Existing @label can be edited inline.', ['@label' => $labels['plural']]);
++    }
++    else {
++      $summary[] = $this->t('Existing @label can not be edited inline.', ['@label' => $labels['plural']]);
++    }
++
+     switch ($this->getSetting('removed_reference')) {
+       case self::REMOVED_KEEP:
+         $summary[] = $this->t('Always keep unreferenced @label.', ['@label' => $labels['plural']]);
+@@ -450,8 +463,7 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+         ];
+ 
+         // Make sure entity_access is not checked for unsaved entities.
+-        $entity_id = $entity->id();
+-        if (empty($entity_id) || $entity->access('update')) {
++        if ($entity->isNew() || ($this->getSetting('allow_edit') && $entity->access('update'))) {
+           $row['actions']['ief_entity_edit'] = [
+             '#type' => 'submit',
+             '#value' => $this->t('Edit'),
+@@ -496,7 +508,7 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+         $reference_is_not_required = !$element['#required'] || $entities_count > 1 || $can_replace_last_reference;
+ 
+         // Unsaved entities may always be removed.
+-        $may_remove = empty($entity_id) || ($may_remove_existing && $reference_is_not_required);
++        $may_remove = $entity->isNew() || ($may_remove_existing && $reference_is_not_required);
+ 
+         // If an entity may be removed, show the "Remove" button.
+         if ($may_remove) {
+@@ -910,7 +922,6 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+   protected function buildRemoveForm(array &$form) {
+     /** @var \Drupal\Core\Entity\EntityInterface $entity */
+     $entity = $form['#entity'];
+-    $entity_id = $entity->id();
+     $entity_label = $this->inlineFormHandler->getEntityLabel($entity);
+     $labels = $this->getEntityTypeLabels();
+ 
+@@ -926,7 +937,7 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+       '#markup' => $message,
+     ];
+ 
+-    if (!empty($entity_id) && $this->getSetting('removed_reference') === self::REMOVED_OPTIONAL && $entity->access('delete')) {
++    if (!$entity->isNew() && $this->getSetting('removed_reference') === self::REMOVED_OPTIONAL && $entity->access('delete')) {
+       $form['delete'] = [
+         '#type' => 'checkbox',
+         '#title' => $this->t('Delete this @type_singular from the system.', ['@type_singular' => $labels['singular']]),
+@@ -1010,7 +1021,6 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+ 
+     /** @var \Drupal\Core\Entity\EntityInterface $entity */
+     $entity = $element['entities'][$delta]['form']['#entity'];
+-    $entity_id = $entity->id();
+ 
+     $form_values = NestedArray::getValue($form_state->getValues(), $element['entities'][$delta]['form']['#parents']);
+     $form_state->setRebuild();
+@@ -1024,7 +1034,7 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+     // If the entity has been saved, delete it if either the widget is set to
+     // always delete, or the widget is set to let the user decide and the user
+     // has decided to delete.
+-    if ($entity_id) {
++    if (!$entity->isNew()) {
+       $removed_reference = $remove_button['#removed_reference'];
+       if (
+         ($removed_reference === self::REMOVED_OPTIONAL && !empty($form_values[self::REMOVED_DELETE]))
+diff --git a/tests/src/FunctionalJavascript/ComplexWidgetTest.php b/tests/src/FunctionalJavascript/ComplexWidgetTest.php
+index b47ac0679c9f23f19c6f8a49c1b8959f5a048df0..c20834cd219ca7454f85a108070d0c186f1b384e 100644
+--- a/tests/src/FunctionalJavascript/ComplexWidgetTest.php
++++ b/tests/src/FunctionalJavascript/ComplexWidgetTest.php
+@@ -112,6 +112,9 @@ class ComplexWidgetTest extends InlineEntityFormTestBase {
+     // Allow addition of existing nodes.
+     $this->updateSetting('allow_existing', TRUE);
+ 
++    // Allow editing of existing nodes.
++    $this->updateSetting('allow_edit', FALSE);
++
+     // Asserts 'Add new node' form elements.
+     $this->drupalGet($this->formContentAddUrl);
+     $multi_fieldset = $assert_session
+@@ -359,7 +362,13 @@ class ComplexWidgetTest extends InlineEntityFormTestBase {
+ 
+     $parent_node = $this->drupalGetNodeByTitle('Some title');
+ 
+-    // Edit the second entity.
++    // Unable to edit second entity, feature disabled.
++    $this->drupalGet('node/' . $parent_node->id() . '/edit');
++    $assert_session->elementNotExists('xpath', '(//input[@value="Edit"])[2]');
++
++    // Edit the second entity once edit is enabled.
++    $this->updateSetting('allow_edit', TRUE);
++
+     $this->drupalGet('node/' . $parent_node->id() . '/edit');
+     $assert_session->elementExists('xpath', '(//input[@value="Edit"])[2]')->press();
+     $this->assertNotEmpty($assert_session->waitForElement('xpath', $inner_title_field_xpath));
