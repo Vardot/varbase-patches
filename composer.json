@@ -225,7 +225,7 @@
       },
       "drupal/canvas": {
         "feat: #3567225 Allow per-node override of Content Template via checkbox in node selector":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-05-07--3567225--mr-948.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-06-07--3567225--mr-948.patch",
         "feat: #3584713 Add Allow Edit Global Regions permission to restrict editing of global page regions":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-21--3584713--mr-911.patch",
         "fix: #3584883 Undefined array key placeholder warning in Component::getSlotDefinitions() when versioned_properties lacks last_active_version key":
