@@ -93,7 +93,7 @@
       },
       "drupal/inline_entity_form": {
         "Issue #2913571: Add a setting to enable/disable inline editing for existing entities":
-        "https://www.drupal.org/files/issues/2024-12-27/inline_entity_form--2024-12-27--2913571--mr-127.patch",
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/inline_entity_form--2026-06-07--2913571--mr-127.patch",
         "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated":
         "https://www.drupal.org/files/issues/2025-01-04/inline_entity_form--2025-01-04--mr-126.patch"
       },
