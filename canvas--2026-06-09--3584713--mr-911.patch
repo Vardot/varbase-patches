@@ -1,0 +1,340 @@
+diff --git a/canvas.module b/canvas.module
+index 601390f4b343c49baed45f69a5d25cd5a87364c3..7434858af138e1e55cc00319a04e22417be749c9 100644
+--- a/canvas.module
++++ b/canvas.module
+@@ -13,9 +13,12 @@ ini_set('assert.active', 1);
+ use Drupal\canvas\Entity\Component;
+ use Drupal\canvas\Plugin\Canvas\ComponentSource\JsonSchemaPropsComponentSourceBase;
+ use Drupal\canvas\PropSource\FieldStorageDefinition;
++use Drupal\Core\Access\AccessResult;
++use Drupal\Core\Entity\EntityInterface;
+ use Drupal\Core\Entity\FieldableEntityInterface;
+ use Drupal\Core\Field\FieldStorageDefinitionInterface;
+ use Drupal\Core\Render\Markup;
++use Drupal\Core\Session\AccountInterface;
+ 
+ /**
+  * Provides allowed values for a 'list_*' field used in a StaticPropSource.
+@@ -102,3 +105,29 @@ function canvas_preprocess_html(array &$variables): void {
+     $variables['attributes']['class'][] = 'canvas-page';
+   }
+ }
++
++/**
++ * Implements hook_entity_access().
++ *
++ * Restricts editing of global Canvas page regions (any page_region other than
++ * the "content" region) to users with the "edit canvas global regions"
++ * permission.
++ */
++function canvas_entity_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResult {
++  if ($entity->getEntityTypeId() !== 'page_region') {
++    return AccessResult::neutral();
++  }
++  $id = (string) ($entity->id() ?? '');
++  [, $region] = explode('.', $id, 2) + [NULL, NULL];
++  if (!$region || $region === 'content') {
++    return AccessResult::neutral();
++  }
++  if (!in_array($operation, ['update', 'edit', 'delete'], TRUE)) {
++    return AccessResult::neutral();
++  }
++  if ($account->hasPermission('edit canvas global regions')) {
++    return AccessResult::neutral()->cachePerPermissions();
++  }
++  return AccessResult::forbidden('Editing global Canvas regions requires the "edit canvas global regions" permission.')
++    ->cachePerPermissions();
++}
+diff --git a/canvas.permissions.yml b/canvas.permissions.yml
+index 12c0ac4528a198491538754e20d855c66a7afec6..e33b1fa3f00f6d1a0a7e281d91e0170216a2f2b4 100644
+--- a/canvas.permissions.yml
++++ b/canvas.permissions.yml
+@@ -46,3 +46,8 @@ delete canvas_page:
+ publish auto-saves:
+   title: 'Publish Drupal Canvas Content'
+   description: 'Update entities with auto-saved changes in Drupal Canvas (requires "update" access for those entities).'
++
++edit canvas global regions:
++  title: 'Allow Edit Global Regions'
++  description: 'Edit global Drupal Canvas page regions (such as the header and footer) of the default active theme.'
++  restrict access: true
+diff --git a/tests/src/Functional/CanvasConfigEntityHttpApiTest.php b/tests/src/Functional/CanvasConfigEntityHttpApiTest.php
+index 0be65570a0edce428e453ef795b88a019cf71bad..749d8bb4e7138393fcba4dfe3ef1f501463781df 100644
+--- a/tests/src/Functional/CanvasConfigEntityHttpApiTest.php
++++ b/tests/src/Functional/CanvasConfigEntityHttpApiTest.php
+@@ -259,6 +259,7 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
+       JavaScriptComponent::ADMIN_PERMISSION,
+       Pattern::ADMIN_PERMISSION,
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+       Folder::ADMIN_PERMISSION,
+       ContentTemplate::ADMIN_PERMISSION,
+     ]);
+diff --git a/tests/src/Kernel/ApiAutoSaveControllerTest.php b/tests/src/Kernel/ApiAutoSaveControllerTest.php
+index fd902da29b5e0ccd9ccecb6c8443ab41b4ab5213..7971db8cba317b3439c6052c24d5c97912985c6d 100644
+--- a/tests/src/Kernel/ApiAutoSaveControllerTest.php
++++ b/tests/src/Kernel/ApiAutoSaveControllerTest.php
+@@ -98,6 +98,7 @@ final class ApiAutoSaveControllerTest extends KernelTestBase {
+       Page::EDIT_PERMISSION,
+       // We need access to page regions even for seeing there are changes.
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+     ];
+     $anonAccountContent = Node::create([
+       'type' => 'article',
+@@ -501,6 +502,7 @@ final class ApiAutoSaveControllerTest extends KernelTestBase {
+     $autoSave = \Drupal::service(AutoSaveManager::class);
+     $permissions = [
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+       // @todo 'bypass node access' is a very powerful permission and could have
+       //   side effects. Determine a way to give the user just the access they
+       //   need in https://drupal.org/i/3535354.
+@@ -1282,6 +1284,7 @@ final class ApiAutoSaveControllerTest extends KernelTestBase {
+   public function testEnforceGlobalAssetPublish(bool $global_asset_library_auto_save_exists, array $auto_save_keys_to_publish, int $expected_status_code, ?string $expected_message = NULL): void {
+     $this->setUpCurrentUser(permissions: [
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+       'edit any article content',
+       AssetLibrary::ADMIN_PERMISSION,
+       JavaScriptComponent::ADMIN_PERMISSION,
+diff --git a/tests/src/Kernel/ApiLayoutControllerGetTest.php b/tests/src/Kernel/ApiLayoutControllerGetTest.php
+index f31724cebccdd0b0508e08639202a244376ca14d..469237f20ef9cd6ae6530ec66a50cb10e00f8044 100644
+--- a/tests/src/Kernel/ApiLayoutControllerGetTest.php
++++ b/tests/src/Kernel/ApiLayoutControllerGetTest.php
+@@ -182,7 +182,7 @@ class ApiLayoutControllerGetTest extends ApiLayoutControllerTestBase {
+     // "content" region unless it has permissions to edit the global regions.
+     $this->assertRegions(1, $entity);
+ 
+-    $this->setUpCurrentUser([], [$admin_permission, PageRegion::ADMIN_PERMISSION]);
++    $this->setUpCurrentUser([], [$admin_permission, PageRegion::ADMIN_PERMISSION, 'edit canvas global regions']);
+ 
+     // … and the corresponding client-side representation contains all regions
+     // plus one more (the "content" region) once it has the required permission.
+@@ -369,7 +369,7 @@ class ApiLayoutControllerGetTest extends ApiLayoutControllerTestBase {
+     self::assertInstanceOf(ContentEntityInterface::class, $this->previewEntity);
+     $entity = ContentTemplate::load('node.article.teaser');
+     self::assertInstanceOf(ContentTemplate::class, $entity);
+-    $this->setUpCurrentUser([], [ContentTemplate::ADMIN_PERMISSION, PageRegion::ADMIN_PERMISSION]);
++    $this->setUpCurrentUser([], [ContentTemplate::ADMIN_PERMISSION, PageRegion::ADMIN_PERMISSION, 'edit canvas global regions']);
+     $this->enableGlobalRegions();
+ 
+     $url = $this->getLayoutUrl($entity);
+diff --git a/tests/src/Kernel/ApiLayoutControllerPatchTest.php b/tests/src/Kernel/ApiLayoutControllerPatchTest.php
+index cf828009f99f51ef238a3ceec3b89941e8dc1585..d4f46622973f4cf65c3df5e581a9456c817a780f 100644
+--- a/tests/src/Kernel/ApiLayoutControllerPatchTest.php
++++ b/tests/src/Kernel/ApiLayoutControllerPatchTest.php
+@@ -58,6 +58,7 @@ final class ApiLayoutControllerPatchTest extends ApiLayoutControllerTestBase {
+     $this->setUpCurrentUser([], [
+       'administer url aliases',
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+       'edit any article content',
+     ]);
+   }
+@@ -299,6 +300,7 @@ final class ApiLayoutControllerPatchTest extends ApiLayoutControllerTestBase {
+     $this->setUpCurrentUser([], [
+       'administer url aliases',
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+       self::getAdminPermission($entity),
+     ]);
+     $autoSave = $this->container->get(AutoSaveManager::class);
+diff --git a/tests/src/Kernel/ApiLayoutControllerPostTest.php b/tests/src/Kernel/ApiLayoutControllerPostTest.php
+index 67873e56e837c3e62e18a361a021fee8e0b5b210..08ac85340b34b37cba04a4b6303808222c5c3e17 100644
+--- a/tests/src/Kernel/ApiLayoutControllerPostTest.php
++++ b/tests/src/Kernel/ApiLayoutControllerPostTest.php
+@@ -57,6 +57,7 @@ final class ApiLayoutControllerPostTest extends ApiLayoutControllerTestBase {
+     $this->setUpCurrentUser([], [
+       'administer url aliases',
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+       'edit any article content',
+     ]);
+   }
+@@ -327,6 +328,7 @@ final class ApiLayoutControllerPostTest extends ApiLayoutControllerTestBase {
+       [],
+       [
+         PageRegion::ADMIN_PERMISSION,
++        'edit canvas global regions',
+         self::getAdminPermission($entity),
+       ]
+     );
+@@ -685,6 +687,7 @@ final class ApiLayoutControllerPostTest extends ApiLayoutControllerTestBase {
+       'administer nodes',
+       'administer url aliases',
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+       'edit any article content',
+     ]);
+     $content = $this->parentRequest(Request::create('/canvas/api/v0/layout/node/1'))->getContent();
+@@ -718,6 +721,7 @@ final class ApiLayoutControllerPostTest extends ApiLayoutControllerTestBase {
+       'administer nodes',
+       'administer url aliases',
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+       'edit any article content',
+     ]);
+     $node = Node::load(1);
+@@ -749,6 +753,7 @@ final class ApiLayoutControllerPostTest extends ApiLayoutControllerTestBase {
+     $this->setUpCurrentUser([], [
+       'administer url aliases',
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+       'edit any article content',
+     ]);
+     $content = $this->parentRequest(Request::create('/canvas/api/v0/layout/node/1'))->getContent();
+diff --git a/tests/src/Kernel/AutoSave/AutoSaveConflictPageRegionLayoutTest.php b/tests/src/Kernel/AutoSave/AutoSaveConflictPageRegionLayoutTest.php
+index 84d64ac0e0dc5987076b134b8a50be8311e58371..6befb9f2bbcb7a59ea52d263ef1930d666e23fc8 100644
+--- a/tests/src/Kernel/AutoSave/AutoSaveConflictPageRegionLayoutTest.php
++++ b/tests/src/Kernel/AutoSave/AutoSaveConflictPageRegionLayoutTest.php
+@@ -50,6 +50,7 @@ final class AutoSaveConflictPageRegionLayoutTest extends ApiLayoutControllerTest
+       Page::EDIT_PERMISSION,
+       AutoSaveManager::PUBLISH_PERMISSION,
+       PageRegion::ADMIN_PERMISSION,
++      'edit canvas global regions',
+     ];
+   }
+ 
+@@ -94,7 +95,7 @@ final class AutoSaveConflictPageRegionLayoutTest extends ApiLayoutControllerTest
+     // If we try to post back the same `autoSaves` including the regions
+     // when the user does not have access to 'update' regions, we should get
+     // a conflict.
+-    $permissions = array_diff(self::getPermissions(), [PageRegion::ADMIN_PERMISSION]);
++    $permissions = array_diff(self::getPermissions(), [PageRegion::ADMIN_PERMISSION, 'edit canvas global regions']);
+     $this->setUpCurrentUser(permissions: $permissions);
+     $this->assertRequestAutoSaveConflict($this->getUpdateAutoSaveRequest($getJson));
+ 
+diff --git a/tests/src/Kernel/Entity/PageRegionGlobalEditAccessTest.php b/tests/src/Kernel/Entity/PageRegionGlobalEditAccessTest.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..0132b7f737c2c7e21a8b5b52282fb9495ce8b3ef
+--- /dev/null
++++ b/tests/src/Kernel/Entity/PageRegionGlobalEditAccessTest.php
+@@ -0,0 +1,103 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\Tests\canvas\Kernel\Entity;
++
++use Drupal\canvas\Entity\Page;
++use Drupal\canvas\Entity\PageRegion;
++use Drupal\Core\Session\AccountInterface;
++use Drupal\Tests\canvas\Kernel\CanvasKernelTestBase;
++use PHPUnit\Framework\Attributes\DataProvider;
++use PHPUnit\Framework\Attributes\Group;
++use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
++
++/**
++ * Tests the "edit canvas global regions" permission via hook_entity_access().
++ *
++ * @see canvas_entity_access()
++ */
++#[RunTestsInSeparateProcesses]
++#[Group('canvas')]
++final class PageRegionGlobalEditAccessTest extends CanvasKernelTestBase {
++
++  private const EDIT_GLOBAL_REGIONS_PERMISSION = 'edit canvas global regions';
++
++  /**
++   * {@inheritdoc}
++   */
++  protected function setUp(): void {
++    parent::setUp();
++    $regions = PageRegion::createFromBlockLayout('stark');
++    foreach ($regions as $region) {
++      $region->save();
++    }
++  }
++
++  /**
++   * @param string $region_id
++   *   The page region config ID (e.g. "stark.sidebar_first", "stark.content").
++   * @param string $operation
++   *   The operation to check.
++   * @param array $permissions
++   *   Permissions granted to the account.
++   * @param bool $expected_forbidden
++   *   Whether canvas_entity_access should return a forbidden result.
++   */
++  #[DataProvider('accessProvider')]
++  public function testGlobalRegionAccess(string $region_id, string $operation, array $permissions, bool $expected_forbidden): void {
++    [$theme, $region_name] = explode('.', $region_id, 2);
++    // A "content" PageRegion can never be saved (see PageRegion::preSave()).
++    $region = PageRegion::load($region_id) ?? PageRegion::create([
++      'id' => $region_id,
++      'theme' => $theme,
++      'region' => $region_name,
++    ]);
++    self::assertInstanceOf(PageRegion::class, $region);
++
++    $account = $this->createMock(AccountInterface::class);
++    $account->method('hasPermission')
++      ->willReturnCallback(fn ($permission) => \in_array($permission, $permissions, TRUE));
++
++    $result = canvas_entity_access($region, $operation, $account);
++    self::assertSame($expected_forbidden, $result->isForbidden());
++  }
++
++  public static function accessProvider(): array {
++    return [
++      // Global (non-content) region without the permission: forbidden on write.
++      'sidebar_first update: no permission' => ['stark.sidebar_first', 'update', [], TRUE],
++      'sidebar_first edit: no permission' => ['stark.sidebar_first', 'edit', [], TRUE],
++      'sidebar_first delete: no permission' => ['stark.sidebar_first', 'delete', [], TRUE],
++
++      // Global region with permission: not forbidden.
++      'sidebar_first update: with permission' => ['stark.sidebar_first', 'update', [self::EDIT_GLOBAL_REGIONS_PERMISSION], FALSE],
++      'sidebar_first edit: with permission' => ['stark.sidebar_first', 'edit', [self::EDIT_GLOBAL_REGIONS_PERMISSION], FALSE],
++      'sidebar_first delete: with permission' => ['stark.sidebar_first', 'delete', [self::EDIT_GLOBAL_REGIONS_PERMISSION], FALSE],
++
++      // View operations are unaffected.
++      'sidebar_first view: no permission' => ['stark.sidebar_first', 'view', [], FALSE],
++
++      // Content region: hook is always neutral, regardless of permission.
++      'content update: no permission' => ['stark.content', 'update', [], FALSE],
++      'content delete: no permission' => ['stark.content', 'delete', [], FALSE],
++      'content edit: with permission' => ['stark.content', 'edit', [self::EDIT_GLOBAL_REGIONS_PERMISSION], FALSE],
++    ];
++  }
++
++  /**
++   * Non page_region entities are unaffected by the hook.
++   */
++  public function testNonPageRegionEntityIsNeutral(): void {
++    $this->installEntitySchema('canvas_page');
++    $page = Page::create(['title' => 'Test']);
++    $page->save();
++
++    $account = $this->createMock(AccountInterface::class);
++    $account->method('hasPermission')->willReturn(FALSE);
++
++    $result = canvas_entity_access($page, 'update', $account);
++    self::assertTrue($result->isNeutral());
++  }
++
++}
+diff --git a/tests/src/Playwright/setup.ts b/tests/src/Playwright/setup.ts
+index 167959733abbbbfdd73a53a49984a47e16e90be7..3d32ea96a8de3d19d3f47929068fa976d5b2d1db 100644
+--- a/tests/src/Playwright/setup.ts
++++ b/tests/src/Playwright/setup.ts
+@@ -29,6 +29,7 @@ export async function setupSite({
+         'administer folders',
+         'administer patterns',
+         'administer page template',
++        'edit canvas global regions',
+         'create canvas_page',
+         'create media',
+         'edit canvas_page',
+diff --git a/tests/src/TestSite/CanvasTestSetup.php b/tests/src/TestSite/CanvasTestSetup.php
+index b7d3c9e14d2f24fd58ddedb1c5eeb839b8dce7eb..547573d9ac7a7737e8bb6d1b6c74132c11974967 100644
+--- a/tests/src/TestSite/CanvasTestSetup.php
++++ b/tests/src/TestSite/CanvasTestSetup.php
+@@ -566,6 +566,7 @@ class CanvasTestSetup implements TestSetupInterface {
+         'post comments',
+         'administer permissions',
+         PageRegion::ADMIN_PERMISSION,
++        'edit canvas global regions',
+         'administer site configuration',
+       ],
+     ]);
