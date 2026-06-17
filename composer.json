@@ -231,9 +231,7 @@
         "fix: #3584883 Undefined array key placeholder warning in Component::getSlotDefinitions() when versioned_properties lacks last_active_version key":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-15--3584883--mr-916.patch",
         "feat: #3585221 Fall back to active version when stored component version is not available":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-21--3585221--mr-927.patch",
-        "fix: #3563139 Strip JSON Schema draft-04 id keyword from prop schemas to prevent Ajv strict-mode crash on blur":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-06-07--3563139--mr-1046.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-21--3585221--mr-927.patch"
       },
       "drupal/content_lock": {
         "feat: #3544019 Form Actions Stay Cached and Disabled After Breaking Lock in Gin Admin Theme":
