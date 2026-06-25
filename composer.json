@@ -97,16 +97,6 @@
         "Issue #3531672:  Drupal 10.5/11.2 compatability (tooltip broken, cannot edit embedded entities)":
         "https://www.drupal.org/files/issues/2025-06-30/entity_embed--2025-06-30--3531672--mr-62.patch"
       },
-      "drupal/layout_library": {
-        "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
-        "Issue #3273160: Support inline blocks in layout":
-        "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch",
-        "Issue #3561874 : Add missing isSupported method to Library class for SupportAwareSectionStorageInterface compatibility with Drupal ~11.3.0":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3561874--mr-21.patch",
-        "fix: #3562479 PHP 8.4 - Implicit nullable SectionStorageInterface parameter":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2025-12-10--3562479--mr-22.patch"
-      },
       "drupal/paragraphs": {
         "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]":
         "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
