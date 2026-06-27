@@ -9,12 +9,12 @@ use cweagans\Composer\Resolver\ResolverBase;
 /**
  * Replacement Dependencies resolver with:
  *  - Wildcard support in ignore-dependency-patches (fnmatch).
- *  - Allowlist via allowed-dependency-patches (default: vardot/varbase-patches).
+ *  - Allowlist via allowed-dependency-patches (default: vardot/varbase-patches + vardot/drupal-core-patches).
  *  - patches-ignore semantics from composer-patches v1.
  *
  * Config (root composer.json):
  *   extra.composer-patches.ignore-dependency-patches: ["drupal/*", ...]
- *   extra.composer-patches.allowed-dependency-patches: ["vardot/varbase-patches"]
+ *   extra.composer-patches.allowed-dependency-patches: ["vardot/varbase-patches", "vardot/drupal-core-patches"]
  *   extra.patches-ignore: { "<source-pkg>": { "<target-pkg>": ["<url>", ...] } }
  */
 class FilteredDependencies extends ResolverBase
@@ -33,7 +33,7 @@ class FilteredDependencies extends ResolverBase
         $rootExtra = $this->composer->getPackage()->getExtra();
         $cp = $rootExtra['composer-patches'] ?? [];
         $ignored = (array) ($cp['ignore-dependency-patches'] ?? []);
-        $allowed = (array) ($cp['allowed-dependency-patches'] ?? ['vardot/varbase-patches']);
+        $allowed = (array) ($cp['allowed-dependency-patches'] ?? \Vardot\VarbasePatches\Plugin\VarbasePatchesPlugin::DEFAULT_ALLOWED_DEPENDENCY_PATCHES);
         $patchesIgnore = (array) ($rootExtra['patches-ignore'] ?? []);
 
         $lockdata = $locker->getLockData();
