@@ -22,7 +22,7 @@
   "require": {
     "php": ">=8.1",
     "composer-plugin-api": "^2.0",
-    "drupal/core": "~11.3.0",
+    "vardot/drupal-core-patches": "~11 || ~12",
     "composer/installers": "~2",
     "oomphinc/composer-installers-extender": "~2",
     "cweagans/composer-patches": "~1 || ~2",
@@ -37,42 +37,6 @@
   "extra": {
     "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
     "patches": {
-      "drupal/core": {
-        "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal":
-        "https://www.drupal.org/files/issues/2018-12-10/core--getDerivatives-Invalid-argument-foreach--2893892-11-d8.patch",
-        "Issue #3101231: Fix multilingual site's layout edit context issue with TypeError: Argument 1 passed to UrlHelper::buildQuery() must be of the type array, null given":
-        "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
-        "Issue #2741877: Nested modals don't work: opening a modal from a modal closes the original":
-        "https://www.drupal.org/files/issues/2025-06-24/drupal-core--2025-06-24--2741877--mr-8105.patch",
-        "Issue #3272720: Fix PHP8.1+ Deprecated function: hash(): Passing null to parameter #2 ($data) of type string is deprecated in generateFieldTableName":
-        "https://www.drupal.org/files/issues/2022-07-21/3272720-6.patch",
-        "Issue #3302838: Fix PHP8.1+ Querying with NULL values results in warning mb_strtolower(): Passing null to parameter is deprecated":
-        "https://www.drupal.org/files/issues/2023-07-05/3302838-38.patch",
-        "Issue #3049332: Fix Log error + visual warning for missing or broken block":
-        "https://www.drupal.org/files/issues/2025-07-09/drupal-core--2025-07-09--3049332--mr-12460.patch",
-        "Issue #3080606: Reorder Layout Builder sections":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-12-20--3080606--mr-4075.patch",
-        "Issue #3456176: 11.2 upgrade now missing status-message theme suggestions":
-        "https://www.drupal.org/files/issues/2025-06-20/3456176-138-missing-status-messages-theme-suggestions.patch",
-        "Issue #3457431: Saving text format generates validation warnings":
-        "https://www.drupal.org/files/issues/2024-07-01/drupal-core--2024-07-01--3457431--mr-8608.patch",
-        "Issue #3459881: Fix TypeError: implode(): Argument #1 ($array) must be of type array, string given in implode() (line 537 of core/lib/Drupal/Core/Field/WidgetBase.php)":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-02-17--3459881--mr-8702.patch",
-        "Issue #3431330: Add Action Method to Add a button plugin and settings into the Active toolbar in editor":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-02-18--3431330--drupal-11-1.patch",
-        "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
-        "fix: #3352384 Add Exception for TypeError Argument must be String in Drupal Component Utility Html escape{}":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-21--3352384--mr-14437.patch",
-        "Issue #3415961: [drupalMedia] Using the Insert Media button causes the window to scroll to the bottom of the page":
-        "https://www.drupal.org/files/issues/2025-06-10/drupal-3415961-19.patch",
-        "Issue #3543210: Quick Edit Save Via Contextual Links Redirects to 404 Page":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-20--3543210--mr-13088.patch",
-        "Issue #3538500: Fix block plugin not found warnings during Drush installation of Varbase":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-08-30--3538500--drupal11x02x.patch",
-        "Issue 3544608: Fix Media Library: Selected media lost after pager navigation prevents insertion":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-09-03--mr-13141.patch"
-      },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
         "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
