@@ -22,7 +22,7 @@
   "require": {
     "php": ">=8.1",
     "composer-plugin-api": "^2.0",
-    "drupal/core": "~10.6.0",
+    "vardot/drupal-core-patches": "~10 || ~11 || ~12",
     "composer/installers": "~2",
     "oomphinc/composer-installers-extender": "~2",
     "cweagans/composer-patches": "~1 || ~2",
@@ -37,40 +37,6 @@
   "extra": {
     "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
     "patches": {
-      "drupal/core": {
-        "Issue #2893892: Fixed Warning Invalid argument supplied for foreach() in Drupal":
-        "https://www.drupal.org/files/issues/2018-12-10/core--getDerivatives-Invalid-argument-foreach--2893892-11-d8.patch",
-        "Issue #3101231: Fix multilingual site's layout edit context issue with TypeError: Argument 1 passed to UrlHelper::buildQuery() must be of the type array, null given":
-        "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
-        "Issue #2741877: Nested modals don't work: opening a modal from a modal closes the original":
-        "https://www.drupal.org/files/issues/2025-02-16/drupal-core--2025-02-16--2741877--mr-11137.patch",
-        "Issue #3272720: Fix PHP8.1+ Deprecated function: hash(): Passing null to parameter #2 ($data) of type string is deprecated in generateFieldTableName":
-        "https://www.drupal.org/files/issues/2022-07-21/3272720-6.patch",
-        "Issue #3326684: Fix PHP8.1+ Deprecated function: mb_strtolower(): Passing null to parameter #1 ($string) of type string is deprecated":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-21--3326684--10-6-x.patch",
-        "Issue #3302838: Fix PHP8.1+ Querying with NULL values results in warning mb_strtolower(): Passing null to parameter is deprecated":
-        "https://www.drupal.org/files/issues/2023-07-05/3302838-38.patch",
-        "Issue #3049332: Fix PHP message: Error: Call to a member function getEntityTypeId() on null (Layout Builder)":
-        "https://www.drupal.org/files/issues/2024-01-09/drupal-core--2024-01-09--3049332-85.patch",
-        "Issue #3046152: Video media needs playsinline & muted options":
-        "https://www.drupal.org/files/issues/2024-06-20/drupal-core--2024-06-20--10-3-x--3046152-54--mr-8471.patch",
-        "feat: #3080606 add Reorder Layout Builder sections":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2026-01-21--3080606--10-6-x.patch",
-        "Issue #3456176: 10.3 upgrade now missing status-message theme suggestions":
-        "https://www.drupal.org/files/issues/2024-06-28/3456176-45-missing-status-messages-theme-suggestions.patch",
-        "Issue #3457431: Saving text format generates validation warnings":
-        "https://www.drupal.org/files/issues/2024-07-01/drupal-core--2024-07-01--3457431--mr-8608.patch",
-        "Issue #3459881: Fix TypeError: implode(): Argument #1 ($array) must be of type array, string given in implode() (line 537 of core/lib/Drupal/Core/Field/WidgetBase.php)":
-        "https://www.drupal.org/files/issues/2024-07-08/drupal-core--2024-07-08--3459881--mr-8697.patch",
-        "Issue #3431330: Add Action Method to Add a button plugin and settings into the Active toolbar in editor":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/distributions_recipes--2026-01-21--3431330--10-6-x.patch",
-        "Issue #3497061: Allow recipe input values in array keys":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-01-26--3497061--for-drupal-10-4-x.patch",
-        "Issue #3465033: Fix not saving addItemToToolbar recipe action for divider | (vertical separator) or wrapping - items to CKEditor 5":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2024-08-01--3465033--mr-9003.patch",
-        "Issue #3538500: Fix block plugin not found warnings during Drush installation of Varbase":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drupal-core--2025-08-30--3538500--drupal10x05x.patch"
-      },
       "drupal/default_content": {
         "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
         "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
