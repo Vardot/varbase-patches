@@ -33,6 +33,11 @@ use Composer\Script\ScriptEvents;
  */
 class VarbasePatchesPlugin implements PluginInterface, EventSubscriberInterface, Capable
 {
+    /**
+     * Packages whose extra.patches are applied by default (no config needed).
+     */
+    public const DEFAULT_ALLOWED_DEPENDENCY_PATCHES = ['vardot/varbase-patches', 'vardot/drupal-core-patches'];
+
     private Composer $composer;
     private IOInterface $io;
     private bool $reresolved = false;
@@ -144,7 +149,7 @@ class VarbasePatchesPlugin implements PluginInterface, EventSubscriberInterface,
 
         if (!$this->v1Mutated) {
             $this->v1Mutated = true;
-            $this->io->write('<info>varbase-patches: re-gathered patches via v1 (allowed: vardot/varbase-patches).</info>');
+            $this->io->write('<info>varbase-patches: re-gathered patches via v1 (allowed dependency patches).</info>');
         }
     }
 
@@ -171,7 +176,7 @@ class VarbasePatchesPlugin implements PluginInterface, EventSubscriberInterface,
         }
 
         $cp = $rootExtra['composer-patches'] ?? [];
-        $allowed = (array) ($cp['allowed-dependency-patches'] ?? ['vardot/varbase-patches']);
+        $allowed = (array) ($cp['allowed-dependency-patches'] ?? self::DEFAULT_ALLOWED_DEPENDENCY_PATCHES);
         $ignored = (array) ($cp['ignore-dependency-patches'] ?? []);
         $patchesIgnore = (array) ($rootExtra['patches-ignore'] ?? []);
 
@@ -312,7 +317,7 @@ class VarbasePatchesPlugin implements PluginInterface, EventSubscriberInterface,
         }
         $this->reresolved = true;
 
-        $this->io->write('<info>varbase-patches: re-resolving patches with filter (allowed: vardot/varbase-patches).</info>');
+        $this->io->write('<info>varbase-patches: re-resolving patches with filter (allowed dependency patches).</info>');
         $newCollection = $cweagans->resolvePatches();
 
         $r = new \ReflectionClass($cweagans);
