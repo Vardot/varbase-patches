@@ -171,7 +171,7 @@ class VarbasePatchesPlugin implements PluginInterface, EventSubscriberInterface,
         }
 
         $cp = $rootExtra['composer-patches'] ?? [];
-        $allowed = (array) ($cp['allowed-dependency-patches'] ?? ['vardot/varbase-patches']);
+        $allowed = (array) ($cp['allowed-dependency-patches'] ?? ['vardot/varbase-patches', 'vardot/drupal-core-patches']);
         $ignored = (array) ($cp['ignore-dependency-patches'] ?? []);
         $patchesIgnore = (array) ($rootExtra['patches-ignore'] ?? []);
 
