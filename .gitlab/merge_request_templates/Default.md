@@ -6,7 +6,6 @@
 - [ ] Automated unit/functional testing coverage
 - [ ] Developer Documentation support on feature change/addition
 - [ ] User Guide Documentation support on feature change/addition
-- [ ] UX/UI designer responsibilities
 - [ ] Accessibility and Readability
 - [ ] Code review by maintainers
 - [ ] Full testing and approval
