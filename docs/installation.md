@@ -38,7 +38,10 @@ For Varbase `~10.1.0` use `~10.1.0`, etc. See the version table in [index.md](in
     "enable-patching": true,
     "composer-exit-on-patch-failure": true,
     "composer-patches": {
-      "allowed-dependency-patches": ["vardot/varbase-patches"]
+      "allowed-dependency-patches": [
+        "vardot/varbase-patches",
+        "vardot/drupal-core-patches"
+      ]
     },
     "patches": {}
   }
