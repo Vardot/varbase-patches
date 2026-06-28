@@ -77,13 +77,17 @@
         "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined":
         "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch",
         "feat: #3079209 Hide POST, PUT, and DELETE endpoints when JSON:API is configured to be read-only":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi_jsonapi--2026-01-22--10308347--mr-6.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi_jsonapi--2026-01-22--10308347--mr-6.patch",
+        "fix: #3539722 PHP 8.4: Implicitly nullable parameter declarations deprecated":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi_jsonapi--2025-12-09--3539722--mr-20.patch"
       },
       "drupal/entity_embed": {
         "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
         "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
         "Issue #2679875: Inline Entity Form integration":
-        "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
+        "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch",
+        "Issue #3531672:  Drupal 10.5/11.2 compatability (tooltip broken, cannot edit embedded entities)":
+        "https://www.drupal.org/files/issues/2025-06-30/entity_embed--2025-06-30--3531672--mr-62.patch"
       },
       "drupal/linkit": {
         "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
@@ -180,6 +184,38 @@
       "drupal/jsonapi_extras": {
         "fix: #3508142 installation error with JSON:API Extra in custom Drupal 11 profiles due to missing synthetic service kernel":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/jsonapi_extras--2026-01-21--3508142--mr-65.patch"
+      },
+      "drupal/embed": {
+        "Issue #3517882: The namespace of EmbedCKEditor5PluginBase does not respect PSR4":
+        "https://www.drupal.org/files/issues/2025-06-30/embed--2025-06-30--3517882--mr-26.patch"
+      },
+      "drupal/social_auth": {
+        "fix: #3578754 Uncaught SocialApiException shows fatal error page when credentials are not configured":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2026-03-13--3578754--mr-40.patch"
+      },
+      "drupal/social_auth_facebook": {
+        "Issue #3507470: Fix fatal error for validateConfig() method signature mismatch":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth_facebook--2026-03-12--3507470--mr-8.patch"
+      },
+      "drupal/social_auth_linkedin": {
+        "Issue #3507495: Remove leftover reference to social_auth_linkedin.settings_form to fix Route Provider Error":
+        "https://www.drupal.org/files/issues/2025-02-18/social_auth_linkedin--2025-02-18--3507495--mr-10.patch"
+      },
+      "drupal/coffee": {
+        "Issue #3535874: Add Navigation Top Bar integration for Coffee module in Drupal ~11.2.0 and Gin ~5.0":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/coffee--2025-07-30--3535874--mr-19.patch"
+      },
+      "drupal/entity": {
+        "Issue #3532309: Fix Deprecation notice from DeleteAction class causes errors in ECA module":
+        "https://www.drupal.org/files/issues/2025-06-25/entity-fix-deprecation.patch"
+      },
+      "drupal/ctools": {
+        "fix: 3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple()":
+        "https://git.drupalcode.org/project/ctools/-/commit/5a323c6e5072515148a54b4055e7db86a50f5111.diff"
+      },
+      "drupal/password_policy": {
+        "fix: #3516906 PHP 8.4 nullable types must be explicit":
+        "https://git.drupalcode.org/project/password_policy/-/commit/999abf8501fd2878dc40b0b4db81315fed60cc03.diff"
       }
     }
   }
