@@ -50,6 +50,22 @@ You will see this line in `composer install -vvv` output:
 varbase-patches: re-resolving patches with filter (allowed: vardot/varbase-patches).
 ```
 
+## Drupal Core Patches
+
+`vardot/varbase-patches` **requires** [`vardot/drupal-core-patches`](https://github.com/Vardot/drupal-core-patches), a dedicated package that stores Varbase's curated Drupal **core** patches separately from contrib patches so Varbase can track the latest Drupal core release. It is a **metapackage** (patch storage), **not** a Composer plugin — the only patch plugin is `vardot/varbase-patches` — so it belongs only under `extra.composer-patches.allowed-dependency-patches`, never under `config.allow-plugins`.
+
+`vardot/drupal-core-patches` has **one git branch per Drupal core `major.minor`** (`10.4.x`, `10.5.x`, `10.6.x`, `11.1.x`, `11.2.x`, `11.3.x`, `11.4.x`, `12.0.x`) plus a flat `patches` branch that holds the `.patch` files. Each release `require`s `drupal/core ~<minor>.0`, so Composer selects the patch set that matches the installed Drupal core. Its dependency-declared core patches flow through `FilteredDependencies` like any other dependency, gated by `allowed-dependency-patches`.
+
+On this branch `vardot/varbase-patches` requires:
+
+```json
+{
+  "require": {
+    "vardot/drupal-core-patches": "~11 || ~12"
+  }
+}
+```
+
 ## Commands
 
 `VarbaseCommandProvider` is exposed via the standard Composer `Composer\Plugin\Capability\CommandProvider` capability. It returns instances of `CleanupPatchesCommand` and `CleanupPatchesFileCommand`, which extend `Composer\Command\BaseCommand`. Both commands delegate the per-URL work (fetch + filename + write) to `Util\MrPatchProcessor`.
