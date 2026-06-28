@@ -167,10 +167,6 @@
         "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemata--2025-12-09--3523349--mr-17.patch"
       },
-      "drupal/social_auth": {
-        "fix: #3564906 PHP 8.4 compatibility - Implicit nullable parameter deprecations in Social Auth module":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2026-01-21--3564906--mr-38.patch"
-      },
       "drupal/simple_oauth": {
         "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
