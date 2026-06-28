@@ -14,7 +14,10 @@ List of package-name patterns. Only packages matching this list contribute patch
 {
   "extra": {
     "composer-patches": {
-      "allowed-dependency-patches": ["vardot/varbase-patches"]
+      "allowed-dependency-patches": [
+        "vardot/varbase-patches",
+        "vardot/drupal-core-patches"
+      ]
     }
   }
 }
@@ -70,9 +73,9 @@ Two equivalent schemas are accepted. The v1-style description-keyed map (matches
   "extra": {
     "patches-ignore": {
       "vardot/varbase-patches": {
-        "drupal/core": {
-          "Issue #2869592: Disabled update module shouldn't produce a status report warning":
-          "https://www.drupal.org/files/issues/2869592-remove-update-warning-7.patch"
+        "drupal/recaptcha": {
+          "fix: #3588269 Make Drupal8Post::submit() compatible with parent":
+          "https://git.drupalcode.org/project/recaptcha/-/commit/68b0f86d1e930ed78f795a97a2fc207be35b3260.diff"
         }
       }
     }
@@ -97,6 +100,26 @@ Or a flat array of URLs:
 ```
 
 Matching is done by URL string. The description (if you use the dict form) is informational only — `vardot/varbase-patches` and the consumer can disagree on the description and the URL still matches.
+
+### Ignoring Drupal Core Patches
+
+`vardot/drupal-core-patches` is an ordinary dependency that contributes patches through the dependency resolver, so the same `extra` keys control it — use `vardot/drupal-core-patches` as the **source** package and `drupal/core` as the **target**:
+
+```json
+{
+  "extra": {
+    "patches-ignore": {
+      "vardot/drupal-core-patches": {
+        "drupal/core": {
+          "Issue #3606822: ContainerBuilder synthetic kernel on install": "https://git.drupalcode.org/project/drupal/-/merge_requests/16159.patch"
+        }
+      }
+    }
+  }
+}
+```
+
+Matching is by URL string, the same as for `vardot/varbase-patches`.
 
 ## Standard `cweagans/composer-patches` keys (still honored)
 
