@@ -1,0 +1,158 @@
+diff --git a/src/Plugin/AiProvider/AnthropicProvider.php b/src/Plugin/AiProvider/AnthropicProvider.php
+index 3c9d592b97c286f8a79a5e59f2f0f62494a655c8..1e1b5a3d480c7096c89f22426f4c5d26a1c9ff2a 100644
+--- a/src/Plugin/AiProvider/AnthropicProvider.php
++++ b/src/Plugin/AiProvider/AnthropicProvider.php
+@@ -9,6 +9,9 @@ use Drupal\ai\Base\OpenAiBasedProviderClientBase;
+ use Drupal\ai\Enum\AiModelCapability;
+ use Drupal\ai\Exception\AiQuotaException;
+ use Drupal\ai\Exception\AiSetupFailureException;
++use Drupal\ai\OperationType\Chat\ChatInput;
++use Drupal\ai\OperationType\Chat\ChatMessage;
++use Drupal\ai\OperationType\Chat\ChatOutput;
+ use Drupal\ai\Traits\OperationType\ChatTrait;
+ 
+ /**
+@@ -22,6 +25,35 @@ class AnthropicProvider extends OpenAiBasedProviderClientBase {
+ 
+   use ChatTrait;
+ 
++  /**
++   * {@inheritdoc}
++   */
++  public function chat(array|string|ChatInput $input, string $model_id, array $tags = []): ChatOutput {
++    if ($input instanceof ChatInput) {
++      $this->ensureConversationEndsWithUser($input);
++    }
++    return parent::chat($input, $model_id, $tags);
++  }
++
++  /**
++   * Ensures the chat conversation ends with a user message.
++   *
++   * Anthropic rejects a conversation whose last message is not from the user,
++   * which the AI Agents handoff can produce (a trailing assistant or system
++   * message), so we append a minimal trailing user message.
++   *
++   * @param \Drupal\ai\OperationType\Chat\ChatInput $input
++   *   The chat input to normalize in place.
++   */
++  protected function ensureConversationEndsWithUser(ChatInput $input): void {
++    $messages = $input->getMessages();
++    $last = end($messages);
++    if ($last instanceof ChatMessage && $last->getRole() !== 'user') {
++      $messages[] = new ChatMessage('user', 'Continue.');
++      $input->setMessages($messages);
++    }
++  }
++
+   /**
+    * {@inheritdoc}
+    */
+diff --git a/tests/src/Unit/AnthropicProviderChatTest.php b/tests/src/Unit/AnthropicProviderChatTest.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..6ccfe940e3638d7e2f64ab8d69c44271f08c0485
+--- /dev/null
++++ b/tests/src/Unit/AnthropicProviderChatTest.php
+@@ -0,0 +1,102 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\Tests\ai_provider_anthropic\Unit;
++
++use Drupal\Tests\UnitTestCase;
++use Drupal\ai\OperationType\Chat\ChatInput;
++use Drupal\ai\OperationType\Chat\ChatMessage;
++use Drupal\ai_provider_anthropic\Plugin\AiProvider\AnthropicProvider;
++
++/**
++ * Tests that a chat conversation is forced to end with a user message.
++ *
++ * Anthropic rejects a conversation whose last message is not from the user, so
++ * the provider appends a minimal trailing user message when needed. These unit
++ * tests exercise that transformation in isolation, without any network calls.
++ *
++ * @group ai_provider_anthropic
++ *
++ * @coversDefaultClass \Drupal\ai_provider_anthropic\Plugin\AiProvider\AnthropicProvider
++ */
++class AnthropicProviderChatTest extends UnitTestCase {
++
++  /**
++   * Invokes the protected helper under test on a bare provider instance.
++   *
++   * The provider is created without its constructor so no services or HTTP
++   * client are required; the helper only reads and rewrites the chat input.
++   *
++   * @param \Drupal\ai\OperationType\Chat\ChatInput $input
++   *   The chat input to normalize in place.
++   */
++  protected function ensureConversationEndsWithUser(ChatInput $input): void {
++    $reflection = new \ReflectionClass(AnthropicProvider::class);
++    $provider = $reflection->newInstanceWithoutConstructor();
++    $method = $reflection->getMethod('ensureConversationEndsWithUser');
++    $method->setAccessible(TRUE);
++    $method->invoke($provider, $input);
++  }
++
++  /**
++   * Tests that a trailing assistant message gets a user message appended.
++   *
++   * @covers ::ensureConversationEndsWithUser
++   */
++  public function testTrailingAssistantMessageAppendsUser(): void {
++    $input = new ChatInput([
++      new ChatMessage('user', 'Hello.'),
++      new ChatMessage('assistant', 'Hi there.'),
++    ]);
++
++    $this->ensureConversationEndsWithUser($input);
++
++    $messages = $input->getMessages();
++    $this->assertCount(3, $messages);
++    $last = end($messages);
++    $this->assertSame('user', $last->getRole());
++    $this->assertSame('Continue.', $last->getText());
++  }
++
++  /**
++   * Tests that a trailing system message gets a user message appended.
++   *
++   * @covers ::ensureConversationEndsWithUser
++   */
++  public function testTrailingSystemMessageAppendsUser(): void {
++    $input = new ChatInput([
++      new ChatMessage('user', 'Hello.'),
++      new ChatMessage('system', 'Be concise.'),
++    ]);
++
++    $this->ensureConversationEndsWithUser($input);
++
++    $messages = $input->getMessages();
++    $this->assertCount(3, $messages);
++    $last = end($messages);
++    $this->assertSame('user', $last->getRole());
++    $this->assertSame('Continue.', $last->getText());
++  }
++
++  /**
++   * Tests that a conversation already ending with a user is left unchanged.
++   *
++   * @covers ::ensureConversationEndsWithUser
++   */
++  public function testTrailingUserMessageIsUnchanged(): void {
++    $input = new ChatInput([
++      new ChatMessage('assistant', 'Hi there.'),
++      new ChatMessage('user', 'Hello.'),
++    ]);
++
++    $this->ensureConversationEndsWithUser($input);
++
++    $messages = $input->getMessages();
++    $this->assertCount(2, $messages);
++    $last = end($messages);
++    $this->assertSame('user', $last->getRole());
++    $this->assertSame('Hello.', $last->getText());
++  }
++
++}
