@@ -1,0 +1,144 @@
+diff --git a/src/PluginBase/AiAgentEntityWrapper.php b/src/PluginBase/AiAgentEntityWrapper.php
+index 5958104d08af159f779b0728e2b5a2c931e07ba8..dcf5a87dbdbaf057e0f19022c81ff3d82f1f7018 100644
+--- a/src/PluginBase/AiAgentEntityWrapper.php
++++ b/src/PluginBase/AiAgentEntityWrapper.php
+@@ -1320,6 +1320,13 @@ class AiAgentEntityWrapper implements PluginInterfacesAiAgentInterface, ConfigAi
+     ];
+     // Add dynamical tokens.
+     $tokens = array_merge($tokens, $this->tokens);
++    // An array token value would trigger an "Array to string conversion"
++    // warning in core Token::doReplace(), so coerce it to a string first.
++    foreach ($tokens as $key => $value) {
++      if (is_array($value)) {
++        $tokens[$key] = implode(', ', array_filter($value, 'is_scalar'));
++      }
++    }
+     return $this->token->replacePlain($prompt, $tokens);
+   }
+ 
+diff --git a/tests/src/Kernel/PluginBase/AiAgentEntityWrapperApplyTokensTest.php b/tests/src/Kernel/PluginBase/AiAgentEntityWrapperApplyTokensTest.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..2e10a1ea6701fc76555c9ae656cccc966e1bc03b
+--- /dev/null
++++ b/tests/src/Kernel/PluginBase/AiAgentEntityWrapperApplyTokensTest.php
+@@ -0,0 +1,120 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\Tests\ai_agents\Kernel\PluginBase;
++
++use Drupal\KernelTests\KernelTestBase;
++use Drupal\Tests\user\Traits\UserCreationTrait;
++use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
++
++/**
++ * Tests that AiAgentEntityWrapper::applyTokens() handles array token values.
++ *
++ * A dynamical token context can hold an array (e.g. a list of values). Such a
++ * value would reach str_replace() in core Token::doReplace() and raise an
++ * "Array to string conversion" warning. applyTokens() must coerce array values
++ * to a string first so token replacement still completes.
++ *
++ * @group ai_agents
++ * @see https://www.drupal.org/project/ai_agents/issues/3586043
++ */
++#[RunTestsInSeparateProcesses]
++final class AiAgentEntityWrapperApplyTokensTest extends KernelTestBase {
++
++  use UserCreationTrait;
++
++  /**
++   * {@inheritdoc}
++   */
++  protected static $modules = [
++    'system',
++    'user',
++    'ai',
++    'ai_agents',
++    'ai_agents_tools_test',
++    'key',
++  ];
++
++  /**
++   * {@inheritdoc}
++   */
++  protected function setUp(): void {
++    parent::setUp();
++
++    $this->installEntitySchema('user');
++    $this->installConfig('ai_agents');
++    $this->setUpCurrentUser(['uid' => 1], [], TRUE);
++  }
++
++  /**
++   * Tests that a scalar token value is replaced normally (control case).
++   */
++  public function testApplyTokensWithScalarValue(): void {
++    $token = '[ai_agents_tools_test:value]';
++    $wrapper = $this->createWrapper();
++    $wrapper->setTokenContexts(['ai_agents_tools_test' => 'hello world']);
++
++    $result = $wrapper->applyTokens("Context: $token end.");
++
++    $this->assertIsString($result);
++    $this->assertStringContainsString('hello world', $result);
++    $this->assertStringNotContainsString($token, $result);
++  }
++
++  /**
++   * Tests that an array token value does not raise a warning and is replaced.
++   *
++   * Drupal's test runner converts the "Array to string conversion" warning to
++   * an exception, so the test would fail if the array reached str_replace().
++   * The call completing with a string proves the value was coerced first.
++   */
++  public function testApplyTokensWithArrayValue(): void {
++    $token = '[ai_agents_tools_test:value]';
++    $wrapper = $this->createWrapper();
++    $wrapper->setTokenContexts([
++      'ai_agents_tools_test' => ['alpha', 'beta', 'gamma'],
++    ]);
++
++    $result = $wrapper->applyTokens("Context: $token end.");
++
++    $this->assertIsString($result);
++    $this->assertStringContainsString('alpha', $result);
++    $this->assertStringContainsString('gamma', $result);
++    $this->assertStringNotContainsString($token, $result);
++  }
++
++  /**
++   * Builds an AiAgentEntityWrapper for a minimal test agent.
++   *
++   * @return \Drupal\ai_agents\PluginInterfaces\AiAgentInterface
++   *   The instantiated agent wrapper.
++   */
++  protected function createWrapper() {
++    $this->container->get('entity_type.manager')
++      ->getStorage('ai_agent')
++      ->create([
++        'id' => 'test_apply_tokens_agent',
++        'label' => 'Test Apply Tokens Agent',
++        'description' => 'Agent for testing applyTokens() value coercion.',
++        'system_prompt' => 'You are a helpful assistant.',
++        'tools' => [],
++        'tool_settings' => [],
++        'tool_usage_limits' => [],
++        'orchestration_agent' => FALSE,
++        'triage_agent' => FALSE,
++        'max_loops' => 3,
++        'default_information_tools' => '',
++        'masquerade_roles' => [],
++        'exclude_users_role' => FALSE,
++      ])->save();
++
++    $wrapper = $this->container
++      ->get('plugin.manager.ai_agents')
++      ->createInstance('test_apply_tokens_agent');
++    $wrapper->setRunnerId('test-runner-id');
++
++    return $wrapper;
++  }
++
++}
