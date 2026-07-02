@@ -164,6 +164,26 @@ Examples:
 
 Static, timestamped local files give reproducible builds; raw MR URLs change as commits are added to the MR and break Composer checksums mid-install.
 
+## Never re-roll a patch in place
+
+A published `.patch` file is **immutable**. When a patch needs re-rolling (new module/core version, updated MR, corrected diff), do NOT reuse the old date or filename and do NOT overwrite the old file — other projects may still pin it by URL/checksum and must keep resolving.
+
+- Create a **new** file with the standard name and **today's** date (`$(date +%Y-%m-%d)`): `[package]--[YYYY-MM-DD]--[issue]--[mr-N].patch`.
+- Point `composer.json` (and the `patches` branch) at the new file; leave the old file in place so existing pins keep resolving. The correct precedent is PR #421 (new MR !199 → new timestamped file → supersede the old one), not an in-place reroll that reuses the old filename.
+- **Only** exception: edit a patch file's content in place if it was created **today** (its date segment equals today) and needs a same-day correction before anyone has consumed it.
+
+## Materialize every drupal.org MR through `ddev composer var-ccup`
+
+Never reference a raw drupal.org / git.drupalcode.org MR URL directly in `extra.patches` — MR URLs drift as commits land and break Composer checksums mid-install. Add the MR URL, then run the plugin command inside DDEV to convert the MR `.diff` into a static, timestamped patch file:
+
+```bash
+# add the MR URL to root extra.patches, then:
+ddev composer var-ccup     # varbase-patches:cleanup:patches → ./patches/[pkg]--[today]--[issue]--[mr].patch
+# (outside DDEV: composer var-ccup)
+```
+
+Verify the file starts with `diff --git`, not `<!DOCTYPE html>` (the git.drupalcode.org bot challenge); if it grabbed HTML, generate the diff from the fork clone instead (`git diff origin/<targetBranch>...<mrBranch> > patches/<file>.patch`) — an equivalent that applies the same logic (static, timestamped, standard filename). Reference the resulting static file — never the MR URL.
+
 ## Adding a custom patch to a project
 
 ```bash

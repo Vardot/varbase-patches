@@ -64,6 +64,15 @@ curl -o patches/module--$(date +%Y-%m-%d)--issue-123.patch \
 
 ### Re-rolling Patches
 
+> **Patch files are immutable — never re-roll in place.** A re-roll ALWAYS produces a **new** file
+> named with **today's** date (`$(date +%Y-%m-%d)`) and the standard convention; never reuse the old
+> date/filename and never overwrite the old file — other projects may still pin it by URL/checksum and
+> must keep resolving. Point `composer.json` at the new file; leave the old one (see PR #421 for the
+> supersede pattern). **Only** exception: edit a patch's content in place if it was created **today**
+> and needs a same-day correction before anyone consumed it. Every drupal.org MR is materialized via
+> `ddev composer var-ccup` (or an equivalent producing a static, timestamped, standard-named file) —
+> never a raw MR URL.
+
 When a patch no longer applies:
 
 1. **Get the original issue context**

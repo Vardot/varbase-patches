@@ -101,6 +101,14 @@ Examples:
 
 Do not invent variants. The cleanup commands rely on this format.
 
+**Patch files are immutable — never re-roll in place.** A re-roll produces a **new** file with **today's**
+date, never the old date/filename, and never overwrites the old file (other projects still pin it by
+URL/checksum and must keep resolving). Point `composer.json` at the new file; leave the old one — see
+PR #421 (new MR !199 → new timestamped file → supersede) for the correct pattern. Only exception: edit a
+file created **today** before anyone has consumed it. Materialize every drupal.org / git.drupalcode.org MR
+through `ddev composer var-ccup` (or an equivalent producing a static, timestamped, standard-named file) —
+never reference a raw MR URL.
+
 ### 6. The `patches` branch is data, not a dependency.
 
 The `patches` branch carries `.patch` files only. Never add it to `require`. The plugin's curated list references files on this branch via raw GitHub URLs.
