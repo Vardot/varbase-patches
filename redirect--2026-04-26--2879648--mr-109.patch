@@ -1,5 +1,5 @@
 diff --git a/config/install/redirect.settings.yml b/config/install/redirect.settings.yml
-index 70a96888dce3ced6bfe581ac1fc5a8e3d264f05e..9fbbde06ccfefa84d164fcd1895cf5d1d1ee5da8 100644
+index 70a9688..9fbbde0 100644
 --- a/config/install/redirect.settings.yml
 +++ b/config/install/redirect.settings.yml
 @@ -1,4 +1,5 @@
@@ -9,7 +9,7 @@ index 70a96888dce3ced6bfe581ac1fc5a8e3d264f05e..9fbbde06ccfefa84d164fcd1895cf5d1
  passthrough_querystring: true
  warning: false
 diff --git a/config/schema/redirect.schema.yml b/config/schema/redirect.schema.yml
-index bd9ccd5d6e5fa4c6c7888a9980c47064ad51d896..050dc6ed4dbed47aee81e1cd99e04e9236cbe753 100644
+index bd9ccd5..050dc6e 100644
 --- a/config/schema/redirect.schema.yml
 +++ b/config/schema/redirect.schema.yml
 @@ -7,6 +7,9 @@ redirect.settings:
@@ -23,7 +23,7 @@ index bd9ccd5d6e5fa4c6c7888a9980c47064ad51d896..050dc6ed4dbed47aee81e1cd99e04e92
        type: integer
        label: 'Default redirect status'
 diff --git a/redirect.services.yml b/redirect.services.yml
-index 908b399ec7683cb7b74a4a67fe91dd5921779b1e..8a3585ad3bde6c09173ea5f977b3d0d58c64becd 100644
+index 908b399..8a3585a 100644
 --- a/redirect.services.yml
 +++ b/redirect.services.yml
 @@ -17,7 +17,7 @@ services:
@@ -45,7 +45,7 @@ index 908b399ec7683cb7b74a4a67fe91dd5921779b1e..8a3585ad3bde6c09173ea5f977b3d0d5
 +    tags:
 +      - { name: service_collector, tag: path_processor_inbound, call: addInbound }
 diff --git a/src/EventSubscriber/RedirectRequestSubscriber.php b/src/EventSubscriber/RedirectRequestSubscriber.php
-index 9fda4f4d11db4583506b03c71fe2a2c454cb0e8f..ad76e136b963617b1fc2ba074a775119efb28bb6 100644
+index 9fda4f4..ad76e13 100644
 --- a/src/EventSubscriber/RedirectRequestSubscriber.php
 +++ b/src/EventSubscriber/RedirectRequestSubscriber.php
 @@ -7,11 +7,11 @@ use Drupal\Core\Config\ConfigFactoryInterface;
@@ -132,7 +132,7 @@ index 9fda4f4d11db4583506b03c71fe2a2c454cb0e8f..ad76e136b963617b1fc2ba074a775119
      catch (RedirectLoopException $e) {
        \Drupal::logger('redirect')->warning('Redirect loop identified at %path for redirect %rid', ['%path' => $e->getPath(), '%rid' => $e->getRedirectId()]);
 diff --git a/src/Form/RedirectSettingsForm.php b/src/Form/RedirectSettingsForm.php
-index 41da6ebdb1fdc6ea471e27259938921b2e9e65e8..6a377fd96a2cea94fe5e88ee51a3db803a6490d1 100644
+index 41da6eb..6a377fd 100644
 --- a/src/Form/RedirectSettingsForm.php
 +++ b/src/Form/RedirectSettingsForm.php
 @@ -52,6 +52,14 @@ class RedirectSettingsForm extends ConfigFormBase {
@@ -152,10 +152,10 @@ index 41da6ebdb1fdc6ea471e27259938921b2e9e65e8..6a377fd96a2cea94fe5e88ee51a3db80
        '#title' => $this->t('Retain query string through redirect.'),
 diff --git a/src/PathProcessor/RedirectPathProcessorManager.php b/src/PathProcessor/RedirectPathProcessorManager.php
 new file mode 100644
-index 0000000000000000000000000000000000000000..d7c323d4db167b885e8c376eba09faa746ac3378
+index 0000000..7b1d0da
 --- /dev/null
 +++ b/src/PathProcessor/RedirectPathProcessorManager.php
-@@ -0,0 +1,111 @@
+@@ -0,0 +1,155 @@
 +<?php
 +
 +namespace Drupal\redirect\PathProcessor;
@@ -170,7 +170,14 @@ index 0000000000000000000000000000000000000000..d7c323d4db167b885e8c376eba09faa7
 +/**
 + * Redirect path processor manager.
 + *
-+ * Extends PathProcessorManager to customize the processInbound logic.
++ * Collects the inbound path processors through the service_collector tag and
++ * runs them to resolve the source (and optionally aliased) path for a request.
++ *
++ * The inbound processors are stored locally instead of relying on the parent
++ * PathProcessorManager: on Drupal 11.4 the core manager collects its processors
++ * through an autowired tagged iterator and no longer provides the addInbound()
++ * / getInbound() methods, so this manager keeps its own priority-sorted list
++ * (which also works on earlier Drupal versions).
 + */
 +class RedirectPathProcessorManager extends PathProcessorManager implements RedirectPathProcessorManagerInterface {
 +
@@ -180,12 +187,29 @@ index 0000000000000000000000000000000000000000..d7c323d4db167b885e8c376eba09faa7
 +  protected $config;
 +
 +  /**
++   * Holds the inbound path processors, keyed by priority.
++   *
++   * @var array
++   */
++  protected $processorsByPriority = [];
++
++  /**
++   * Holds the inbound path processors sorted by priority.
++   *
++   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface[]
++   */
++  protected $sortedProcessors;
++
++  /**
 +   * Constructs a \Drupal\redirect\PathProcessor\RedirectPathProcessorManager object.
 +   *
 +   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
 +   *   The config factory.
 +   */
 +  public function __construct(ConfigFactoryInterface $config_factory) {
++    // Intentionally do not call parent::__construct(): this manager collects
++    // its inbound processors through the service_collector tag (addInbound)
++    // rather than the core manager's autowired tagged iterator.
 +    $this->config = $config_factory->get('redirect.settings');
 +  }
 +
@@ -194,8 +218,28 @@ index 0000000000000000000000000000000000000000..d7c323d4db167b885e8c376eba09faa7
 +   */
 +  public function addInbound(InboundPathProcessorInterface $processor, $priority = 0) {
 +    if ($this->applies($processor)) {
-+      parent::addInbound($processor, $priority);
++      $this->processorsByPriority[$priority][] = $processor;
++      // Force the processors to be re-sorted.
++      $this->sortedProcessors = NULL;
 +    }
++  }
++
++  /**
++   * Returns the sorted array of inbound path processors.
++   *
++   * @return \Drupal\Core\PathProcessor\InboundPathProcessorInterface[]
++   *   An array of path processor objects.
++   */
++  protected function getInbound() {
++    if (!isset($this->sortedProcessors)) {
++      $this->sortedProcessors = [];
++      // Sort by priority, highest first.
++      krsort($this->processorsByPriority);
++      foreach ($this->processorsByPriority as $processors) {
++        $this->sortedProcessors = array_merge($this->sortedProcessors, $processors);
++      }
++    }
++    return $this->sortedProcessors;
 +  }
 +
 +  /**
@@ -269,7 +313,7 @@ index 0000000000000000000000000000000000000000..d7c323d4db167b885e8c376eba09faa7
 +}
 diff --git a/src/PathProcessor/RedirectPathProcessorManagerInterface.php b/src/PathProcessor/RedirectPathProcessorManagerInterface.php
 new file mode 100644
-index 0000000000000000000000000000000000000000..7b761565fc908691f57d9b9a678f71ccad6327e0
+index 0000000..7b76156
 --- /dev/null
 +++ b/src/PathProcessor/RedirectPathProcessorManagerInterface.php
 @@ -0,0 +1,23 @@
@@ -297,7 +341,7 @@ index 0000000000000000000000000000000000000000..7b761565fc908691f57d9b9a678f71cc
 +
 +}
 diff --git a/src/RedirectRepository.php b/src/RedirectRepository.php
-index ea438569eced45ad6297878dc75a25edf582ff49..590a121f2a24ffb9c1739072123b12bcee7f19ec 100644
+index ea43856..590a121 100644
 --- a/src/RedirectRepository.php
 +++ b/src/RedirectRepository.php
 @@ -80,6 +80,32 @@ class RedirectRepository {
@@ -415,7 +459,7 @@ index ea438569eced45ad6297878dc75a25edf582ff49..590a121f2a24ffb9c1739072123b12bc
      if (!empty($rid)) {
        // Check if this is a loop.
 diff --git a/tests/src/Functional/RedirectUILanguageTest.php b/tests/src/Functional/RedirectUILanguageTest.php
-index 849346264b1ff5412b0683030087ebf8bafb66c8..686c1d43b5f374800ec2f67ad58f0d2cf50bb495 100644
+index 8493462..686c1d4 100644
 --- a/tests/src/Functional/RedirectUILanguageTest.php
 +++ b/tests/src/Functional/RedirectUILanguageTest.php
 @@ -16,6 +16,11 @@ use Drupal\language\Entity\ConfigurableLanguage;
@@ -481,7 +525,7 @@ index 849346264b1ff5412b0683030087ebf8bafb66c8..686c1d43b5f374800ec2f67ad58f0d2c
 +
  }
 diff --git a/tests/src/Functional/RedirectUITest.php b/tests/src/Functional/RedirectUITest.php
-index 08f80c780bdaa00847ca0da2b1aeaed314af670c..b0af83285bd26f6072252ea1af8a0e3b8f5279e0 100644
+index 08f80c7..b0af832 100644
 --- a/tests/src/Functional/RedirectUITest.php
 +++ b/tests/src/Functional/RedirectUITest.php
 @@ -27,6 +27,11 @@ class RedirectUITest extends BrowserTestBase {
@@ -581,7 +625,7 @@ index 08f80c780bdaa00847ca0da2b1aeaed314af670c..b0af83285bd26f6072252ea1af8a0e3b
 +
  }
 diff --git a/tests/src/Unit/RedirectRequestSubscriberTest.php b/tests/src/Unit/RedirectRequestSubscriberTest.php
-index 263e82e268c2443ad9edf65275ab77d9d2550e1f..fcf424a778c3bc81027c310a99c8c1f5aad1dfb2 100644
+index 263e82e..fcf424a 100644
 --- a/tests/src/Unit/RedirectRequestSubscriberTest.php
 +++ b/tests/src/Unit/RedirectRequestSubscriberTest.php
 @@ -135,11 +135,12 @@ class RedirectRequestSubscriberTest extends UnitTestCase {
