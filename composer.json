@@ -75,7 +75,9 @@
       },
       "drupal/redirect": {
         "Issue #2879648: Redirects from aliased paths aren't triggered":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-04-26--2879648--mr-109.patch"
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-04-26--2879648--mr-109.patch",
+        "Drupal 11.4: RedirectPathProcessorManager - PathProcessorManager::addInbound() removed (constructor-injected autowired path processors)":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-07-02--PathProcessorManager-11.4-addInbound.patch"
       },
       "drupal/layout_builder_perms": {
         "Issue #3502237: Fix type error in layout builder perms access manager logger channel factory with LoggerChannelFactoryInterface ":
