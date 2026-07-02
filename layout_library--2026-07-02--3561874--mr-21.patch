@@ -1,0 +1,39 @@
+diff --git a/src/Plugin/SectionStorage/Library.php b/src/Plugin/SectionStorage/Library.php
+index a07fbca..5b81d55 100644
+--- a/src/Plugin/SectionStorage/Library.php
++++ b/src/Plugin/SectionStorage/Library.php
+@@ -16,6 +16,7 @@ use Drupal\Core\Url;
+ use Drupal\field_ui\FieldUI;
+ use Drupal\layout_builder\DefaultsSectionStorageInterface;
+ use Drupal\layout_builder\Entity\LayoutBuilderSampleEntityGenerator;
++use Drupal\layout_builder\SupportAwareSectionStorageInterface;
+ use Drupal\layout_builder\Plugin\SectionStorage\SectionStorageBase;
+ use Drupal\layout_library\Entity\Layout;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+@@ -38,7 +39,7 @@ use Symfony\Component\Routing\RouteCollection;
+  *   },
+  * )
+  */
+-class Library extends SectionStorageBase implements ContainerFactoryPluginInterface, DefaultsSectionStorageInterface {
++class Library extends SectionStorageBase implements ContainerFactoryPluginInterface, DefaultsSectionStorageInterface, SupportAwareSectionStorageInterface {
+ 
+   /**
+    * Entity type manager.
+@@ -392,4 +393,17 @@ class Library extends SectionStorageBase implements ContainerFactoryPluginInterf
+     $this->notImplemented();
+   }
+ 
++  /**
++   * {@inheritdoc}
++   */
++  public function isSupported(string $entity_type_id, string $bundle, string $view_mode): bool {
++    $id = "$entity_type_id.$bundle.$view_mode";
++    $storage = $this->entityTypeManager->getStorage('entity_view_display');
++    $display = $storage->load($id);
++    if ($display) {
++      return (bool) $display->getThirdPartySetting('layout_library', 'enable');
++    }
++    return FALSE;
++  }
++
+ }
