@@ -180,6 +180,26 @@ git diff > ../../../../patches/paragraphs--$(date +%Y-%m-%d)--custom-fix.patch
 composer update drupal/paragraphs --with-dependencies
 ```
 
+## Contribution workflow — the proper Varbase way (NO direct commits)
+
+When a Varbase dependency (contrib OR core) needs a patch, do NOT push directly to `vardot/varbase-patches`, `vardot/drupal-core-patches`, or their `patches` branches. Everything goes through issues + MRs/PRs for review. Steps:
+
+1. **File the fix upstream on drupal.org** against the actual module/project (e.g. `redirect`), with a clear Problem/Motivation + Proposed resolution. If the broken code was itself introduced by a Varbase-curated patch (e.g. `RedirectPathProcessorManager` comes only from #2879648/mr-109, not the module's base), the new MR must carry that whole feature rewritten for the new core — it **supersedes** the old patch (never reference both; they conflict).
+2. **Create the issue fork + MR** on the module. Commit to the issue fork as **Rajab Natshah `<rajabn@gmail.com>`**, message format per <https://www.drupal.org/node/3586390>:
+   ```
+   {type}: #{issueID} One line summary
+
+   By: rajab natshah
+
+   AI-Generated: Yes (short human-written note on what AI did; reviewed by Rajab Natshah.)
+   ```
+   Types (core list, **no `chore`**): `fix` `feat` `ci` `docs` `perf` `refactor` `test` `task` `revert`. Set the **MR title to the same** `{type}: #{id} summary`. Disclose AI on the commit AND the MR description per the AI policy <https://www.drupal.org/docs/develop/issues/issue-procedures-and-etiquette/policy-on-the-use-of-ai-when-contributing-to-drupal> (`AI-Generated: Yes (...)`).
+3. **Materialize the MR `.diff` into a static patch file** with `composer var-ccup` (add the MR URL to the root `extra.patches`, run it → `patches/[pkg]--[date]--[issue]--[MR].patch`, the file content **is** the MR `.diff`). Static timestamped files = reproducible; raw MR URLs drift and break checksums.
+   - **GOTCHA:** git.drupalcode.org serves a bot "Client Challenge" HTML page to plain fetches, so `var-ccup` may write an **HTML file instead of the diff**. Verify (`head` the file — must start with `diff --git`, not `<!DOCTYPE html>`). If it grabbed HTML, generate the real diff from the fork clone instead: `git diff origin/<targetBranch>...<mrBranch> > <file>.patch`.
+4. **Land it in varbase-patches via PRs (github), not direct commits:** add the `.patch` file to the `patches` branch (PR, base `patches`) and reference its raw URL `https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/<file>` from `composer.json` on the version branch (PR, base e.g. `11.0.x`). Edit `composer.json` **surgically** (only the changed `drupal/<pkg>` block) — never reserialize the whole file (json.dump churns key order/formatting into a huge diff). For a core patch, same pattern in `vardot/drupal-core-patches` (`patches` branch + the `<minor>.x` composer.json), then tag a new 4-segment release (never move a tag).
+5. PR/MR titles for varbase-patches follow the Vardot style: `Add a patch for the <Module> module on <description> (#<issueID>)` (imperative, proper names Capitalized, no trailing period). The upstream module commit/MR title uses the #3586390 `{type}: #{id}` form instead.
+6. If a prior direct commit slipped in, **revert it** (restore the branch) and redo via PR.
+
 ## Handling patch failures
 
 **Patch already applied (upstream merged the fix):**
