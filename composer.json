@@ -74,8 +74,8 @@
         "https://www.drupal.org/files/issues/2025-06-30/entity_embed--2025-06-30--3531672--mr-62.patch"
       },
       "drupal/redirect": {
-        "Issue #2879648: Redirects from aliased paths aren't triggered":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-04-26--2879648--mr-109.patch"
+        "Issue #3607821: Drupal 11.4 compatibility for the RedirectPathProcessorManager approach (supersedes #2879648)":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-07-02--3607821--mr-199.patch"
       },
       "drupal/layout_builder_perms": {
         "Issue #3502237: Fix type error in layout builder perms access manager logger channel factory with LoggerChannelFactoryInterface ":
