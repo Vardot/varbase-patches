@@ -120,8 +120,8 @@
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs_previewer--2025-12-08--3538671--mr-5.patch"
       },
       "drupal/redirect": {
-        "Issue #2879648: Redirects from aliased paths aren't triggered":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-04-26--2879648--mr-109.patch"
+        "Issue #3607821: Drupal 11.4 compatibility for the RedirectPathProcessorManager approach (supersedes #2879648)":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-07-02--3607821--mr-199.patch"
       },
       "drupal/panels": {
         "fix: #3534531 php 8.4 compatibility issue":
