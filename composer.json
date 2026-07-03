@@ -77,6 +77,9 @@
         "Issue #3607821: Drupal 11.4 compatibility for the RedirectPathProcessorManager approach (supersedes #2879648)":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-07-02--3607821--mr-199.patch"
       },
+      "drupal/eca_helper": {
+        "fix: #3608313 Guard null event and catch Throwable in Messenger decorator": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/eca_helper--2026-07-04--3608313--mr-16.patch"
+      },
       "drupal/layout_builder_perms": {
         "Issue #3502237: Fix type error in layout builder perms access manager logger channel factory with LoggerChannelFactoryInterface ":
         "https://www.drupal.org/files/issues/2025-01-25/layout_builder_perms--2025-01-25--3502237--mr-25.patch",
