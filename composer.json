@@ -218,6 +218,10 @@
       "drupal/recaptcha": {
         "fix: #3588269 Make Drupal8Post::submit() compatible with parent":
         "https://git.drupalcode.org/project/recaptcha/-/commit/68b0f86d1e930ed78f795a97a2fc207be35b3260.diff"
+      },
+      "drupal/eca_helper": {
+        "fix: #3608313 Guard null event and catch Throwable in Messenger decorator":
+        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/eca_helper--2026-07-04--3608313--mr-16.patch"
       }
     }
   }
