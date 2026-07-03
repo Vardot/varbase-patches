@@ -139,10 +139,6 @@
         "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemata--2025-12-09--3523349--mr-17.patch"
       },
-      "drupal/openapi_jsonapi": {
-        "fix: #3539722 PHP 8.4: Implicitly nullable parameter declarations deprecated":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi_jsonapi--2025-12-09--3539722--mr-20.patch"
-      },
       "drupal/ctools": {
         "fix: 3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple()":
         "https://git.drupalcode.org/project/ctools/-/commit/5a323c6e5072515148a54b4055e7db86a50f5111.diff",
