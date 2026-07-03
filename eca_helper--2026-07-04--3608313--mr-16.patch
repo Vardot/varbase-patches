@@ -1,0 +1,22 @@
+diff --git a/src/Decorate/Messenger.php b/src/Decorate/Messenger.php
+index fa8336d..396baf2 100644
+--- a/src/Decorate/Messenger.php
++++ b/src/Decorate/Messenger.php
+@@ -45,7 +45,7 @@ class Messenger implements MessengerInterface {
+         /** @var \Drupal\eca_helper\Event\StatusMessagesEvent $event */
+         $msg = (string) $message;
+         $event = $this->triggerEvent->dispatchFromPlugin('eca_helper:status_messages', $msg, $type);
+-        if ($event->isChanged()) {
++        if ($event !== NULL && $event->isChanged()) {
+           $message_altered = $event->getMessage();
+           if ($message_altered && mb_strlen($message) > 0) {
+             return $this->originalMessenger->addMessage($message_altered, $type, $repeat);
+@@ -53,7 +53,7 @@ class Messenger implements MessengerInterface {
+           return $this;
+         }
+       }
+-      catch (\Exception $e) {
++      catch (\Throwable $e) {
+         // During early bootstrap (e.g., installation), some services may not
+         // be available yet. In this case, fall back to the original messenger.
+         return $this->originalMessenger->addMessage($message, $type, $repeat);
