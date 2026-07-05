@@ -1,228 +1,176 @@
 {
-  "name": "vardot/varbase-patches",
-  "description": "List of needed patches for Varbase used packages with Composer Patches.",
-  "keywords": [
-    "composer",
-    "patches",
-    "composer patches",
-    "varbase",
-    "varbase patches",
-    "drupal",
-    "drupal patches"
-  ],
-  "license": "GPL-2.0-or-later",
-  "type": "composer-plugin",
-  "authors": [
-    {
-      "name": "Vardot",
-      "homepage": "https://www.drupal.org/vardot",
-      "role": "Maintainer"
+    "name": "vardot/varbase-patches",
+    "description": "List of needed patches for Varbase used packages with Composer Patches.",
+    "keywords": [
+        "composer",
+        "patches",
+        "composer patches",
+        "varbase",
+        "varbase patches",
+        "drupal",
+        "drupal patches"
+    ],
+    "license": "GPL-2.0-or-later",
+    "type": "composer-plugin",
+    "authors": [
+        {
+            "name": "Vardot",
+            "homepage": "https://www.drupal.org/vardot",
+            "role": "Maintainer"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "composer-plugin-api": "^2.0",
+        "vardot/drupal-core-patches": "~11 || ~12",
+        "composer/installers": "~2",
+        "oomphinc/composer-installers-extender": "~2",
+        "cweagans/composer-patches": "~1 || ~2",
+        "vardot/entity-definition-update-manager": "~1",
+        "vardot/module-installer-factory": "~1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vardot\\VarbasePatches\\": "src/"
+        }
+    },
+    "extra": {
+        "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
+        "patches": {
+            "drupal/default_content": {
+                "Issue #3160146: Add Layout Builder Normalizer and Denormalize": "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
+            },
+            "drupal/gin": {
+                "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2024-11-12--3325263.patch",
+                "fix: #3590827 Sticky form actions appear on node revision revert/delete confirm forms (incomplete exclusion pattern)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2026-05-19--3590827--mp-787.patch"
+            },
+            "drupal/persistent_login": {
+                "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles": "https://www.drupal.org/files/issues/persistent_login-user_task_permission-2899530-6.patch"
+            },
+            "drupal/update_helper": {
+                "Issue #3024165: [PATCH] Enhancements, Better messages for the unable to apply updates, drush command and removed the Mark all updates as successful on install": "https://www.drupal.org/files/issues/2022-06-05/3024165-55.patch"
+            },
+            "drupal/inline_entity_form": {
+                "Issue #2913571: Add a setting to enable/disable inline editing for existing entities": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/inline_entity_form--2026-06-07--2913571--mr-127.patch",
+                "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated": "https://www.drupal.org/files/issues/2025-01-04/inline_entity_form--2025-01-04--mr-126.patch"
+            },
+            "drupal/entity_clone": {
+                "Issue #3388460: Fatal error on cloning a menu link (D10 site)": "https://www.drupal.org/files/issues/2023-10-17/3388460-7.patch"
+            },
+            "drupal/rabbit_hole": {
+                "Issue #3419073: Fix Return value must be of type bool fatal error": "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch"
+            },
+            "drupal/cl_block": {
+                "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration": "https://www.drupal.org/files/issues/2023-06-08/3365591-3.patch",
+                "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()": "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
+            },
+            "drupal/embed": {
+                "Issue #3517882: The namespace of EmbedCKEditor5PluginBase does not respect PSR4": "https://www.drupal.org/files/issues/2025-06-30/embed--2025-06-30--3517882--mr-26.patch"
+            },
+            "drupal/entity_embed": {
+                "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor": "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
+                "Issue #2679875: Inline Entity Form integration": "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch",
+                "Issue #3531672:  Drupal 10.5/11.2 compatability (tooltip broken, cannot edit embedded entities)": "https://www.drupal.org/files/issues/2025-06-30/entity_embed--2025-06-30--3531672--mr-62.patch"
+            },
+            "drupal/layout_library": {
+                "fix: #3075067 Duplicate entry for key 'block_content_field__uuid__value'": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
+                "Issue #3273160: Support inline blocks in layout": "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch",
+                "Issue #3561874 : Add missing isSupported method to Library class for SupportAwareSectionStorageInterface compatibility with Drupal ~11.3.0": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3561874--mr-21.patch"
+            },
+            "drupal/paragraphs": {
+                "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]": "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
+                "Issue #3138609: Fixe Field group support broken": "https://www.drupal.org/files/issues/2020-06-03/3138609-24.patch",
+                "Issue #3090200: Paragraph access check using incorrect revision of its parent, leading to issues editing and viewing paragraphs when content moderation is involved.": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs--2026-06-25--3090200--mr264.patch"
+            },
+            "drupal/paragraphs_previewer": {
+                "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch": "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch"
+            },
+            "drupal/redirect": {
+                "Issue #2879648: Redirects from aliased paths aren't triggered (Drupal 11.4, RedirectPathProcessorManager approach)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-07-05--2879648--mr-202.patch"
+            },
+            "drupal/layout_builder_perms": {
+                "Issue #3502237: Fix type error in layout builder perms access manager logger channel factory with LoggerChannelFactoryInterface ": "https://www.drupal.org/files/issues/2025-01-25/layout_builder_perms--2025-01-25--3502237--mr-25.patch",
+                "fix: #3562020 PHP 8.4 implicit nullable parameters across Layout Builder Advanced Permissions": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_builder_perms--2025-12-08--3562020--mr-28.patch"
+            },
+            "drupal/cl_server": {
+                "Issue #3456661: Update Drupal core to ^10.3 and ^11 and drop the use of the SDC experimental module": "https://www.drupal.org/files/issues/2024-06-25/cl_server--2024-06-25--3456661-9--mr-32.patch"
+            },
+            "drupal/node_edit_protection": {
+                "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme": "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
+            },
+            "drupal/social_auth": {
+                "fix: #3578754 Uncaught SocialApiException shows fatal error page when credentials are not configured": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2026-03-13--3578754--mr-40.patch"
+            },
+            "drupal/social_auth_facebook": {
+                "Issue #3507470: Fix fatal error for validateConfig() method signature mismatch": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth_facebook--2026-03-12--3507470--mr-8.patch"
+            },
+            "drupal/social_auth_linkedin": {
+                "Issue #3507495: Remove leftover reference to social_auth_linkedin.settings_form to fix Route Provider Error": "https://www.drupal.org/files/issues/2025-02-18/social_auth_linkedin--2025-02-18--3507495--mr-10.patch"
+            },
+            "drupal/jsonapi_extras": {
+                "fix: #3508142 installation error with JSON:API Extra in custom Drupal 11 profiles due to missing synthetic service kernel": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/jsonapi_extras--2026-01-21--3508142--mr-65.patch"
+            },
+            "drupal/block_class": {
+                "Issue #3493849: Argument #1 ($array) must be of type array, string given": "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
+            },
+            "drupal/ui_patterns_ds-ui_patterns_ds": {
+                "Issue #3504614 Render field value in component using DS field source": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns_ds-ui_patterns_ds--2025-11-24--3504614--mr-3.patch"
+            },
+            "drupal/dashboard": {
+                "Issue #3528064: Add support for Layout Builder Restrictions": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboard--2026-01-11--3528064--mr-63.patch"
+            },
+            "drupal/coffee": {
+                "Issue #3535874: Add Navigation Top Bar integration for Coffee module in Drupal ~11.2.0 and Gin ~5.0": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/coffee--2025-07-30--3535874--mr-19.patch"
+            },
+            "drupal/entity": {
+                "Issue #3532309: Fix Deprecation notice from DeleteAction class causes errors in ECA module": "https://www.drupal.org/files/issues/2025-06-25/entity-fix-deprecation.patch"
+            },
+            "drupal/dropzonejs": {
+                "Issue #3542463: Fix TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in DropzoneJsUploadForm::validateUploadElement()": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dropzonejs--2025-08-21--3542463--mr-24.patch"
+            },
+            "drupal/views_bulk_edit": {
+                "Issue #3544584: Change default Change method to Replace the current value when configuring Modify field values action": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-09-03--3544584--mr-44.patch"
+            },
+            "drupal/content_planner": {
+                "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch",
+                "fix: #3542886 PHP 8.4 Support fixes": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-12-09--3542886--mr-63.patch"
+            },
+            "drupal/webp": {
+                "fix: #3561953 PHP 8.4 implicit nullable & constructor parameter order issues in WebP FileDownloadController": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webp--2026-04-15--3561953--mr-54.patch"
+            },
+            "neilime/php-css-lint": {
+                "fix: #3498301 PHP 8.4 compatibility to fix PHP 8.4 deprecation warning for implicit nullable parameter in CssLint Linter": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/php-css-lint--2025-12-21--3498301.patch"
+            },
+            "drupal/openapi": {
+                "fix: #3523346 PHP 8.4: Implicitly nullable parameter declarations deprecated": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi--2025-12-08--3523346--mr-22.patch"
+            },
+            "drupal/google_analytics": {
+                "fix: #3562288 PHP 8.4 - Implicit Nullable Parameters for Google Analytics": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/google_analytics--2025-12-09--3562288--mr-45.patch"
+            },
+            "drupal/schemata": {
+                "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemata--2025-12-09--3523349--mr-17.patch"
+            },
+            "drupal/ctools": {
+                "fix: 3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple()": "https://git.drupalcode.org/project/ctools/-/commit/5a323c6e5072515148a54b4055e7db86a50f5111.diff"
+            },
+            "drupal/shield": {
+                "fix: #3562392 PHP 8.4 - Implicit nullable parameters for Shield": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/shield--2025-12-10--3562392--mr-30.patch"
+            },
+            "drupal/password_policy": {
+                "fix: #3516906 PHP 8.4 nullable types must be explicit": "https://git.drupalcode.org/project/password_policy/-/commit/999abf8501fd2878dc40b0b4db81315fed60cc03.diff"
+            },
+            "drupal/simple_oauth": {
+                "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
+            },
+            "openai-php/client": {
+                "fix: PHP 8.4 compatibility - TypeError when API returns null for results array #725": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openai-php--client--2025-12-30--pr-725.patch"
+            },
+            "drupal/recaptcha": {
+                "fix: #3588269 Make Drupal8Post::submit() compatible with parent": "https://git.drupalcode.org/project/recaptcha/-/commit/68b0f86d1e930ed78f795a97a2fc207be35b3260.diff"
+            },
+            "drupal/eca_helper": {
+                "fix: #3608313 Guard null event and catch Throwable in Messenger decorator": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/eca_helper--2026-07-04--3608313--mr-16.patch"
+            }
+        }
     }
-  ],
-  "require": {
-    "php": ">=8.1",
-    "composer-plugin-api": "^2.0",
-    "vardot/drupal-core-patches": "~11 || ~12",
-    "composer/installers": "~2",
-    "oomphinc/composer-installers-extender": "~2",
-    "cweagans/composer-patches": "~1 || ~2",
-    "vardot/entity-definition-update-manager": "~1",
-    "vardot/module-installer-factory": "~1"
-  },
-  "autoload": {
-    "psr-4": {
-      "Vardot\\VarbasePatches\\": "src/"
-    }
-  },
-  "extra": {
-    "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
-    "patches": {
-      "drupal/default_content": {
-        "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
-        "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
-      },
-      "drupal/gin": {
-        "Issue #3325263: Fix user.data ServiceNotFoundException when using Gin as distribution installer theme":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2024-11-12--3325263.patch",
-        "fix: #3590827 Sticky form actions appear on node revision revert/delete confirm forms (incomplete exclusion pattern)":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2026-05-19--3590827--mp-787.patch"
-      },
-      "drupal/persistent_login": {
-        "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles":
-        "https://www.drupal.org/files/issues/persistent_login-user_task_permission-2899530-6.patch"
-      },
-      "drupal/update_helper": {
-        "Issue #3024165: [PATCH] Enhancements, Better messages for the unable to apply updates, drush command and removed the Mark all updates as successful on install":
-        "https://www.drupal.org/files/issues/2022-06-05/3024165-55.patch"
-      },
-      "drupal/inline_entity_form": {
-        "Issue #2913571: Add a setting to enable/disable inline editing for existing entities":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/inline_entity_form--2026-06-07--2913571--mr-127.patch",
-        "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated":
-        "https://www.drupal.org/files/issues/2025-01-04/inline_entity_form--2025-01-04--mr-126.patch"
-      },
-      "drupal/entity_clone": {
-        "Issue #3388460: Fatal error on cloning a menu link (D10 site)":
-        "https://www.drupal.org/files/issues/2023-10-17/3388460-7.patch"
-      },
-      "drupal/rabbit_hole": {
-        "Issue #3419073: Fix Return value must be of type bool fatal error":
-        "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch"
-      },
-      "drupal/cl_block": {
-        "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration":
-        "https://www.drupal.org/files/issues/2023-06-08/3365591-3.patch",
-        "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()":
-        "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
-      },
-      "drupal/embed": {
-        "Issue #3517882: The namespace of EmbedCKEditor5PluginBase does not respect PSR4":
-        "https://www.drupal.org/files/issues/2025-06-30/embed--2025-06-30--3517882--mr-26.patch"
-      },
-      "drupal/entity_embed": {
-        "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
-        "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
-        "Issue #2679875: Inline Entity Form integration":
-        "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch",
-        "Issue #3531672:  Drupal 10.5/11.2 compatability (tooltip broken, cannot edit embedded entities)":
-        "https://www.drupal.org/files/issues/2025-06-30/entity_embed--2025-06-30--3531672--mr-62.patch"
-      },
-      "drupal/layout_library": {
-        "fix: #3075067 Duplicate entry for key 'block_content_field__uuid__value'":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
-        "Issue #3273160: Support inline blocks in layout":
-        "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch",
-        "Issue #3561874 : Add missing isSupported method to Library class for SupportAwareSectionStorageInterface compatibility with Drupal ~11.3.0":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3561874--mr-21.patch"
-      },
-      "drupal/paragraphs": {
-        "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]":
-        "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
-        "Issue #3138609: Fixe Field group support broken":
-        "https://www.drupal.org/files/issues/2020-06-03/3138609-24.patch",
-        "Issue #3090200: Paragraph access check using incorrect revision of its parent, leading to issues editing and viewing paragraphs when content moderation is involved.":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs--2026-06-25--3090200--mr264.patch"
-      },
-      "drupal/paragraphs_previewer": {
-        "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch":
-        "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch"
-      },
-      "drupal/redirect": {
-        "fix: #3607821 Drupal 11.4 compatibility for RedirectPathProcessorManager":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-07-02--3607821--mr-199.patch"
-      },
-      "drupal/layout_builder_perms": {
-        "Issue #3502237: Fix type error in layout builder perms access manager logger channel factory with LoggerChannelFactoryInterface ":
-        "https://www.drupal.org/files/issues/2025-01-25/layout_builder_perms--2025-01-25--3502237--mr-25.patch",
-        "fix: #3562020 PHP 8.4 implicit nullable parameters across Layout Builder Advanced Permissions":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_builder_perms--2025-12-08--3562020--mr-28.patch"
-      },
-      "drupal/cl_server": {
-        "Issue #3456661: Update Drupal core to ^10.3 and ^11 and drop the use of the SDC experimental module":
-        "https://www.drupal.org/files/issues/2024-06-25/cl_server--2024-06-25--3456661-9--mr-32.patch"
-      },
-      "drupal/node_edit_protection": {
-        "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
-        "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
-      },
-      "drupal/social_auth": {
-        "fix: #3578754 Uncaught SocialApiException shows fatal error page when credentials are not configured":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2026-03-13--3578754--mr-40.patch"
-      },
-      "drupal/social_auth_facebook": {
-        "Issue #3507470: Fix fatal error for validateConfig() method signature mismatch":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth_facebook--2026-03-12--3507470--mr-8.patch"
-      },
-      "drupal/social_auth_linkedin": {
-        "Issue #3507495: Remove leftover reference to social_auth_linkedin.settings_form to fix Route Provider Error":
-        "https://www.drupal.org/files/issues/2025-02-18/social_auth_linkedin--2025-02-18--3507495--mr-10.patch"
-      },
-      "drupal/jsonapi_extras": {
-        "fix: #3508142 installation error with JSON:API Extra in custom Drupal 11 profiles due to missing synthetic service kernel":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/jsonapi_extras--2026-01-21--3508142--mr-65.patch"
-      },
-      "drupal/block_class": {
-        "Issue #3493849: Argument #1 ($array) must be of type array, string given":
-        "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
-      },
-      "drupal/ui_patterns_ds-ui_patterns_ds": {
-        "Issue #3504614 Render field value in component using DS field source":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ui_patterns_ds-ui_patterns_ds--2025-11-24--3504614--mr-3.patch"
-      },
-      "drupal/dashboard": {
-        "Issue #3528064: Add support for Layout Builder Restrictions":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dashboard--2026-01-11--3528064--mr-63.patch"
-      },
-      "drupal/coffee": {
-        "Issue #3535874: Add Navigation Top Bar integration for Coffee module in Drupal ~11.2.0 and Gin ~5.0":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/coffee--2025-07-30--3535874--mr-19.patch"
-      },
-      "drupal/entity": {
-        "Issue #3532309: Fix Deprecation notice from DeleteAction class causes errors in ECA module":
-        "https://www.drupal.org/files/issues/2025-06-25/entity-fix-deprecation.patch"
-      },
-      "drupal/dropzonejs": {
-        "Issue #3542463: Fix TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in DropzoneJsUploadForm::validateUploadElement()":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dropzonejs--2025-08-21--3542463--mr-24.patch"
-      },
-      "drupal/views_bulk_edit": {
-        "Issue #3544584: Change default Change method to Replace the current value when configuring Modify field values action":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-09-03--3544584--mr-44.patch"
-      },
-      "drupal/content_planner": {
-        "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch",
-        "fix: #3542886 PHP 8.4 Support fixes":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-12-09--3542886--mr-63.patch"
-      },
-      "drupal/webp": {
-        "fix: #3561953 PHP 8.4 implicit nullable & constructor parameter order issues in WebP FileDownloadController":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webp--2026-04-15--3561953--mr-54.patch"
-      },
-      "neilime/php-css-lint": {
-        "fix: #3498301 PHP 8.4 compatibility to fix PHP 8.4 deprecation warning for implicit nullable parameter in CssLint Linter":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/php-css-lint--2025-12-21--3498301.patch"
-      },
-      "drupal/openapi": {
-        "fix: #3523346 PHP 8.4: Implicitly nullable parameter declarations deprecated":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi--2025-12-08--3523346--mr-22.patch"
-      },
-      "drupal/google_analytics": {
-        "fix: #3562288 PHP 8.4 - Implicit Nullable Parameters for Google Analytics":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/google_analytics--2025-12-09--3562288--mr-45.patch"
-      },
-      "drupal/schemata": {
-        "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemata--2025-12-09--3523349--mr-17.patch"
-      },
-      "drupal/ctools": {
-        "fix: 3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple()":
-        "https://git.drupalcode.org/project/ctools/-/commit/5a323c6e5072515148a54b4055e7db86a50f5111.diff"
-      },
-      "drupal/shield": {
-        "fix: #3562392 PHP 8.4 - Implicit nullable parameters for Shield":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/shield--2025-12-10--3562392--mr-30.patch"
-      },
-      "drupal/password_policy": {
-        "fix: #3516906 PHP 8.4 nullable types must be explicit":
-        "https://git.drupalcode.org/project/password_policy/-/commit/999abf8501fd2878dc40b0b4db81315fed60cc03.diff"
-      },
-      "drupal/simple_oauth": {
-        "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
-      },
-      "openai-php/client": {
-        "fix: PHP 8.4 compatibility - TypeError when API returns null for results array #725":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openai-php--client--2025-12-30--pr-725.patch"
-      },
-      "drupal/recaptcha": {
-        "fix: #3588269 Make Drupal8Post::submit() compatible with parent":
-        "https://git.drupalcode.org/project/recaptcha/-/commit/68b0f86d1e930ed78f795a97a2fc207be35b3260.diff"
-      },
-      "drupal/eca_helper": {
-        "fix: #3608313 Guard null event and catch Throwable in Messenger decorator":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/eca_helper--2026-07-04--3608313--mr-16.patch"
-      }
-    }
-  }
 }
