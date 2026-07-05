@@ -1,0 +1,20 @@
+--- a/src/Form/QuickTransitionForm.php
++++ b/src/Form/QuickTransitionForm.php
+@@ -71,7 +71,7 @@
+    * @param \Drupal\Component\Datetime\TimeInterface|null $datetime
+    *   Drupal Time Manager.
+    */
+-  public function __construct(ModerationInformationInterface $moderation_info, StateTransitionValidationInterface $validation, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository, TimeInterface $datetime = NULL) {
++  public function __construct(ModerationInformationInterface $moderation_info, StateTransitionValidationInterface $validation, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository, ?TimeInterface $datetime = NULL) {
+     $this->moderationInformation = $moderation_info;
+     $this->validation = $validation;
+     $this->entityTypeManager = $entity_type_manager;
+@@ -107,7 +107,7 @@
+   /**
+    * {@inheritdoc}
+    */
+-  public function buildForm(array $form, FormStateInterface $form_state, ContentEntityInterface $entity = NULL) {
++  public function buildForm(array $form, FormStateInterface $form_state, ?ContentEntityInterface $entity = NULL) {
+     // Return an empty form if the user does not have appropriate permissions.
+     if (!$entity->access('update')) {
+       return [];

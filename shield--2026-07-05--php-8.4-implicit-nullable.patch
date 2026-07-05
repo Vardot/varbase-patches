@@ -1,0 +1,11 @@
+--- a/src/Form/ShieldSettingsForm.php
++++ b/src/Form/ShieldSettingsForm.php
+@@ -43,7 +43,7 @@
+    * @param \Drupal\key\Plugin\KeyPluginManager|null $keyTypeManager
+    *   The key plugin manager.
+    */
+-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $moduleHandler, KeyPluginManager $keyTypeManager = NULL) {
++  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $moduleHandler, ?KeyPluginManager $keyTypeManager = NULL) {
+     parent::__construct($config_factory, $typedConfigManager);
+     $this->moduleHandler = $moduleHandler;
+     $this->keyTypeManager = $keyTypeManager;
