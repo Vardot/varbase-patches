@@ -1,0 +1,11 @@
+--- a/src/AuthManager/OAuth2Manager.php
++++ b/src/AuthManager/OAuth2Manager.php
+@@ -73,7 +73,7 @@
+    */
+   public function __construct(ImmutableConfig $settings,
+                               LoggerChannelFactoryInterface $logger_factory,
+-                              Request $request = NULL) {
++                              ?Request $request = NULL) {
+ 
+     $this->settings = $settings;
+     $this->loggerFactory = $logger_factory;
