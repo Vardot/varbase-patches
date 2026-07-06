@@ -67,7 +67,7 @@
       },
       "drupal/rabbit_hole": {
         "Issue #3419073: Fix Return value must be of type bool fatal error":
-        "https://www.drupal.org/files/issues/2024-02-04/rabbit_hole--2024-02-04--3419073-3.patch"
+        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/rabbit_hole--2026-07-06--3419073--mr-65.patch"
       },
       "drupal/cl_block": {
         "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration":
