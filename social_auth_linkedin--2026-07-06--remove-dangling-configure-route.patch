@@ -1,0 +1,13 @@
+diff --git a/social_auth_linkedin.info.yml b/social_auth_linkedin.info.yml
+index 0000000..1111111 100644
+--- a/social_auth_linkedin.info.yml
++++ b/social_auth_linkedin.info.yml
+@@ -3,8 +3,6 @@ type: module
+ description: 'Social Auth integration for LinkedIn.'
+ core_version_requirement: ^9.5 || ^10 || ^11
+ package: Social
+ 
+-configure: social_auth_linkedin.settings_form
+-
+ dependencies:
+   - social_auth:social_auth
