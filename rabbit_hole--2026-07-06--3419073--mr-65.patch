@@ -1,0 +1,22 @@
+diff --git a/src/Entity/BehaviorSettings.php b/src/Entity/BehaviorSettings.php
+index 79f9f9d4b5a419672d4837cf1ff5559fdab84e9b..8c7fe5014b93b991a8aa293cd57a6419d7e34fb0 100644
+--- a/src/Entity/BehaviorSettings.php
++++ b/src/Entity/BehaviorSettings.php
+@@ -131,7 +131,7 @@ class BehaviorSettings extends ConfigEntityBase implements BehaviorSettingsInter
+    * {@inheritdoc}
+    */
+   public function getNoBypass(): bool {
+-    return $this->no_bypass;
++    return $this->no_bypass ? TRUE : FALSE;
+   }
+ 
+   /**
+@@ -146,7 +146,7 @@ class BehaviorSettings extends ConfigEntityBase implements BehaviorSettingsInter
+    * {@inheritdoc}
+    */
+   public function getBypassMessage(): bool {
+-    return $this->bypass_message;
++    return $this->bypass_message ? TRUE : FALSE;
+   }
+ 
+   /**
