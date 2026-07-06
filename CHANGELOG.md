@@ -6,10 +6,17 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.20] - 2026-07-06
+
 - Add a patch for the Redirect module on Drupal 11.4 compatibility for RedirectPathProcessorManager (#3607821) (#420)
 - docs: Add the contribution workflow to the varbase-patches agent (#422)
 - Revert "Add a patch for the Redirect module on Drupal 11.4 compat: PathProcessorManager::addInbound() removed (constructor-injected autowired path processors), applied after Issue #2879648 mr-109"
 - Add a patch for the Redirect module on Drupal 11.4 compat: PathProcessorManager::addInbound() removed (constructor-injected autowired path processors), applied after Issue #2879648 mr-109
+- docs: Add CHANGELOG.md for the 11.0.x branch (#432)
+- fix: #446 Remove the openapi_jsonapi #3539722 patch on 11.0.x (fixed upstream in 3.x) (#447)
+- fix: add the eca_helper #3608313 patch on the 11.0.x branch (same patch file as 10.1.x) (#454)
+- fix: Point the redirect patch at #2879648 MR!202 and drop the superseded #3607821 patch (Drupal 11.4 RedirectPathProcessorManager)
+- Change a patch for the Rabbit Hole module for Fix Return value must be of type bool fatal error (#3419073) — for Varbase 11.0.x (#465)
 
 ## [11.0.19] - 2026-06-30
 
