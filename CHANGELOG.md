@@ -6,8 +6,20 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [9.2.94] - 2026-07-06
+
 - Remove the drupal/default_content patch on 9.2.x (#419)
 - docs: document drupal-core-patches and update the patch-ignore guidance (#406)
+- docs: Add CHANGELOG.md for the 9.2.x branch (#429)
+- fix: #433 Use the Drupal 11.4-compatible redirect patch (#3607821 / MR !199) on 9.2.x (#434)
+- fix: #435 Use the corrected layout_library isSupported patch on 9.2.x (#437)
+- fix: #440 Remove the openapi_jsonapi #3539722 patch on 9.2.x (fixed upstream in 3.x) (#441)
+- fix: #448 Remove the openapi_jsonapi #3079209 patch on 9.2.x (implemented upstream in 3.x) (#449)
+- fix: Point the redirect patch at #2879648 MR!202 and drop the superseded #3607821 patch (Drupal 11.4 RedirectPathProcessorManager)
+- Add social_api PHP 8.4 implicit-nullable patch (fixes install AJAX parsererror) (#455)
+- Add PHP 8.4 implicit-nullable patches for moderation_sidebar, shield, panels IPE (#456)
+- fix: patch social_auth_linkedin dangling configure route on 9.2.x (#458)
+- Change a patch for the Rabbit Hole module for Fix Return value must be of type bool fatal error (#3419073) — for Varbase 9.2.x (#462)
 
 ## [9.2.93] - 2026-06-28
 
