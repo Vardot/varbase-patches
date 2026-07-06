@@ -6,7 +6,15 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [10.1.77] - 2026-07-06
+
 - docs: document drupal-core-patches and update the patch-ignore guidance (#408)
+- docs: Add CHANGELOG.md for the 10.1.x branch (#431)
+- Replace the drupal/redirect #2879648 (mr-109) stored patch with the Drupal 11.4 compatible merge request (#439)
+- fix: #444 Remove the openapi_jsonapi #3539722 patch on 10.1.x (fixed upstream in 3.x) (#445)
+- Add a patch for the ECA Helper module on fix: #3608313 Guard null event and catch Throwable in Messenger decorator (#453)
+- fix: Point the redirect patch at #2879648 MR!202 and drop the superseded #3607821 patch (Drupal 11.4 RedirectPathProcessorManager)
+- Change a patch for the Rabbit Hole module for Fix Return value must be of type bool fatal error (#3419073) — for Varbase 10.1.x (#464)
 
 ## [10.1.76] - 2026-06-28
 
