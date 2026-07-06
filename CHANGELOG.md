@@ -6,7 +6,12 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [10.0.136] - 2026-07-06
+
 - docs: document drupal-core-patches and update the patch-ignore guidance (#407)
+- docs: Add CHANGELOG.md for the 10.0.x branch (#430)
+- fix: #442 Remove the openapi_jsonapi #3539722 patch on 10.0.x (fixed upstream in 3.x) (#443)
+- Change a patch for the Rabbit Hole module for Fix Return value must be of type bool fatal error (#3419073) — for Varbase 10.0.x (#463)
 
 ## [10.0.135] - 2026-06-28
 
