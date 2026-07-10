@@ -150,6 +150,37 @@ composer varbase-patches:cleanup:patches-file
 composer var-ccupf
 ```
 
+## Standard issue / PR title
+
+Every patch issue and its MR/PR share ONE title in this grammar (proper names Capitalized, no trailing period):
+
+`<Action> a patch for the <Target> on <ref>[ -- <reason>]`
+
+- **Action** — `Add` · `Remove` · `Change` · `Update` · `Revert -`. Use **`Remove all patches for …`** when dropping every patch for a target (usually after upstream released the fix).
+- **Target** — `<Module name> module` · `<Theme name> theme` · `<machine> recipe` · `<vendor/lib> library` · `Drupal Core` · `Varbase <x.y.x> profile`.
+- **ref** — the drupal.org change, one of:
+  - commit-type (current): `fix: #3607821 <summary>`, `feat: #3567225 <summary>` — the type echoes the upstream issue (fix / feat / perf / refactor / task / …).
+  - legacy: `Issue #3607821: <summary>`.
+- **reason** (optional) — why now: `-- after <Module> <version> was released`, `- for Varbase 11.0.x`, `- for Drupal 10.6.2`.
+
+Real examples:
+- `Add a patch for the CTools module on fix: #3572317 ctools_views schema alter missing requiredKey for views_block mapping keys causes validation errors in Drupal Canvas`
+- `Remove a patch for the Dashboards module on fix: #3542888 PHP 8.4 Support`
+- `Change a patch for the Redirect module on feat: #2879648 Redirects from aliased paths aren't triggered -- after 8.x-1.13 was released`
+- `Remove all patches for The Gin Admin theme after Gin 5.0.12 was released`
+- `Add a patch for the openai-php/client library on fix: PHP 8.4 compatibility - TypeError when API returns null for results array`
+- `Add a patch for Drupal Core on Issue #3543210: Quick Edit Save Via Contextual Links Redirects to 404 Page`
+
+Infrastructure / branch issues drop the "patch for" grammar and state the action directly, e.g. `Start an 11.0.x branch for Varbase Patches to work with Drupal CMS ~2.0 and Varbase ~11.0.0`, `Add a no-patches branch - to let developers manage their list of patches in the root composer.json`, `Change the path for Varbase Patches storage branch with refs/heads/patches for the patches branch`.
+
+The MR/PR uses this exact title; its description still ends with the Checkpoints checklist.
+
+### Reinforcements (2026-07)
+
+1. **A re-roll of an existing patch is a `Change`** — never `fix: Re-roll…` or any ad-hoc `{type}:` prefix. A re-roll keeps the ORIGINAL upstream `{type}` and issue title: `Change a patch for the <Module> module on <type>: #<nid> <full upstream issue title>`. The "why now" goes only in the optional `-- <reason>` suffix (e.g. `-- re-rolled against Canvas 1.8.0`). Match the title style already used in that branch's `CHANGELOG.md`.
+2. **A patch change split across branches shares ONE canonical title** — when one change spans the `patches`-branch file PR + the version-branch wiring PR, the issue AND both PRs carry the identical title (two PRs, one story, one title).
+3. **`gh pr edit --title` gotcha** — it can fail with `Projects (classic) … deprecated (repository.pullRequest.projectCards)` and silently NOT apply the title (always verify after). Retitle via REST instead: `gh api -X PATCH repos/<owner>/<repo>/pulls/<n> -f title="…"`.
+
 ## Filename convention
 
 ```
