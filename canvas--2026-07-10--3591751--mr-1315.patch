@@ -1,0 +1,188 @@
+diff --git a/modules/canvas_ai/src/Plugin/AiFunctionCall/CreateComponent.php b/modules/canvas_ai/src/Plugin/AiFunctionCall/CreateComponent.php
+index 5e976c226d4551cdfa6acb3a5337f6301cbc2503..82a41a0c11f02f4f1b532422f729992b1b9a183d 100644
+--- a/modules/canvas_ai/src/Plugin/AiFunctionCall/CreateComponent.php
++++ b/modules/canvas_ai/src/Plugin/AiFunctionCall/CreateComponent.php
+@@ -140,7 +140,7 @@ final class CreateComponent extends FunctionCallBase implements ExecutableFuncti
+         'status' => FALSE,
+         'sourceCodeJs' => $javascript,
+         'sourceCodeCss' => $css,
+-        'compiledJs' => '',
++        'compiledJs' => $this->compileSourceJs($javascript),
+         'compiledCss' => '',
+         'importedJsComponents' => [],
+         'props' => $transformed_props,
+@@ -170,4 +170,55 @@ final class CreateComponent extends FunctionCallBase implements ExecutableFuncti
+     $this->setOutput('The component ' . $component_name . ' has been created successfully.');
+   }
+ 
++  /**
++   * Compiles JSX source to JavaScript with esbuild (matches the browser build).
++   *
++   * Code components are compiled in the browser editor; when created or edited
++   * programmatically (e.g. by the AI) compiledJs is left empty, which makes the
++   * rendered component show "[object Object]". Compile it server-side instead.
++   *
++   * @param string $source
++   *   The JSX source code.
++   *
++   * @return string
++   *   The compiled JavaScript, or an empty string if esbuild is unavailable.
++   */
++  protected function compileSourceJs(string $source): string {
++    if (\trim($source) === '') {
++      return '';
++    }
++    // Prefer the standalone esbuild binary (an ELF executable that needs no
++    // Node) over the node_modules/.bin/esbuild wrapper, whose
++    // "#!/usr/bin/env node" shebang fails under php-fpm where Node is usually
++    // not on PATH.
++    $candidates = [];
++    foreach (['/../node_modules', '/node_modules', '/core/node_modules'] as $base) {
++      $candidates = \array_merge($candidates, \glob(DRUPAL_ROOT . $base . '/@esbuild/*/bin/esbuild') ?: []);
++      $candidates[] = DRUPAL_ROOT . $base . '/.bin/esbuild';
++    }
++    $bin = '';
++    foreach ($candidates as $candidate) {
++      if (@\is_executable($candidate)) {
++        $bin = $candidate;
++        break;
++      }
++    }
++    if ($bin === '') {
++      return '';
++    }
++    $descriptors = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']];
++    $command = \escapeshellarg($bin) . ' --loader=jsx --jsx=automatic --format=esm';
++    $process = @\proc_open($command, $descriptors, $pipes);
++    if (!\is_resource($process)) {
++      return '';
++    }
++    \fwrite($pipes[0], $source);
++    \fclose($pipes[0]);
++    $compiled = \stream_get_contents($pipes[1]);
++    \fclose($pipes[1]);
++    \fclose($pipes[2]);
++    $code = \proc_close($process);
++    return ($code === 0 && \is_string($compiled)) ? $compiled : '';
++  }
++
+ }
+diff --git a/modules/canvas_ai/src/Plugin/AiFunctionCall/EditComponentJs.php b/modules/canvas_ai/src/Plugin/AiFunctionCall/EditComponentJs.php
+index a0b77fa..9428113 100644
+--- a/modules/canvas_ai/src/Plugin/AiFunctionCall/EditComponentJs.php
++++ b/modules/canvas_ai/src/Plugin/AiFunctionCall/EditComponentJs.php
+@@ -162,7 +162,7 @@ final class EditComponentJs extends FunctionCallBase implements ExecutableFuncti
+         'status' => FALSE,
+         'sourceCodeJs' => $js,
+         'sourceCodeCss' => '',
+-        'compiledJs' => '',
++        'compiledJs' => $this->compileSourceJs($js),
+         'compiledCss' => '',
+         'importedJsComponents' => [],
+         'props' => $transformed_props,
+@@ -211,4 +211,55 @@ final class EditComponentJs extends FunctionCallBase implements ExecutableFuncti
+     $this->logger->info($message);
+   }
+ 
++  /**
++   * Compiles JSX source to JavaScript with esbuild (matches the browser build).
++   *
++   * Code components are compiled in the browser editor; when created or edited
++   * programmatically (e.g. by the AI) compiledJs is left empty, which makes the
++   * rendered component show "[object Object]". Compile it server-side instead.
++   *
++   * @param string $source
++   *   The JSX source code.
++   *
++   * @return string
++   *   The compiled JavaScript, or an empty string if esbuild is unavailable.
++   */
++  protected function compileSourceJs(string $source): string {
++    if (\trim($source) === '') {
++      return '';
++    }
++    // Prefer the standalone esbuild binary (an ELF executable that needs no
++    // Node) over the node_modules/.bin/esbuild wrapper, whose
++    // "#!/usr/bin/env node" shebang fails under php-fpm where Node is usually
++    // not on PATH.
++    $candidates = [];
++    foreach (['/../node_modules', '/node_modules', '/core/node_modules'] as $base) {
++      $candidates = \array_merge($candidates, \glob(DRUPAL_ROOT . $base . '/@esbuild/*/bin/esbuild') ?: []);
++      $candidates[] = DRUPAL_ROOT . $base . '/.bin/esbuild';
++    }
++    $bin = '';
++    foreach ($candidates as $candidate) {
++      if (@\is_executable($candidate)) {
++        $bin = $candidate;
++        break;
++      }
++    }
++    if ($bin === '') {
++      return '';
++    }
++    $descriptors = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']];
++    $command = \escapeshellarg($bin) . ' --loader=jsx --jsx=automatic --format=esm';
++    $process = @\proc_open($command, $descriptors, $pipes);
++    if (!\is_resource($process)) {
++      return '';
++    }
++    \fwrite($pipes[0], $source);
++    \fclose($pipes[0]);
++    $compiled = \stream_get_contents($pipes[1]);
++    \fclose($pipes[1]);
++    \fclose($pipes[2]);
++    $code = \proc_close($process);
++    return ($code === 0 && \is_string($compiled)) ? $compiled : '';
++  }
++
+ }
+diff --git a/modules/canvas_ai/tests/src/Kernel/Plugin/AiFunctionCall/CreateComponentTest.php b/modules/canvas_ai/tests/src/Kernel/Plugin/AiFunctionCall/CreateComponentTest.php
+index 95184a7..48dc168 100644
+--- a/modules/canvas_ai/tests/src/Kernel/Plugin/AiFunctionCall/CreateComponentTest.php
++++ b/modules/canvas_ai/tests/src/Kernel/Plugin/AiFunctionCall/CreateComponentTest.php
+@@ -85,7 +85,11 @@ final class CreateComponentTest extends CanvasKernelTestBase {
+     $this->assertFalse($component_structure['status']);
+     $this->assertEquals($javascript, $component_structure['sourceCodeJs']);
+     $this->assertEquals($css, $component_structure['sourceCodeCss']);
+-    $this->assertEquals('', $component_structure['compiledJs']);
++    // The source is compiled server-side; compiledJs must equal what the
++    // plugin's own compiler produces (empty when esbuild is unavailable).
++    $compile = new \ReflectionMethod($tool, 'compileSourceJs');
++    $compile->setAccessible(TRUE);
++    $this->assertSame($compile->invoke($tool, $javascript), $component_structure['compiledJs']);
+     $this->assertEquals('', $component_structure['compiledCss']);
+     $this->assertEquals([], $component_structure['importedJsComponents']);
+     $this->assertEquals([], $component_structure['dataDependencies']);
+@@ -108,6 +112,32 @@ final class CreateComponentTest extends CanvasKernelTestBase {
+     $this->assertEquals([], $component_structure['slots']);
+   }
+ 
++  /**
++   * Tests that JSX source is compiled server-side to the automatic runtime.
++   *
++   * Without this, AI-created code components keep an empty compiledJs and
++   * render as "[object Object]".
++   */
++  public function testCreateComponentCompilesJsx(): void {
++    $tool = $this->functionCallManager->createInstance('ai_agent:create_component');
++    $this->assertInstanceOf(CreateComponent::class, $tool);
++
++    $compile = new \ReflectionMethod($tool, 'compileSourceJs');
++    $compile->setAccessible(TRUE);
++    $jsx = "export default function Eyebrow({ text = 'Subtitle' }) {\n  return (<span>{text}</span>);\n}\n";
++    $compiled = $compile->invoke($tool, $jsx);
++
++    if ($compiled === '') {
++      $this->markTestSkipped('esbuild is not available in this environment.');
++    }
++    // The esbuild --jsx=automatic transform emits the react/jsx-runtime import
++    // and keeps the default export, matching the in-browser build.
++    $this->assertStringContainsString('react/jsx-runtime', $compiled);
++    $this->assertStringContainsString('default', $compiled);
++    // Empty source always compiles to an empty string.
++    $this->assertSame('', $compile->invoke($tool, ''));
++  }
++
+   /**
+    * Test that a formatted-text prop retains its rich-text schema keys.
+    *
