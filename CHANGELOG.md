@@ -6,6 +6,9 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Canvas module on feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- re-rolled for canvas 1.8.0
+- Change a patch for the Canvas module on fix: #3591751 Compile JSX server-side for AI-created/edited code components (fixes [object Object]) -- re-rolled for canvas 1.8.0
+
 ## [11.0.20] - 2026-07-06
 
 - Add a patch for the Redirect module on Drupal 11.4 compatibility for RedirectPathProcessorManager (#3607821) (#420)
