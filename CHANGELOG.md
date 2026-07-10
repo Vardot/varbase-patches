@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.21] - 2026-07-10
+
 - Change a patch for the Drupal Canvas module on fix: #3591751 Compile JSX server-side for AI-created/edited code components (fixes [object Object]) -- re-rolled against Canvas 1.8.0 (#478)
 - Change a patch for the Drupal Canvas module on feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- re-rolled against Canvas 1.8.0 (#477)
 - docs: lock the patch issue/PR title standard in the agent docs (#480)
