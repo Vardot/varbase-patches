@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- docs: lock the patch issue/PR title standard in the agent docs (#<PR>)
+
 ## [11.0.20] - 2026-07-06
 
 - Add a patch for the Redirect module on Drupal 11.4 compatibility for RedirectPathProcessorManager (#3607821) (#420)
