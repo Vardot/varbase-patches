@@ -6,6 +6,7 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Drupal Canvas module on feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- re-rolled against Canvas 1.8.0 (#477)
 - docs: lock the patch issue/PR title standard in the agent docs (#480)
 
 ## [11.0.20] - 2026-07-06
