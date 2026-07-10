@@ -6,7 +6,7 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
-- docs: lock the patch issue/PR title standard in the agent docs (#<PR>)
+- docs: lock the patch issue/PR title standard in the agent docs (#480)
 
 ## [11.0.20] - 2026-07-06
 
