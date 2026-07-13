@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- ci: Add a GitHub Actions patches test — installs Drupal and the modules this branch patches from `tests/test.composer.json`, asserts Composer Patches (v1 and v2) applies every Varbase patch, and checks that every patch file still exists
+
 - Change a patch for the Social Auth LinkedIn module for Remove leftover reference to social_auth_linkedin.settings_form to fix Route Provider Error (#3507495) — the stored patch file could not be applied by Composer Patches v1 (#490)
 
 ## [9.2.94] - 2026-07-06
