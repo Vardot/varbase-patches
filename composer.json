@@ -170,6 +170,9 @@
             },
             "drupal/eca_helper": {
                 "fix: #3608313 Guard null event and catch Throwable in Messenger decorator": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/eca_helper--2026-07-04--3608313--mr-16.patch"
+            },
+            "drupal/ai_provider_amazeeio": {
+                "fix: #3586236 Do not abort recipe apply when amazee.ai trial provisioning fails": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai_provider_amazeeio--2026-07-13--3586236--mr-78.patch"
             }
         }
     }
