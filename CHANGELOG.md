@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- ci: Add a GitHub Actions patches test — installs Drupal and the modules this branch patches from `tests/test.composer.json`, asserts Composer Patches (v1 and v2) applies every Varbase patch, and checks that every patch file still exists
+
 ## [11.0.21] - 2026-07-10
 
 - Change a patch for the Drupal Canvas module on fix: #3591751 Compile JSX server-side for AI-created/edited code components (fixes [object Object]) -- re-rolled against Canvas 1.8.0 (#478)
