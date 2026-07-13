@@ -38,6 +38,9 @@
             "drupal/ai_agents": {
                 "fix: #3586043 Array to string conversion in Token::doReplace() when a dynamical token value is an array (applyTokens)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai_agents--2026-06-30--3586043--mr-287.patch"
             },
+            "drupal/ai_provider_amazeeio": {
+                "fix: #3586236 Do not abort recipe apply when amazee.ai trial provisioning fails": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai_provider_amazeeio--2026-07-13--3586236--mr-78.patch"
+            },
             "drupal/ai_provider_anthropic": {
                 "fix: #3607044 Chat: requests rejected when the conversation ends with a non-user (assistant/system) message": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai_provider_anthropic--2026-06-30--3607044--mr-30.patch"
             },
