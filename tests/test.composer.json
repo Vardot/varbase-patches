@@ -1,0 +1,115 @@
+{
+    "name": "vardot/varbase-patches-test",
+    "description": "Test project for vardot/varbase-patches (9.1.x): installs Drupal core and every package this branch patches, then checks that cweagans/composer-patches applies all of the Varbase patches.",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": {
+        "varbase-patches": {
+            "type": "path",
+            "url": "../../",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "vardot/varbase-patches": "9.1.x-dev"
+                }
+            }
+        },
+        "drupal": {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    },
+    "require": {
+        "composer/installers": "~2",
+        "cweagans/composer-patches": "~2.0",
+        "drupal/block_class": "~3 || ~4",
+        "drupal/ckeditor": "~1",
+        "drupal/ckeditor_media_embed": "~1",
+        "drupal/cl_block": "~1.0",
+        "drupal/content_planner": "*",
+        "drupal/core-composer-scaffold": "~10.6.0",
+        "drupal/core-recommended": "~10.6.0",
+        "drupal/default_content": "~2",
+        "drupal/dropzonejs": "~2",
+        "drupal/entity_clone": "~2",
+        "drupal/entity_embed": "~1",
+        "drupal/inline_entity_form": "~3",
+        "drupal/layout_library": "*",
+        "drupal/linkit": "~7",
+        "drupal/node_edit_protection": "~1",
+        "drupal/openapi_jsonapi": "~3",
+        "drupal/paragraphs": "~1",
+        "drupal/paragraphs_previewer": "~1",
+        "drupal/persistent_login": "~2",
+        "drupal/rabbit_hole": "~2",
+        "drupal/recaptcha": "~3",
+        "drupal/redirect": "~1",
+        "drupal/update_helper": "~3 || ~4",
+        "drupal/views_bulk_edit": "~2 || ~3",
+        "oomphinc/composer-installers-extender": "~2",
+        "vardot/varbase-patches": "9.1.x-dev"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/installers": true,
+            "cweagans/composer-patches": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "drupal/core-composer-scaffold": true,
+            "oomphinc/composer-installers-extender": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true,
+            "symfony/runtime": true,
+            "tbachert/spi": true,
+            "vardot/varbase-patches": true
+        }
+    },
+    "extra": {
+        "enable-patching": true,
+        "composer-exit-on-patch-failure": true,
+        "patchLevel": {
+            "drupal/core": "-p2"
+        },
+        "composer-patches": {
+            "exit-on-patch-failure": true,
+            "allowed-dependency-patches": [
+                "vardot/varbase-patches",
+                "vardot/drupal-core-patches"
+            ]
+        },
+        "drupal-scaffold": {
+            "locations": {
+                "web-root": "web/"
+            }
+        },
+        "installer-types": [
+            "bower-asset",
+            "npm-asset"
+        ],
+        "installer-paths": {
+            "web/core": [
+                "type:drupal-core"
+            ],
+            "web/libraries/{$name}": [
+                "type:drupal-library",
+                "type:bower-asset",
+                "type:npm-asset"
+            ],
+            "web/modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "web/profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "web/themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ],
+            "drush/Commands/contrib/{$name}": [
+                "type:drupal-drush"
+            ]
+        },
+        "patches": {}
+    }
+}
