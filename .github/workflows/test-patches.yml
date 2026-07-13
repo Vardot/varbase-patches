@@ -1,0 +1,89 @@
+name: Test patches
+
+on:
+  push:
+    branches:
+      - 9.2.x
+  pull_request:
+    branches:
+      - 9.2.x
+  schedule:
+    # Weekly, so that a patch file disappearing upstream turns the branch red.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  patch-files:
+    name: Patch files exist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch the canonical patches branch
+        run: git fetch --depth=1 https://github.com/Vardot/varbase-patches.git patches:refs/remotes/upstream/patches
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Every patch URL resolves to a real patch file
+        run: php tests/verify-patch-files.php upstream/patches
+
+  apply-patches:
+    name: Patches apply (composer-patches ${{ matrix.composer-patches }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        composer-patches:
+          - '~2.0'
+          - '~1.7.0'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd, mbstring, dom, simplexml, tokenizer, curl, zip
+          tools: composer:v2
+          coverage: none
+
+      - name: Create the test project
+        run: |
+          mkdir -p tests/build
+          cp tests/test.composer.json tests/build/composer.json
+
+      - name: Pin cweagans/composer-patches ${{ matrix.composer-patches }}
+        run: composer --working-dir=tests/build --no-interaction --no-update require cweagans/composer-patches:"${{ matrix.composer-patches }}"
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ github.ref_name }}-${{ matrix.composer-patches }}-${{ hashFiles('tests/test.composer.json') }}
+          restore-keys: composer-${{ github.ref_name }}-
+
+      - name: Install Drupal and the patched modules
+        run: |
+          set -o pipefail
+          composer --working-dir=tests/build --no-interaction --no-progress install 2>&1 | tee tests/build/install.log
+
+      - name: Every Varbase patch was applied
+        run: php tests/verify-applied-patches.php tests/build tests/build/install.log
+
+      - name: Upload the install log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-log-${{ github.ref_name }}-composer-patches-${{ matrix.composer-patches }}
+          path: tests/build/install.log
+          if-no-files-found: ignore
