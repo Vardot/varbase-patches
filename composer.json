@@ -1,154 +1,122 @@
 {
-  "name": "vardot/varbase-patches",
-  "description": "List of needed patches for Varbase used packages with Composer Patches.",
-  "keywords": [
-    "composer",
-    "patches",
-    "composer patches",
-    "varbase",
-    "varbase patches",
-    "drupal",
-    "drupal patches"
-  ],
-  "license": "GPL-2.0-or-later",
-  "type": "composer-plugin",
-  "authors": [
-    {
-      "name": "Vardot",
-      "homepage": "https://www.drupal.org/vardot",
-      "role": "Maintainer"
+    "name": "vardot/varbase-patches",
+    "description": "List of needed patches for Varbase used packages with Composer Patches.",
+    "keywords": [
+        "composer",
+        "patches",
+        "composer patches",
+        "varbase",
+        "varbase patches",
+        "drupal",
+        "drupal patches"
+    ],
+    "license": "GPL-2.0-or-later",
+    "type": "composer-plugin",
+    "authors": [
+        {
+            "name": "Vardot",
+            "homepage": "https://www.drupal.org/vardot",
+            "role": "Maintainer"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "composer-plugin-api": "^2.0",
+        "vardot/drupal-core-patches": "~10 || ~11 || ~12",
+        "composer/installers": "~2",
+        "oomphinc/composer-installers-extender": "~2",
+        "cweagans/composer-patches": "~1 || ~2",
+        "vardot/entity-definition-update-manager": "~1",
+        "vardot/module-installer-factory": "~1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vardot\\VarbasePatches\\": "src/"
+        }
+    },
+    "extra": {
+        "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
+        "patches": {
+            "drupal/default_content": {
+                "Issue #3160146: Add Layout Builder Normalizer and Denormalize": "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
+            },
+            "drupal/persistent_login": {
+                "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles": "https://www.drupal.org/files/issues/persistent_login-user_task_permission-2899530-6.patch"
+            },
+            "drupal/update_helper": {
+                "Issue #3024165: [PATCH] Enhancements, Better messages for the unable to apply updates, drush command and removed the Mark all updates as successful on install": "https://www.drupal.org/files/issues/2022-06-05/3024165-55.patch"
+            },
+            "drupal/inline_entity_form": {
+                "Issue #2913571: Add a setting to enable/disable inline editing for existing entities": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/inline_entity_form--2026-06-07--2913571--mr-127.patch",
+                "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated": "https://www.drupal.org/files/issues/2025-01-04/inline_entity_form--2025-01-04--mr-126.patch"
+            },
+            "drupal/entity_clone": {
+                "Issue #3388460: Fatal error on cloning a menu link (D10 site)": "https://www.drupal.org/files/issues/2023-10-17/3388460-7.patch"
+            },
+            "drupal/rabbit_hole": {
+                "Issue #3419073: Fix Return value must be of type bool fatal error": "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/rabbit_hole--2026-07-06--3419073--mr-65.patch"
+            },
+            "drupal/cl_block": {
+                "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration": "https://www.drupal.org/files/issues/2023-06-08/3365591-3.patch",
+                "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()": "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
+            },
+            "drupal/ui_patterns_settings": {
+                "Issue #3414084: Fix UI Patterns Settings issue of TypeError: array_unshift(): Argument #1 ($array) must be of type array, null given in array_unshift() Caused by Deprecated Hooks in Drupal ~10.2.0": "https://www.drupal.org/files/issues/2024-01-11/ui_patterns_settings--2023-12-17--3409221-3--mr-21--39e896da.patch"
+            },
+            "drupal/openapi_jsonapi": {
+                "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined": "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch"
+            },
+            "drupal/entity_embed": {
+                "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor": "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
+                "Issue #2679875: Inline Entity Form integration": "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
+            },
+            "drupal/ckeditor": {
+                "Issue #3392765: Add the textmatch vendor plugin": "https://www.drupal.org/files/issues/2023-10-09/3392765-3.patch"
+            },
+            "drupal/ckeditor_media_embed": {
+                "Issue #2900313: Add ability to embed media and other rich content in WYSIWYG with Varbase Editor [Rich editor] Text format": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor_media_embed--2024-05-20--2900313.patch"
+            },
+            "drupal/linkit": {
+                "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor": "https://www.drupal.org/files/issues/2023-04-25/3158783-24.patch",
+                "Issue #3201405: Edit internal link and remove the URL breaks layout builder": "https://www.drupal.org/files/issues/2021-03-03/3201405-2.patch"
+            },
+            "drupal/lb_ux": {
+                "Issue #3173730: Remove the change of default for auto-submit controller on the existing route to have a better behavior when adding a new section": "https://www.drupal.org/files/issues/2020-09-29/3173730-2.patch",
+                "Issue #3150012: Fix RuntimeException: Callable LayoutBuilderAccessCheck::access requires a value for the $section_storage argument": "https://www.drupal.org/files/issues/2020-10-11/3150012-12_0.patch"
+            },
+            "drupal/layout_library": {
+                "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
+                "Issue #3273160: Support inline blocks in layout": "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch"
+            },
+            "drupal/paragraphs": {
+                "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]": "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
+                "Issue #3138609: Fixe Field group support broken": "https://www.drupal.org/files/issues/2020-06-03/3138609-24.patch",
+                "Issue #3090200: Paragraph access check using incorrect revision of its parent, leading to issues editing and viewing paragraphs when content moderation is involved.": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs--2026-06-25--3090200--mr264.patch"
+            },
+            "drupal/paragraphs_previewer": {
+                "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch": "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch"
+            },
+            "drupal/redirect": {
+                "Issue #2879648: Redirects from aliased paths aren't triggered": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-04-26--2879648--mr-109.patch"
+            },
+            "drupal/node_edit_protection": {
+                "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme": "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
+            },
+            "drupal/block_class": {
+                "Issue #3493849: Argument #1 ($array) must be of type array, string given": "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
+            },
+            "drupal/dropzonejs": {
+                "Issue #3542463: Fix TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in DropzoneJsUploadForm::validateUploadElement()": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dropzonejs--2025-08-21--3542463--mr-24.patch"
+            },
+            "drupal/views_bulk_edit": {
+                "Issue #3544584: Change default Change method to Replace the current value when configuring Modify field values action": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-09-03--3544584--mr-44.patch"
+            },
+            "drupal/content_planner": {
+                "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch"
+            },
+            "drupal/recaptcha": {
+                "fix: #3588269 Make Drupal8Post::submit() compatible with parent": "https://git.drupalcode.org/project/recaptcha/-/commit/68b0f86d1e930ed78f795a97a2fc207be35b3260.diff"
+            }
+        }
     }
-  ],
-  "require": {
-    "php": ">=8.1",
-    "composer-plugin-api": "^2.0",
-    "vardot/drupal-core-patches": "~10 || ~11 || ~12",
-    "composer/installers": "~2",
-    "oomphinc/composer-installers-extender": "~2",
-    "cweagans/composer-patches": "~1 || ~2",
-    "vardot/entity-definition-update-manager": "~1",
-    "vardot/module-installer-factory": "~1"
-  },
-  "autoload": {
-    "psr-4": {
-      "Vardot\\VarbasePatches\\": "src/"
-    }
-  },
-  "extra": {
-    "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
-    "patches": {
-      "drupal/default_content": {
-        "Issue #3160146: Add Layout Builder Normalizer and Denormalize":
-        "https://www.drupal.org/files/issues/2024-12-02/default_content--2024-12-02--3160146--mr-15.patch"
-      },
-      "drupal/persistent_login": {
-        "Issue #2899530 by josebc: Provide a permission for users to see Persistent Logins tab in their profiles":
-        "https://www.drupal.org/files/issues/persistent_login-user_task_permission-2899530-6.patch"
-      },
-      "drupal/update_helper": {
-        "Issue #3024165: [PATCH] Enhancements, Better messages for the unable to apply updates, drush command and removed the Mark all updates as successful on install":
-        "https://www.drupal.org/files/issues/2022-06-05/3024165-55.patch"
-      },
-      "drupal/inline_entity_form": {
-        "Issue #2913571: Add a setting to enable/disable inline editing for existing entities":
-        "https://www.drupal.org/files/issues/2024-12-27/inline_entity_form--2024-12-27--2913571--mr-127.patch",
-        "Issue #3136514: IEF complex widget: Re-ordering / weight sometimes not updated":
-        "https://www.drupal.org/files/issues/2025-01-04/inline_entity_form--2025-01-04--mr-126.patch"
-      },
-      "drupal/entity_clone": {
-        "Issue #3388460: Fatal error on cloning a menu link (D10 site)":
-        "https://www.drupal.org/files/issues/2023-10-17/3388460-7.patch"
-      },
-      "drupal/rabbit_hole": {
-        "Issue #3419073: Fix Return value must be of type bool fatal error":
-        "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/rabbit_hole--2026-07-06--3419073--mr-65.patch"
-      },
-      "drupal/cl_block": {
-        "Issue #3365591: Fix TypeError: array_filter() when pressing Save configuration":
-        "https://www.drupal.org/files/issues/2023-06-08/3365591-3.patch",
-        "Issue #3367477: Fix Error: Call to undefined method getFilteredComponentTypes()":
-        "https://www.drupal.org/files/issues/2023-06-18/3367477-11.patch"
-      },
-      "drupal/ui_patterns_settings": {
-        "Issue #3414084: Fix UI Patterns Settings issue of TypeError: array_unshift(): Argument #1 ($array) must be of type array, null given in array_unshift() Caused by Deprecated Hooks in Drupal ~10.2.0":
-        "https://www.drupal.org/files/issues/2024-01-11/ui_patterns_settings--2023-12-17--3409221-3--mr-21--39e896da.patch"
-      },
-      "drupal/openapi_jsonapi": {
-        "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined":
-        "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch"
-      },
-      "drupal/entity_embed": {
-        "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor":
-        "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
-        "Issue #2679875: Inline Entity Form integration":
-        "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch"
-      },
-      "drupal/ckeditor": {
-        "Issue #3392765: Add the textmatch vendor plugin":
-        "https://www.drupal.org/files/issues/2023-10-09/3392765-3.patch"
-      },
-      "drupal/ckeditor_media_embed": {
-        "Issue #2900313: Add ability to embed media and other rich content in WYSIWYG with Varbase Editor [Rich editor] Text format":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor_media_embed--2024-05-20--2900313.patch"
-      },
-      "drupal/linkit": {
-        "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor":
-        "https://www.drupal.org/files/issues/2023-04-25/3158783-24.patch",
-        "Issue #3201405: Edit internal link and remove the URL breaks layout builder":
-        "https://www.drupal.org/files/issues/2021-03-03/3201405-2.patch"
-      },
-      "drupal/lb_ux": {
-        "Issue #3173730: Remove the change of default for auto-submit controller on the existing route to have a better behavior when adding a new section":
-        "https://www.drupal.org/files/issues/2020-09-29/3173730-2.patch",
-        "Issue #3150012: Fix RuntimeException: Callable LayoutBuilderAccessCheck::access requires a value for the $section_storage argument":
-        "https://www.drupal.org/files/issues/2020-10-11/3150012-12_0.patch"
-      },
-      "drupal/layout_library": {
-        "Issue #3075067: Duplicate entry for key 'block_content_field__uuid__value'":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
-        "Issue #3273160: Support inline blocks in layout":
-        "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch"
-      },
-      "drupal/paragraphs": {
-        "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]":
-        "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
-        "Issue #3138609: Fixe Field group support broken":
-        "https://www.drupal.org/files/issues/2020-06-03/3138609-24.patch",
-        "Issue #3090200: Paragraph access check using incorrect revision of its parent, leading to issues editing and viewing paragraphs when content moderation is involved.":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs--2026-06-25--3090200--mr264.patch"
-      },
-      "drupal/paragraphs_previewer": {
-        "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch":
-        "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch"
-      },
-      "drupal/redirect": {
-        "Issue #2879648: Redirects from aliased paths aren't triggered":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-04-26--2879648--mr-109.patch"
-      },
-      "drupal/node_edit_protection": {
-        "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme":
-        "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
-      },
-      "drupal/block_class": {
-        "Issue #3493849: Argument #1 ($array) must be of type array, string given":
-        "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
-      },
-      "drupal/dropzonejs": {
-        "Issue #3542463: Fix TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in DropzoneJsUploadForm::validateUploadElement()":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dropzonejs--2025-08-21--3542463--mr-24.patch"
-      },
-      "drupal/views_bulk_edit": {
-        "Issue #3544584: Change default Change method to Replace the current value when configuring Modify field values action":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/views_bulk_edit--2025-09-03--3544584--mr-44.patch"
-      },
-      "drupal/content_planner": {
-        "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded":
-        "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch"
-      },
-      "drupal/recaptcha": {
-        "fix: #3588269 Make Drupal8Post::submit() compatible with parent":
-        "https://git.drupalcode.org/project/recaptcha/-/commit/68b0f86d1e930ed78f795a97a2fc207be35b3260.diff"
-      }
-    }
-  }
 }

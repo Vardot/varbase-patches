@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Inline Entity Form module for Add a setting to enable/disable inline editing for existing entities (#2913571) — the 2024-12-27 file no longer applies to Inline Entity Form 3.0.0 (#488)
+
 ## [9.1.90] - 2026-07-06
 
 - docs: document drupal-core-patches and update the patch-ignore guidance (#405)
