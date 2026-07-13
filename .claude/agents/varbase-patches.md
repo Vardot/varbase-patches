@@ -195,6 +195,25 @@ Examples:
 
 Static, timestamped local files give reproducible builds; raw MR URLs change as commits are added to the MR and break Composer checksums mid-install.
 
+## Standard issue / PR title
+
+Every patch issue and its PRs share ONE title, in this grammar (proper names Capitalized, no trailing period):
+
+`<Action> a patch for the <Target> on <ref>[ -- <reason>]`
+
+- **Action** — `Add` · `Change` · `Remove` · `Update` · `Revert -`. Use `Remove all patches for …` when dropping every patch for a target.
+- **Target** — `<Module name> module` · `<Theme name> theme` · `<machine> recipe` · `<vendor/lib> library` · `Drupal Core` · `Varbase <x.y.x> profile`.
+- **ref** — the upstream change: `fix: #3607821 <summary>` (current commit-type form) or `Issue #3607821: <summary>` (legacy form).
+- **reason** (optional) — why now: `-- after Inline Entity Form 3.0.0 was released`.
+
+Rules:
+
+- **A re-roll or a correction of an existing patch is a `Change`** — never `fix: Re-roll…` or any ad-hoc `{type}:` prefix. Keep the upstream type and issue title; the "why now" goes in the `-- <reason>` suffix.
+- **A patch change split across branches shares ONE canonical title** — the issue, the `patches`-branch file PR and the version-branch wiring PR all carry the same title.
+- **A change ported to several branches keeps that one title plus a `- for Varbase <x.y.x>` suffix per PR** — never a trailing `(<branch>)` tag, never an ad-hoc `ci: #<n> …` prefix. This holds for infrastructure changes (CI workflows, tests, docs) too.
+- **Infrastructure / branch issues drop the "patch for" grammar** and state the action directly, e.g. `Add a no-patches branch - to let developers manage their list of patches in the root composer.json`.
+- **The patch file name follows the same source of truth as the title.** A corrected or re-rolled file is a NEW dated file (dated files are immutable), named `<package>--YYYY-MM-DD--<issue>--mr-<n>.patch` and dated the day it was cut. Never keep an ad-hoc descriptive slug once the Drupal.org issue and MR numbers are known — that form is only for a fix with no upstream issue/MR to cite. The `extra.patches` key quotes the upstream issue the same way on every branch (`"Issue #3507495: <full upstream title>"`), so one patch reads identically everywhere.
+
 ## Adding a custom patch to a project
 
 ```bash
