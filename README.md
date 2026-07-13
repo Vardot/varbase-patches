@@ -1,9 +1,12 @@
 # Varbase Patches
 
+[![Test patches (10.0.x)](https://github.com/Vardot/varbase-patches/actions/workflows/test-patches.yml/badge.svg?branch=10.0.x)](https://github.com/Vardot/varbase-patches/actions/workflows/test-patches.yml?query=branch%3A10.0.x)
 [![Total Downloads](https://img.shields.io/packagist/dt/vardot/varbase-patches.svg)](https://packagist.org/packages/vardot/varbase-patches)
 [![License](https://img.shields.io/packagist/l/vardot/varbase-patches.svg)](LICENSE)
 
 List of needed patches for Varbase used packages with Composer Patches.
+
+The `10.0.x` branch tests itself: it installs Drupal plus the modules it patches, asserts that Composer Patches applies all of them, and checks that every patch file still exists ([`tests/`](tests/)).
 
 Composer plugin and curated patch list for [Varbase](https://www.drupal.org/project/varbase). Built on top of [`cweagans/composer-patches`](https://github.com/cweagans/composer-patches) v2 with three additions that v2 dropped or never had:
 
