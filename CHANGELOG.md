@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.23] - 2026-07-13
+
 - Add a patch for the AI Provider amazee.ai module on fix: #3586236 Do not abort recipe apply when amazee.ai trial provisioning fails (#499)
 - ci: Add a GitHub Actions patches test — installs Drupal and the modules this branch patches from `tests/test.composer.json`, asserts Composer Patches (v1 and v2) applies every Varbase patch, and checks that every patch file still exists
 
