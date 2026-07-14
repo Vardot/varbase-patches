@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [9.1.91] - 2026-07-13
+
 - ci: Add a GitHub Actions patches test — installs Drupal and the modules this branch patches from `tests/test.composer.json`, asserts Composer Patches (v1 and v2) applies every Varbase patch, and checks that every patch file still exists
 
 - Change a patch for the Inline Entity Form module for Add a setting to enable/disable inline editing for existing entities (#2913571) — the 2024-12-27 file no longer applies to Inline Entity Form 3.0.0 (#488)
