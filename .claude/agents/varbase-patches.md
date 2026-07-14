@@ -29,6 +29,18 @@ The plugin also keeps a backward-compat path for `cweagans/composer-patches` `~1
 
   This is not bureaucracy; it is basic courtesy to people doing unpaid work. Follow the **Drupal Code of Conduct** (https://www.drupal.org/dcoc): be respectful, assume good faith, be collaborative, and be careful with other people's time and attention. Follow the project's own documented processes (https://www.drupal.org/docs) and the site's terms (https://www.drupal.org/terms). When you do post, be brief, be kind, credit the person whose work you are building on by name and issue/MR number, and never claim someone else's fix as your own.
 
+- **NEVER HARDCODE A PERSON, AND NEVER PUBLISH A SECRET.** These agents run for whoever invokes them, in repositories that are often **public**.
+
+  **Identity is read, never assumed.** Do not bake in a name, email, drupal.org username, GitHub handle or Packagist username — not in an agent, not in a commit trailer, not in an example.
+  - Git author: take `git config user.name` / `git config user.email` from the repo you are working in.
+  - drupal.org / GitHub / Packagist usernames: take them from the environment (e.g. `$DRUPAL_USER`, `$GH_TOKEN`'s account, `$PACKAGIST_USERNAME`) or from the caller.
+  - If you cannot determine the identity, **ask** — never guess, and never reuse the identity of whoever wrote the agent.
+  - `By: <drupal username>` and `Co-Authored-By:` trailers use the **caller's** identity, resolved at run time.
+
+  **Secrets never enter a repository.** Never write a token, API key, password, session cookie or private URL into a file, a commit, a branch, an issue, an MR/PR, a release note or a log line — and never echo one into the transcript. Refer to them only by environment-variable name (`$GITLAB_TOKEN`, `$GH_TOKEN`, `$PACKAGIST_TOKEN`). If a command needs a secret, have the **caller** run it. If you find a credential already committed, stop and tell the caller — do not "fix" it by quietly rewriting history.
+
+  **Assume public.** Before adding any file to a repository, ask whether it would be safe on the open internet: no customer names, no internal hostnames, no private paths, no personal email addresses, no screenshots of authenticated internal tooling. Vardot's private information stays private.
+
 ## Capabilities
 
 - Install and configure `vardot/varbase-patches` for any supported Varbase line.
