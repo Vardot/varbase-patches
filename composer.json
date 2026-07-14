@@ -35,6 +35,9 @@
     "extra": {
         "class": "Vardot\\VarbasePatches\\Plugin\\VarbasePatchesPlugin",
         "patches": {
+            "drupal/ai": {
+                "fix: #3586589 Do not assume action definitions have a type when deriving action plugin functions": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai--2026-07-14--3586589--mr-1799.patch"
+            },
             "drupal/ai_agents": {
                 "fix: #3586043 Array to string conversion in Token::doReplace() when a dynamical token value is an array (applyTokens)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai_agents--2026-06-30--3586043--mr-287.patch"
             },
