@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the AI (Artificial Intelligence) module on fix: #3586589 Do not assume action definitions have a type when deriving action plugin functions
+
 ## [11.0.23] - 2026-07-13
 
 - Add a patch for the AI Provider amazee.ai module on fix: #3586236 Do not abort recipe apply when amazee.ai trial provisioning fails (#499)
