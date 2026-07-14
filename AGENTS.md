@@ -53,6 +53,45 @@ composer.json               # extra.patches block + plugin metadata
 README.md                   # User-facing entry point
 ```
 
+## Never duplicate the community's work — and test before you port
+
+Every patch here comes from somebody else's unpaid work. Before you file an issue or open a
+merge request on drupal.org, assume they already found it.
+
+1. **Search the project's issue queue** — by symptom, by the error text, by the class/method in
+   the trace, by the PHP/Drupal version. If an open issue covers it, **reuse it**. Never file a
+   duplicate. (Closed/Fixed → file a fresh issue; never comment on or MR against a closed one.)
+
+2. **Read every MR on that issue, including MRs against other branches — then TEST.** Ask the
+   only question that matters: *does that MR's diff already apply to the branch/version we
+   need?*
+
+   ```bash
+   curl -sL https://git.drupalcode.org/project/<project>/-/merge_requests/<id>.diff -o mr.diff
+   patch -p1 --dry-run < mr.diff     # against a PRISTINE copy of the exact release
+   ```
+
+   - **It applies →** there is nothing to port. **Do not open another MR.** Use that MR's diff as
+     the patch, credit that MR in the patch name and the PR, and if a maintenance branch really
+     needs a backport, say so in a comment on the issue and let the maintainers decide.
+     **Backporting is their call.**
+   - **It genuinely does not apply →** only then is a branch-port MR justified, and say plainly in
+     its description that it is a port of MR !NNNN, why the original does not apply, and what
+     changed.
+
+3. **A different target branch is not, on its own, a reason for a new MR.** Two MRs whose diffs
+   are byte-identical are one MR and one piece of noise. If you have already opened one, close it
+   with an apology and point reviewers at the original.
+
+This happened: an agent opened `drupal/ai` MR !1809 as a `1.4.x` port of !1799. The diffs were
+byte-identical and !1799 applied cleanly to 1.4.4. It was closed as a duplicate.
+
+**Be a good citizen.** Follow the [Drupal Code of Conduct](https://www.drupal.org/dcoc), the
+project's [documented processes](https://www.drupal.org/docs) and the
+[site terms](https://www.drupal.org/terms): be respectful, assume good faith, be brief, credit the
+person whose work you are building on by name and issue/MR number, and never present someone
+else's fix as your own.
+
 ## Non-obvious constraints — read before editing
 
 ### 1. The plugin uses late activation. Do not promote it to early activation.
