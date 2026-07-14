@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.24] - 2026-07-14
+
 - Add a patch for the AI (Artificial Intelligence) module on fix: #3586589 Do not assume action definitions have a type when deriving action plugin functions
 
 ## [11.0.23] - 2026-07-13
