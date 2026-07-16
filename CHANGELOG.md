@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [10.1.82] - 2026-07-16
+
 - Remove a patch for the AI Provider amazee.ai module on fix: #3586236 Do not abort recipe apply when amazee.ai trial provisioning fails (fixed upstream in 1.3.3) (#522)
 
 ## [10.1.81] - 2026-07-16
