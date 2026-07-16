@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the CKEditor Media Resize module on chore: #3607786 Add Drupal Core ~11.4.0 support in the CKEditor Media Resize module on the 1.1.x branch -- breaks CI, Composer resolves the already-compatible 1.0.0 on Drupal core ~11.4
+
 ## [10.1.82] - 2026-07-16
 
 - Remove a patch for the AI Provider amazee.ai module on fix: #3586236 Do not abort recipe apply when amazee.ai trial provisioning fails (fixed upstream in 1.3.3) (#522)
