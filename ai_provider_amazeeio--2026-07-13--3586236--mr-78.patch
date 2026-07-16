@@ -1,0 +1,205 @@
+diff --git a/src/Plugin/ConfigAction/EnsureAmazeeAiAccess.php b/src/Plugin/ConfigAction/EnsureAmazeeAiAccess.php
+index a2e0fe056762c64dedd2ff332c4b79ac89757b22..6c20180957c9ffc36a621e1b15a09488c7108e05 100644
+--- a/src/Plugin/ConfigAction/EnsureAmazeeAiAccess.php
++++ b/src/Plugin/ConfigAction/EnsureAmazeeAiAccess.php
+@@ -6,12 +6,11 @@ namespace Drupal\ai_provider_amazeeio\Plugin\ConfigAction;
+ 
+ use Drupal\ai_provider_amazeeio\TrialAccess\ProgressReporterFactoryInterface;
+ use Drupal\ai_provider_amazeeio\TrialAccess\TrialAccountProvisionerFactoryInterface;
+-use Drupal\ai_provider_amazeeio\TrialAccess\TrialAccountProvisioningException;
+ use Drupal\Core\Config\Action\Attribute\ConfigAction;
+-use Drupal\Core\Config\Action\ConfigActionException;
+ use Drupal\Core\Config\Action\ConfigActionPluginInterface;
+ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+ use Drupal\Core\StringTranslation\TranslatableMarkup;
++use Psr\Log\LoggerInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ 
+ /**
+@@ -23,6 +22,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
+  * This is a lightweight wrapper around the Trial Access provisioner, which can
+  * not be exposed as a config action directly.
+  *
++ * Provisioning the trial account is a FALLBACK, not a requirement: it must
++ * never abort the recipe/install that depends on this config action. If
++ * amazee.ai is at trial capacity (HTTP 429), rate-limiting, returning a
++ * malformed payload, unreachable (network/DNS/timeout), or fails for any
++ * other reason - including an unexpected error anywhere else in the
++ * provisioning path - this action logs a warning and lets the install
++ * continue, so the site can be configured with any AI provider afterwards.
++ *
+  * @internal
+  */
+ #[ConfigAction(
+@@ -35,6 +42,7 @@ final class EnsureAmazeeAiAccess implements ConfigActionPluginInterface, Contain
+   public function __construct(
+     private readonly TrialAccountProvisionerFactoryInterface $trialAccountProvisionerFactory,
+     private readonly ProgressReporterFactoryInterface $progressReporterFactory,
++    private readonly LoggerInterface $logger,
+   ) {}
+ 
+   /**
+@@ -44,6 +52,7 @@ final class EnsureAmazeeAiAccess implements ConfigActionPluginInterface, Contain
+     return new self(
+       $container->get(TrialAccountProvisionerFactoryInterface::class),
+       $container->get(ProgressReporterFactoryInterface::class),
++      $container->get('logger.channel.ai_provider_amazeeio'),
+     );
+   }
+ 
+@@ -51,11 +60,20 @@ final class EnsureAmazeeAiAccess implements ConfigActionPluginInterface, Contain
+    * {@inheritdoc}
+    */
+   public function apply(string $configName, mixed $value): void {
++    $progressReporter = $this->progressReporterFactory->forCurrentRuntime();
+     try {
+-      $this->trialAccountProvisionerFactory->create($this->progressReporterFactory->forCurrentRuntime())->provision();
++      $this->trialAccountProvisionerFactory->create($progressReporter)->provision();
+     }
+-    catch (TrialAccountProvisioningException $e) {
+-      throw new ConfigActionException($e->getMessage(), $e->getCode(), $e);
++    catch (\Throwable $e) {
++      // Provisioning a free anonymous trial account is a convenience, not a
++      // requirement, so ANY failure here (a known provisioning error, or an
++      // unexpected \Throwable anywhere in the provisioning path, e.g. from
++      // the provider's post-setup or a Key/Config save) is treated as a
++      // graceful fallback rather than an install-breaker.
++      $this->logger->warning('Could not provision an amazee.ai trial account: @message. Configure an AI provider at /admin/config/ai/providers.', [
++        '@message' => $e->getMessage(),
++      ]);
++      $progressReporter->info('Skipped amazee.ai trial account provisioning; configure an AI provider at /admin/config/ai/providers.');
+     }
+   }
+ 
+diff --git a/tests/src/Kernel/EnsureAmazeeAiAccessTest.php b/tests/src/Kernel/EnsureAmazeeAiAccessTest.php
+index 3f8cd1f9b281f5dc297de1ab014ff53266dc1288..cf508308ce882c139b8e4262f383556fd87ce44d 100644
+--- a/tests/src/Kernel/EnsureAmazeeAiAccessTest.php
++++ b/tests/src/Kernel/EnsureAmazeeAiAccessTest.php
+@@ -5,7 +5,17 @@ declare(strict_types=1);
+ namespace Drupal\Tests\ai_provider_amazeeio\Kernel;
+ 
+ use Drupal\ai_provider_amazeeio\Plugin\ConfigAction\EnsureAmazeeAiAccess;
++use Drupal\ai_provider_amazeeio\TrialAccess\ProgressReporterInterface;
++use Drupal\ai_provider_amazeeio\TrialAccess\TrialAccountProvisionerFactoryInterface;
++use Drupal\ai_provider_amazeeio\TrialAccess\TrialAccountProvisionerInterface;
++use Drupal\ai_provider_amazeeio\TrialAccess\TrialAccountProvisioningResult;
++use Drupal\Core\DependencyInjection\ContainerBuilder;
++use Drupal\Core\State\StateInterface;
+ use Drupal\KernelTests\KernelTestBase;
++use GuzzleHttp\Client;
++use GuzzleHttp\Handler\MockHandler;
++use GuzzleHttp\HandlerStack;
++use GuzzleHttp\Psr7\Response;
+ 
+ /**
+  * Tests the ensureAmazeeAiAccess config action.
+@@ -18,6 +28,7 @@ final class EnsureAmazeeAiAccessTest extends KernelTestBase {
+    */
+   protected static $modules = [
+     'ai',
++    'key',
+     'ai_provider_amazeeio',
+   ];
+ 
+@@ -31,10 +42,22 @@ final class EnsureAmazeeAiAccessTest extends KernelTestBase {
+    */
+   protected function setUp(): void {
+     parent::setUp();
++    $this->installConfig(['ai_provider_amazeeio']);
+ 
+     $this->action = \Drupal::service('plugin.manager.config_action')->createInstance('ensureAmazeeAiAccess');
+   }
+ 
++  /**
++   * {@inheritdoc}
++   */
++  public function register(ContainerBuilder $container): void {
++    parent::register($container);
++
++    // Guardrails are in place, we can bypass the built-in protection
++    // that disables trial access provisioning in tests.
++    $container->setParameter('ai_provider_amazeeio.internal.disable_environment_detection', TRUE);
++  }
++
+   /**
+    * Test the config action exists.
+    */
+@@ -43,4 +66,78 @@ final class EnsureAmazeeAiAccessTest extends KernelTestBase {
+     $this->action->apply('ai_provider_amazeeio.settings', []);
+   }
+ 
++  /**
++   * A provisioning failure (e.g. amazee.ai at trial capacity) must not throw.
++   *
++   * The trial account is an anonymous convenience; a recipe that runs this
++   * config action must complete successfully even when amazee.ai returns an
++   * HTTP 429 "Trial capacity reached" response, so the site can be
++   * configured with any AI provider afterwards.
++   */
++  public function testDoesNotThrowWhenProvisioningFails(): void {
++    $mockHandler = new MockHandler([
++      new Response(
++        429,
++        ['Content-Type' => 'application/json'],
++        '{"detail":"Trial capacity reached. Please contact sales to continue."}'
++      ),
++    ]);
++    $stack = HandlerStack::create($mockHandler);
++    $this->container->set('http_client', new Client(['handler' => $stack]));
++
++    // Re-create the action so it picks up the mocked http_client through the
++    // trial account provisioner factory.
++    $this->action = \Drupal::service('plugin.manager.config_action')->createInstance('ensureAmazeeAiAccess');
++
++    $this->action->apply('ai_provider_amazeeio.settings', []);
++
++    self::assertNull(
++      $this->container->get(StateInterface::class)->get('ai_provider_amazeeio.trial_account'),
++      'Trial flag must not be set when provisioning fails.'
++    );
++  }
++
++  /**
++   * ANY unexpected failure during provisioning must also be swallowed.
++   *
++   * This is a graceful fallback, not a contract limited to
++   * TrialAccountProvisioningException: an unrelated \Throwable escaping
++   * from anywhere in the provisioning path (e.g. the AI provider's
++   * post-setup, or a Key/Config entity save) must not abort the recipe
++   * apply either.
++   */
++  public function testDoesNotThrowOnUnexpectedThrowableDuringProvisioning(): void {
++    $provisioner = new class implements TrialAccountProvisionerInterface {
++
++      /**
++       * {@inheritdoc}
++       */
++      public function provision(): TrialAccountProvisioningResult {
++        throw new \RuntimeException('Unexpected failure unrelated to amazee.ai trial provisioning.');
++      }
++
++    };
++
++    $factory = new class($provisioner) implements TrialAccountProvisionerFactoryInterface {
++
++      public function __construct(
++        private readonly TrialAccountProvisionerInterface $provisioner,
++      ) {}
++
++      /**
++       * {@inheritdoc}
++       */
++      public function create(ProgressReporterInterface $progressReporter): TrialAccountProvisionerInterface {
++        return $this->provisioner;
++      }
++
++    };
++
++    $this->container->set(TrialAccountProvisionerFactoryInterface::class, $factory);
++    $this->action = \Drupal::service('plugin.manager.config_action')->createInstance('ensureAmazeeAiAccess');
++
++    $this->expectNotToPerformAssertions();
++    $this->action->apply('ai_provider_amazeeio.settings', []);
++  }
++
+ }
