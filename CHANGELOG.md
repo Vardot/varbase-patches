@@ -6,7 +6,9 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
-- Add a patch for the CKEditor Media Resize module on chore: #3607786 Add Drupal Core ~11.4.0 support in the CKEditor Media Resize module on the 1.1.x branch
+## [10.1.81] - 2026-07-16
+
+- Add a patch for the CKEditor Media Resize module on chore: #3607786 Add Drupal Core ~11.4.0 support in the CKEditor Media Resize module on the 1.1.x branch (#525)
 
 ## [10.1.79] - 2026-07-13
 
