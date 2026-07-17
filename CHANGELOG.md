@@ -6,7 +6,9 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
-- Add a patch for the Social API module on fix: #3593752 Deprecated function: Drupal\social_api\AuthManager\OAuth2Manager::__construct(): Implicitly marking parameter $request as nullable is deprecated, the explicit nullable type must be used instead in include() (line 576 of vendor/composer/ClassLoader.php).
+## [10.1.83] - 2026-07-17
+
+- Add a patch for the Social API module on fix: #3593752 Deprecated function: Drupal\social_api\AuthManager\OAuth2Manager::__construct(): Implicitly marking parameter $request as nullable is deprecated, the explicit nullable type must be used instead in include() (line 576 of vendor/composer/ClassLoader.php). (#538)
 
 ## [10.1.82] - 2026-07-16
 
