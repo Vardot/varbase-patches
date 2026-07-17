@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Social API module on fix: #3593752 Deprecated function: Drupal\social_api\AuthManager\OAuth2Manager::__construct(): Implicitly marking parameter $request as nullable is deprecated, the explicit nullable type must be used instead in include() (line 576 of vendor/composer/ClassLoader.php).
+
 ## [10.1.82] - 2026-07-16
 
 - Remove a patch for the AI Provider amazee.ai module on fix: #3586236 Do not abort recipe apply when amazee.ai trial provisioning fails (fixed upstream in 1.3.3) (#522)
