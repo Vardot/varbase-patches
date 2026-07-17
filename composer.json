@@ -98,6 +98,9 @@
             "drupal/node_edit_protection": {
                 "Issue #3455823: Fix the warning issue that occurs when pressing the save submit button in the Gin Admin theme": "https://www.drupal.org/files/issues/2024-07-03/3455823-13-warning-popup-node-add-and-edit-save.patch"
             },
+            "drupal/social_api": {
+                "fix: #3593752 Deprecated implicit nullable $request parameter in OAuth2Manager::__construct() on PHP 8.4 (breaks the installer's AJAX batch response)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_api--2026-07-17--3593752--mr-17.patch"
+            },
             "drupal/social_auth": {
                 "fix: #3578754 Uncaught SocialApiException shows fatal error page when credentials are not configured": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/social_auth--2026-03-13--3578754--mr-40.patch"
             },
