@@ -87,7 +87,13 @@ class VarbasePatchesPlugin implements PluginInterface, EventSubscriberInterface,
 
     private function detectVersion(): int
     {
-        if ($this->cweagansVersion !== null) {
+        // Cache only a positive detection. Within a single Composer process the
+        // cweagans classes can become autoloadable mid-run (for example when
+        // cweagans/composer-patches is installed by the same `composer require`
+        // that installs other plugins), so a cached "not found" must be probed
+        // again on the next call instead of short-circuiting the v2 resolver
+        // filter and the capability wiring for the rest of the process.
+        if ($this->cweagansVersion !== null && $this->cweagansVersion > 0) {
             return $this->cweagansVersion;
         }
         if (class_exists(\cweagans\Composer\Plugin\Patches::class)) {

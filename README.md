@@ -172,6 +172,49 @@ Examples:
 - `ctools--2026-05-10--3572317--mr-85.patch`
 - `redirect--2026-05-10--2879648--mr-109.patch`
 
+## Fresh builds: commit `patches.lock.json`
+
+On a fresh, lock-less build (`composer create-project`, or the first
+`composer require`/`composer update` of a project with no `vendor/`),
+Composer installs plugins one at a time inside the same run.
+`cweagans/composer-patches` activates first — it is a dependency of this
+plugin — and resolves the patch collection at the first package event after
+its own activation, **before Varbase Patches has been installed**. The
+allow-list cannot run inside that one-shot bootstrap window:
+
+- Normally this is harmless: the collection is momentarily unfiltered, and
+  Varbase Patches re-resolves and rewrites `patches.lock.json` through the
+  allow-list the moment its own package lands, later in the same run.
+- It turns fatal when any third-party dependency in the tree declares a
+  patch Composer cannot download — for example a repository-relative path
+  like `patches/foo.patch`, which only resolves inside that package's own
+  repository. `composer-patches` then aborts the whole install while
+  creating `patches.lock.json`, before the filter exists:
+
+  ```
+  The "patches/foo.patch" file could not be downloaded: Failed to open stream:
+  No such file or directory
+  ```
+
+The fix is to **commit `patches.lock.json` to the project template or site
+repository** — it is a lock file and belongs in version control next to
+`composer.lock`. When it is present, `composer-patches` loads it instead of
+resolving, nothing is downloaded during the window, and Varbase Patches
+re-resolves and rewrites it through the allow-list once active. For a CI job
+that cannot ship a committed lock, seed a stub before the first Composer
+command:
+
+```bash
+[ -f patches.lock.json ] || echo '{"patches": {}}' > patches.lock.json
+```
+
+or install the plugin globally first (`composer global require
+vardot/varbase-patches`) so it is active from process start. Once the plugin
+is loaded, the allow-list is enforced on every resolve and the lock file
+self-heals — patches from packages outside `allowed-dependency-patches`
+(default: `vardot/varbase-patches` and `vardot/drupal-core-patches`) never
+reach `patches.lock.json`.
+
 ## Documentation
 
 - [Overview](docs/README.md)
