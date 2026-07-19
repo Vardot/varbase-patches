@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Fix the allow-list surviving a broken third-party dependency patch on fresh builds - stop caching a negative cweagans/composer-patches version detection, and document the lock-less bootstrap window with its `patches.lock.json` bridge in the README and AGENTS.md
+
 ## [11.0.26] - 2026-07-16
 
 - Add a patch for the CKEditor Media Resize module on chore: #3607786 Add Drupal Core ~11.4.0 support in the CKEditor Media Resize module on the 1.1.x branch (#533)

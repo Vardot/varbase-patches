@@ -105,6 +105,8 @@ Install of vardot/varbase-patches failed.
 
 The late-activation path (POST_PACKAGE_INSTALL of self, with reflection-driven lock rewrite for v2 and patch-map rebuild for v1) is intentional and already covers the in-flight re-resolve. Do not add those flags as a "fix" for anything.
 
+Late activation has one unavoidable consequence on a fresh, lock-less build: `cweagans/composer-patches` activates and resolves the patch collection at the first package event after its own install, **before this plugin's package exists in `vendor/`** — so the allow-list cannot intervene in that first resolve, and a third-party dependency patch with an undownloadable URL aborts the whole run there. This was verified empirically; setting the early-activation flags does not help (the crash simply moves to this plugin's own PRE_PACKAGE_INSTALL event), and neither does installing this plugin's package earlier in the same run. The supported bridge is a committed `patches.lock.json` (see the README section "Fresh builds: commit `patches.lock.json`"): when it exists, cweagans loads it instead of resolving, and once this plugin is active it pre-empts every later resolve (priority 9999) and rewrites the lock through the allow-list.
+
 ### 2. `cweagans/composer-patches` v1 AND v2 must both keep working.
 
 The `require` constraint is `cweagans/composer-patches: ~1.7.0 || ~2.0`. Code paths that touch patch resolution must handle both:
