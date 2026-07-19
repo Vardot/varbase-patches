@@ -1,0 +1,45 @@
+diff --git a/composer.json b/composer.json
+index aea3576..0258dd6 100644
+--- a/composer.json
++++ b/composer.json
+@@ -48,12 +48,5 @@
+       "drupal/canvas": "Required when using Context Items on Canvas-enabled sites; see extra.patches for a StringLongItemOverride workaround.",
+       "drupal/scheduler": "Schedule publishing and unpublishing of context items.",
+       "drupal/scheduler_content_moderation_integration": "Schedule moderation state changes for context items."
+-  },
+-  "extra": {
+-    "patches": {
+-      "drupal/canvas": {
+-        "3575644 - Skip StringLongItemOverride regex for ai_context_item": "patches/canvas-3575644-string-long-regex-ai-context-item.patch"
+-      }
+-    }
+   }
+ }
+diff --git a/patches/canvas-3575644-string-long-regex-ai-context-item.patch b/patches/canvas-3575644-string-long-regex-ai-context-item.patch
+deleted file mode 100644
+index 799eddf..0000000
+--- a/patches/canvas-3575644-string-long-regex-ai-context-item.patch
++++ /dev/null
+@@ -1,22 +0,0 @@
+-diff --git a/src/Plugin/Field/FieldTypeOverride/StringLongItemOverride.php b/src/Plugin/Field/FieldTypeOverride/StringLongItemOverride.php
+-index d2b9a11d..a1c4e8f2 100644
+---- a/src/Plugin/Field/FieldTypeOverride/StringLongItemOverride.php
+-+++ b/src/Plugin/Field/FieldTypeOverride/StringLongItemOverride.php
+-@@ -21,9 +21,15 @@ class StringLongItemOverride extends StringLongItem {
+-     $properties['value']->addConstraint('StringSemantics', [
+-       'semantic' => StringSemanticsConstraint::PROSE,
+-     ]);
+--    $properties['value']->addConstraint('Regex', [
+--      'pattern' => '/(.|\r?\n)*/',
+--    ]);
+-+    // Large string_long values can exceed pcre.backtrack_limit with /(.|\r?\n)*/.
+-+    $skip_regex = $field_definition->getProvider() === 'canvas_ai_seo'
+-+      || $field_definition->getTargetEntityTypeId() === 'ai_context_item';
+-+    if (!$skip_regex) {
+-+      $properties['value']->addConstraint('Regex', [
+-+        'pattern' => '/(.|\r?\n)*/',
+-+      ]);
+-+    }
+-     return $properties;
+-   }
+- 
