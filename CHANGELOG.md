@@ -7,6 +7,7 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 ## [Unreleased]
 
 - Fix the allow-list surviving a broken third-party dependency patch on fresh builds - stop caching a negative cweagans/composer-patches version detection, and document the lock-less bootstrap window with its `patches.lock.json` bridge in the README and AGENTS.md
+- Add a patch for the AI Context module on fix: #3586336 Remove the Drupal Canvas patch from the package
 
 ## [11.0.26] - 2026-07-16
 
