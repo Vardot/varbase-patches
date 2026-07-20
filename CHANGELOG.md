@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.28] - 2026-07-20
+
 - Remove a patch for the CKEditor Media Resize module on chore: #3607786 Add Drupal Core ~11.4.0 support in the CKEditor Media Resize module on the 1.1.x branch -- no longer needed, `drupal/varbase_editor_base` (1.0.0-beta3) now requires the `vardot/ckeditor_media_resize` fork (`~2.0.0`), which carries Drupal core ~11.4.0 support natively and `replace`s `drupal/ckeditor_media_resize`
 
 ## [11.0.27] - 2026-07-20
