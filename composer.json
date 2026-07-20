@@ -157,9 +157,6 @@
             "drupal/gin": {
                 "fix: #3590827 Sticky form actions appear on node revision revert/delete confirm forms (incomplete exclusion pattern)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2026-05-19--3590827--mp-787.patch"
             },
-            "drupal/ckeditor_media_resize": {
-                "chore: #3607786 Add Drupal Core ~11.4.0 support in the CKEditor Media Resize module on the 1.1.x branch": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor_media_resize--2026-07-16--3607786--mr-30.patch"
-            },
             "drupal/ai_context": {
                 "fix: #3586336 Remove the Drupal Canvas patch from the package": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai_context--2026-07-19--3586336--mr-222.patch"
             }
