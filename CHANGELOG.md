@@ -6,7 +6,9 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
-- Remove a patch for the AI (Artificial Intelligence) module on fix: #3586589 Do not assume action definitions have a type when deriving action plugin functions (fixed upstream, released in drupal/ai 1.4.5)
+## [11.0.29] - 2026-07-22
+
+- Remove a patch for the AI (Artificial Intelligence) module on fix: #3586589 Do not assume action definitions have a type when deriving action plugin functions (fixed upstream, released in drupal/ai 1.4.5) (#549)
 
 ## [11.0.28] - 2026-07-20
 
