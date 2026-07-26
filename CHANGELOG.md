@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Drupal Canvas module on fix: #3591876 Canvas AI: page builder discards the whole build when the LLM names a region that does not exist ([#3591876](https://git.drupalcode.org/project/canvas/-/work_items/3591876))
+
 ## [11.0.30] - 2026-07-26
 
 - Remove all patches for the CTools (Chaos Tool Suite) module on fix: #3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple() and fix: #3572317 ctools_views schema alter missing requiredKey for views_block mapping keys causes validation errors in Drupal Canvas (both fixed upstream, released in ctools 4.1.1) (#552)
