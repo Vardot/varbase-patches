@@ -6,7 +6,9 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
-- Remove all patches for the CTools (Chaos Tool Suite) module on fix: #3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple() and fix: #3572317 ctools_views schema alter missing requiredKey for views_block mapping keys causes validation errors in Drupal Canvas (both fixed upstream, released in ctools 4.1.1)
+## [11.0.30] - 2026-07-26
+
+- Remove all patches for the CTools (Chaos Tool Suite) module on fix: #3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple() and fix: #3572317 ctools_views schema alter missing requiredKey for views_block mapping keys causes validation errors in Drupal Canvas (both fixed upstream, released in ctools 4.1.1) (#552)
 
 ## [11.0.29] - 2026-07-22
 
