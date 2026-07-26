@@ -1,0 +1,17 @@
+diff --git a/src/Plugin/Canvas/ComponentSource/JsComponent.php b/src/Plugin/Canvas/ComponentSource/JsComponent.php
+index b7d50ea69d42cb4a36eda70c1d426bae85cdb42d..af0eee292c156ea2cbd09ed59ec0f212b09e8eaf 100644
+--- a/src/Plugin/Canvas/ComponentSource/JsComponent.php
++++ b/src/Plugin/Canvas/ComponentSource/JsComponent.php
+@@ -657,6 +657,12 @@ final class JsComponent extends JsonSchemaPropsComponentSourceBase implements Ur
+     if ($url === self::EXAMPLE_VIDEO_HORIZONTAL || $url === self::EXAMPLE_VIDEO_VERTICAL) {
+       return;
+     }
++    // Allow root-relative paths (e.g. managed files under /sites/default/files)
++    // which resolve on the current host at runtime; reject scheme-relative
++    // "//host" URLs, which stay ambiguous.
++    if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
++      return;
++    }
+     throw new \InvalidArgumentException('Default images for Javascript Components must be a fully-qualified URL with both scheme and host.');
+   }
+ 
