@@ -1,0 +1,20 @@
+diff --git a/modules/canvas_ai/src/CanvasAiPageBuilderHelper.php b/modules/canvas_ai/src/CanvasAiPageBuilderHelper.php
+index 863662cf85654cd8ac1a8836f2bed70ff0d7e7f2..9bf276facb0da2afacdcf22cfbbd803d10246bc2 100644
+--- a/modules/canvas_ai/src/CanvasAiPageBuilderHelper.php
++++ b/modules/canvas_ai/src/CanvasAiPageBuilderHelper.php
+@@ -1143,7 +1143,14 @@ class CanvasAiPageBuilderHelper {
+         $modified_layout[$target] = array_merge($component_tree, $modified_layout[$target]);
+       }
+       else {
+-        throw new \Exception(\sprintf('Region "%s" not found in layout', $target));
++        // The AI often names a generic region ("content", "main") that does
++        // not exist on this entity's layout. Fall back to the first region
++        // instead of failing the whole operation.
++        $fallback = array_key_first($modified_layout);
++        if ($fallback === NULL) {
++          throw new \Exception(\sprintf('Region "%s" not found in layout', $target));
++        }
++        $modified_layout[$fallback] = array_merge($component_tree, $modified_layout[$fallback]);
+       }
+     }
+ 
