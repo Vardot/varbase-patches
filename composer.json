@@ -103,7 +103,6 @@
                 "Issue #2879648: Redirects from aliased paths aren't triggered (Drupal 11.4, RedirectPathProcessorManager approach)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-07-05--2879648--mr-202.patch"
             },
             "drupal/panels": {
-                "fix: #3534531 php 8.4 compatibility issue": "https://git.drupalcode.org/project/panels/-/commit/55700b96188b96f75d07aeb2454cf3dc1b2a597a.diff",
                 "Fix PHP 8.4 implicit-nullable deprecations in Panels IPE forms": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/panels--2026-07-05--php-8.4-implicit-nullable.patch"
             },
             "drupal/node_edit_protection": {

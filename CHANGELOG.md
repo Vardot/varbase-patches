@@ -6,6 +6,7 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove the redundant Panels (Panels) patch on fix: #3534531 php 8.4 compatibility issue (already shipped upstream in Panels 8.x-4.10; the commit patch no longer applies). The Panels IPE-forms PHP 8.4 patch is kept (still needed on 8.x-4.10).
 - Remove a patch for the CTools (Chaos Tool Suite) module on fix: #3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple() (fixed upstream, released in ctools 4.1.1)
 
 ## [9.2.95] - 2026-07-13
