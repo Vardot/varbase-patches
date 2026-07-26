@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Drupal Canvas module on fix: #3591751 Compile on serve when a code component's compiled JS is empty ([#3591751](https://git.drupalcode.org/project/canvas/-/work_items/3591751))
+
 - Add a patch for the Drupal Canvas module on fix: #3591876 Canvas AI: page builder discards the whole build when the LLM names a region that does not exist ([#3591876](https://git.drupalcode.org/project/canvas/-/work_items/3591876))
 
 ## [11.0.30] - 2026-07-26
