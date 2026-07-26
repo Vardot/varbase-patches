@@ -155,9 +155,6 @@
             "drupal/entity": {
                 "Issue #3532309: Fix Deprecation notice from DeleteAction class causes errors in ECA module": "https://www.drupal.org/files/issues/2025-06-25/entity-fix-deprecation.patch"
             },
-            "drupal/ctools": {
-                "fix: 3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple()": "https://git.drupalcode.org/project/ctools/-/commit/5a323c6e5072515148a54b4055e7db86a50f5111.diff"
-            },
             "drupal/password_policy": {
                 "fix: #3516906 PHP 8.4 nullable types must be explicit": "https://git.drupalcode.org/project/password_policy/-/commit/999abf8501fd2878dc40b0b4db81315fed60cc03.diff"
             },
