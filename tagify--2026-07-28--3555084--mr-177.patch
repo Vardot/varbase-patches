@@ -1,0 +1,116 @@
+diff --git a/js/tagify.js b/js/tagify.js
+index 2d9090b..a40ca9d 100644
+--- a/js/tagify.js
++++ b/js/tagify.js
+@@ -268,6 +268,36 @@
+         // Check if input is inside gin sidebar.
+         const isInGinSidebar = !!input.closest('#gin_sidebar');
+ 
++        // Accessibility: associate the input with its visible field label,
++        // so the accessible name can be propagated onto Tagify's
++        // contenteditable span once Tagify replaces this input.
++        // See: https://www.drupal.org/project/tagify/issues/3555084.
++        (() => {
++          try {
++            const inputId = input.getAttribute('id');
++            let labelElement = inputId
++              ? document.querySelector(`label[for="${CSS.escape(inputId)}"]`)
++              : null;
++            if (!labelElement) {
++              const formItem = input.closest('.js-form-item, .form-item, .form-group, fieldset');
++              labelElement = formItem
++                ? formItem.querySelector('label, legend .fieldset__label, legend span')
++                : null;
++            }
++            if (labelElement) {
++              if (!input.id) {
++                input.id = `tagify-input-${Math.random().toString(36).slice(2)}`;
++              }
++              if (!labelElement.id) {
++                labelElement.id = `${input.id}__label`;
++              }
++              input.setAttribute('aria-labelledby', labelElement.id);
++            }
++          } catch (e) {
++            // Non-fatal: fall back to no accessible name association.
++          }
++        })();
++
+         // Tagify initialization.
+         // eslint-disable-next-line no-undef
+         const tagify = new Tagify(input, {
+@@ -308,6 +338,18 @@
+           pasteAsTags: false,
+         });
+ 
++        // Accessibility: propagate the accessible name onto Tagify's
++        // contenteditable span (role="textbox"), which is what screen
++        // readers actually announce, not the original hidden input.
++        // See: https://www.drupal.org/project/tagify/issues/3555084.
++        (() => {
++          const labelledby = input.getAttribute('aria-labelledby');
++          const ceInput = tagify.DOM.input;
++          if (ceInput && labelledby) {
++            ceInput.setAttribute('aria-labelledby', labelledby);
++          }
++        })();
++
+         // Prevent BEF from autosubmitting when typing in Tagify.
+         if (tagify.DOM.input) {
+           tagify.DOM.input.setAttribute('data-bef-auto-submit-exclude', '1');
+@@ -862,6 +904,36 @@
+         input.value = JSON.stringify(selected);
+         this.before(input);
+ 
++        // Accessibility: associate the injected input with the original
++        // select's visible field label, so the accessible name can be
++        // propagated onto Tagify's contenteditable span once Tagify
++        // replaces this input. See: https://www.drupal.org/project/tagify/issues/3555084.
++        (() => {
++          try {
++            const selectId = select.getAttribute('id');
++            let labelElement = selectId
++              ? document.querySelector(`label[for="${CSS.escape(selectId)}"]`)
++              : null;
++            if (!labelElement) {
++              const formItem = select.closest('.js-form-item, .form-item, .form-group, fieldset');
++              labelElement = formItem
++                ? formItem.querySelector('label, legend .fieldset__label, legend span')
++                : null;
++            }
++            if (labelElement) {
++              if (!input.id) {
++                input.id = selectId ? `${selectId}--tagify` : `tagify-input-${Math.random().toString(36).slice(2)}`;
++              }
++              if (!labelElement.id) {
++                labelElement.id = `${input.id}__label`;
++              }
++              input.setAttribute('aria-labelledby', labelElement.id);
++            }
++          } catch (e) {
++            // Non-fatal: fall back to no accessible name association.
++          }
++        })();
++
+         // eslint-disable-next-line no-undef
+         const tagify = new Tagify(input, {
+           mode,
+@@ -895,6 +967,18 @@
+           placeholder,
+         });
+ 
++        // Accessibility: propagate the accessible name onto Tagify's
++        // contenteditable span (role="textbox"), which is what screen
++        // readers actually announce, not the original hidden input.
++        // See: https://www.drupal.org/project/tagify/issues/3555084.
++        (() => {
++          const labelledby = input.getAttribute('aria-labelledby');
++          const ceInput = tagify.DOM.input;
++          if (ceInput && labelledby) {
++            ceInput.setAttribute('aria-labelledby', labelledby);
++          }
++        })();
++
+         // Custom function to group taxonomy terms in the dropdown
+         tagify.dropdown.createListHTML = (suggestionsList) => {
+           if (isTagLimitReached() && !mode) {
