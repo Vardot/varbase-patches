@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Tagify module on fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable -- re-rolled against tagify 1.2.53 (credits MR !177 by Ethan Teague) ([#3555084](https://git.drupalcode.org/project/tagify/-/work_items/3555084))
+
 ## [10.1.84] - 2026-07-26
 
 - Remove a patch for the CTools (Chaos Tool Suite) module on fix: #3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple() (fixed upstream, released in ctools 4.1.1) (#553)
