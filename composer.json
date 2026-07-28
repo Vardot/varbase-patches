@@ -155,6 +155,9 @@
             },
             "drupal/ai_context": {
                 "fix: #3586336 Remove the Drupal Canvas patch from the package": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai_context--2026-07-19--3586336--mr-222.patch"
+            },
+            "drupal/tagify": {
+                "fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/tagify--2026-07-28--3555084--mr-177.patch"
             }
         }
     }
