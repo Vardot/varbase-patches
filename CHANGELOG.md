@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Drupal Canvas module on feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- re-rolled to add the tolerance guard in `CanvasConfigUpdater::blockComponentInstanceId()`, without which canvas 1.9.0 aborts a site template install with `UnexpectedValueException: Missing component source` when a recipe installs a content template before the Component entities its tree references exist ([#3567225](https://git.drupalcode.org/project/canvas/-/work_items/3567225))
+
 - Add a patch for the Drupal Canvas module on fix: #3560889 JsComponent crash renders Canvas Editor unusable when Image Props have relative example URLs ([#3560889](https://git.drupalcode.org/project/canvas/-/work_items/3560889))
 
 - Add a patch for the Drupal Canvas module on fix: #3591751 Compile on serve when a code component's compiled JS is empty ([#3591751](https://git.drupalcode.org/project/canvas/-/work_items/3591751))
