@@ -12,6 +12,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 - Add a patch for the Drupal Canvas module on fix: #3591876 Canvas AI: page builder discards the whole build when the LLM names a region that does not exist ([#3591876](https://git.drupalcode.org/project/canvas/-/work_items/3591876))
 
+- Change a patch for the Drupal Canvas module on feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- re-rolled against canvas 1.9.0 (canvas 1.8.0's patch failed to apply once a fresh `composer update` resolves canvas 1.9.0) ([#3567225](https://git.drupalcode.org/project/canvas/-/work_items/3567225))
+
 ## [11.0.32] - 2026-07-28
 
 - Add a patch for the Tagify module on fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable -- re-rolled against tagify 1.2.53 (credits MR !177 by Ethan Teague) ([#3555084](https://git.drupalcode.org/project/tagify/-/work_items/3555084))
