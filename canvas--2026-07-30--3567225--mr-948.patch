@@ -262,3 +262,25 @@ index aae7b266..b28016b9 100644
          componentInstanceUuid: componentToUpdateId,
          componentType: `${selectedComponentType}@${version}`,
          model: {
+diff --git a/src/CanvasConfigUpdater.php b/src/CanvasConfigUpdater.php
+index 0f79a78..9f696c1 100644
+--- a/src/CanvasConfigUpdater.php
++++ b/src/CanvasConfigUpdater.php
+@@ -282,6 +282,17 @@ class CanvasConfigUpdater {
+     if (!\is_string($component_id) || !\str_starts_with($component_id, BlockComponent::SOURCE_PLUGIN_ID . '.')) {
+       return NULL;
+     }
++    // Tolerate an instance whose Component config entity is not available yet.
++    // A recipe installs a content template before the Component entities its
++    // tree references necessarily exist - a views block component, for example,
++    // is generated from the view, which a later recipe may still be installing.
++    // ::getInputs() would throw \UnexpectedValueException('Missing component
++    // source') for such an item and abort the whole install; there is nothing
++    // to coerce on it, so treat it as not a block instance and let schema
++    // validation report any real problem.
++    if ($item->getComponent()?->getComponentSource() === NULL) {
++      return NULL;
++    }
+     return $component_id;
+   }
+ 
