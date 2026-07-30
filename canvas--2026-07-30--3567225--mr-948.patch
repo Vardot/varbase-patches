@@ -1,0 +1,264 @@
+diff --git a/packages/types/src/DrupalSettings.ts b/packages/types/src/DrupalSettings.ts
+index 6cdbd8de..713bb4a3 100644
+--- a/packages/types/src/DrupalSettings.ts
++++ b/packages/types/src/DrupalSettings.ts
+@@ -82,6 +82,7 @@ export interface DrupalSettings {
+     personalizationExtensionAvailable: boolean;
+     // ⚠️ This is highly experimental and *will* be refactored.
+     canvasAiMaxFileSize: number;
++    hidePageDataPanel?: boolean;
+     // Present when the user may generate Canvas Headless previews. Also gates
+     // access to external components in the component library.
+     canAccessHeadlessPreview?: boolean;
+diff --git a/src/Controller/ApiLayoutController.php b/src/Controller/ApiLayoutController.php
+index 4aa800c5..9da0cb79 100644
+--- a/src/Controller/ApiLayoutController.php
++++ b/src/Controller/ApiLayoutController.php
+@@ -446,7 +446,11 @@ final class ApiLayoutController {
+ 
+     // Update the entity & auto-save it. We might be updating a component
+     // instance version aside of the model itself.
+-    $this->updateComponentInstance($entity_to_patch, $componentInstanceUuid, $version, $model, $preview_entity);
++    // For per-entity canvas layouts, the entity itself is the host entity for
++    // field linking (EntityFieldPropSource). For ContentTemplate editing, the
++    // preview entity serves as the host.
++    $host_entity = $preview_entity ?? ($entity instanceof FieldableEntityInterface ? $entity : NULL);
++    $this->updateComponentInstance($entity_to_patch, $componentInstanceUuid, $version, $model, $host_entity);
+     $this->autoSaveManager->saveEntity($entity_to_patch, $clientInstanceId);
+ 
+     // Inform the UI of the updated reality.
+diff --git a/src/Plugin/Canvas/ComponentSource/JsonSchemaPropsComponentSourceBase.php b/src/Plugin/Canvas/ComponentSource/JsonSchemaPropsComponentSourceBase.php
+index 4bb93017..fbcdb82a 100644
+--- a/src/Plugin/Canvas/ComponentSource/JsonSchemaPropsComponentSourceBase.php
++++ b/src/Plugin/Canvas/ComponentSource/JsonSchemaPropsComponentSourceBase.php
+@@ -880,13 +880,20 @@ abstract class JsonSchemaPropsComponentSourceBase extends ComponentSourceBase im
+     // Component config entity being created!)
+ 
+     // Get suggested non-static prop sources for component instances on
+-    // content templates.
++    // content templates and per-entity canvas layouts.
+     $suggestions = NULL;
++    $entity_data_definition_for_linking = NULL;
+     if ($entity instanceof ContentTemplate) {
++      $entity_data_definition_for_linking = $entity->getTargetEntityDataDefinition();
++    }
++    elseif ($entity->getEntityTypeId() === 'node') {
++      $entity_data_definition_for_linking = TypedDataHelper::entityDataDefinition('node', $entity->bundle());
++    }
++    if ($entity_data_definition_for_linking !== NULL) {
+       $suggestions = PropSourceSuggester::structureSuggestionsForHierarchicalResponse($this->propSourceSuggester->suggest(
+         $this->getSourceSpecificComponentId(),
+         $this->getMetadata(),
+-        $entity->getTargetEntityDataDefinition(),
++        $entity_data_definition_for_linking,
+       ));
+     }
+ 
+@@ -948,7 +955,7 @@ abstract class JsonSchemaPropsComponentSourceBase extends ComponentSourceBase im
+       $form[$sdc_prop_name] = $source->formTemporaryRemoveThisExclamationExclamationExclamation($widget, $sdc_prop_name, $is_required, $entity_object_for_field_widget, $form, $form_state);
+       $form[$sdc_prop_name]['#disabled'] = $disabled;
+ 
+-      if ($entity instanceof ContentTemplate) {
++      if ($entity_data_definition_for_linking !== NULL) {
+         $could_use_dynamic_prop_source = !empty($suggestions[$sdc_prop_name]);
+ 
+         // If the prop is already linked, replace the widget entirely. The
+@@ -962,7 +969,7 @@ abstract class JsonSchemaPropsComponentSourceBase extends ComponentSourceBase im
+             '#sdc_prop_name' => $sdc_prop_name,
+             '#sdc_prop_label' => $label,
+             '#prop_source' => $linkable_prop_source,
+-            '#entity_data_definition' => $entity->getTargetEntityDataDefinition(),
++            '#entity_data_definition' => $entity_data_definition_for_linking,
+             '#field_link_suggestions' => $suggestions[$sdc_prop_name],
+             '#description' => $component_schema['properties'][$sdc_prop_name]['description'] ?? NULL,
+             '#is_required' => $is_required,
+@@ -1001,7 +1008,7 @@ abstract class JsonSchemaPropsComponentSourceBase extends ComponentSourceBase im
+       }
+     }
+     $form['#attached']['canvas-transforms'] = $transforms;
+-    if ($entity instanceof ContentTemplate) {
++    if ($entity_data_definition_for_linking !== NULL) {
+       $form['#after_build'][] = [static::class, 'moveSuggestionsToLabel'];
+     }
+     return $form;
+diff --git a/src/Storage/ComponentTreeLoader.php b/src/Storage/ComponentTreeLoader.php
+index d067a2b4..f15997ce 100644
+--- a/src/Storage/ComponentTreeLoader.php
++++ b/src/Storage/ComponentTreeLoader.php
+@@ -15,11 +15,11 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
+ /**
+  * Handles loading a component tree from entities.
+  */
+-final class ComponentTreeLoader {
++class ComponentTreeLoader {
+ 
+   public function __construct(
+-    private readonly EntityFieldManagerInterface $entityFieldManager,
+-    private readonly ModuleHandlerInterface $moduleHandler,
++    protected readonly EntityFieldManagerInterface $entityFieldManager,
++    protected readonly ModuleHandlerInterface $moduleHandler,
+   ) {}
+ 
+   /**
+diff --git a/src/Utility/TypedDataHelper.php b/src/Utility/TypedDataHelper.php
+index b8b570a5..b9637cfe 100644
+--- a/src/Utility/TypedDataHelper.php
++++ b/src/Utility/TypedDataHelper.php
+@@ -5,9 +5,11 @@ declare(strict_types=1);
+ namespace Drupal\canvas\Utility;
+ 
+ use Drupal\canvas\Plugin\Validation\Constraint\UriSchemeConstraint;
++use Drupal\canvas\TypedData\BetterEntityDataDefinition;
+ use Drupal\Core\Cache\CacheableDependencyInterface;
+ use Drupal\Core\Cache\CacheableMetadata;
+ use Drupal\Core\Entity\Plugin\DataType\EntityReference;
++use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
+ use Drupal\Core\Field\FieldItemInterface;
+ use Drupal\Core\TypedData\DataDefinition;
+ use Drupal\Core\TypedData\DataDefinitionInterface;
+@@ -86,6 +88,10 @@ final readonly class TypedDataHelper {
+     return $allowed_schemes !== [] && \array_diff($allowed_schemes, ['http', 'https']) === [];
+   }
+ 
++  public static function entityDataDefinition(string $entity_type_id, string $bundle): EntityDataDefinitionInterface {
++    return BetterEntityDataDefinition::create($entity_type_id, $bundle);
++  }
++
+   public static function conjureFieldItemObject(string $field_type): FieldItemInterface {
+     $typed_data_manager = self::getTypedDataManger();
+     $field_item_definition = $typed_data_manager->createDataDefinition("field_item:$field_type");
+diff --git a/ui/src/components/ComponentInstanceForm.tsx b/ui/src/components/ComponentInstanceForm.tsx
+index 291f9e58..f69b5cbd 100644
+--- a/ui/src/components/ComponentInstanceForm.tsx
++++ b/ui/src/components/ComponentInstanceForm.tsx
+@@ -340,6 +340,9 @@ const ComponentInstanceForm: React.FC<ComponentInstanceFormProps> = () => {
+       return;
+     }
+     const selectedModel = model[selectedComponent];
++    if (!selectedModel) {
++      return;
++    }
+     const node = findComponentByUuid(layout, selectedComponent);
+     if (!node) {
+       return;
+diff --git a/ui/src/components/UndoRedo.tsx b/ui/src/components/UndoRedo.tsx
+index dd154838..b9a9b128 100644
+--- a/ui/src/components/UndoRedo.tsx
++++ b/ui/src/components/UndoRedo.tsx
+@@ -65,7 +65,7 @@ const UndoRedo = () => {
+         disabled={!isUndoable}
+         aria-label="Undo"
+       >
+-        <ResetIcon height="16" width="auto" />
++        <ResetIcon height="16" width="16" />
+       </Button>
+       <Button
+         variant="ghost"
+@@ -76,11 +76,7 @@ const UndoRedo = () => {
+         disabled={!isRedoable}
+         aria-label="Redo"
+       >
+-        <ResetIcon
+-          height="16"
+-          width="auto"
+-          style={{ transform: 'scaleX(-1)' }}
+-        />
++        <ResetIcon height="16" width="16" style={{ transform: 'scaleX(-1)' }} />
+       </Button>
+     </>
+   );
+diff --git a/ui/src/components/panel/ContextualPanel.tsx b/ui/src/components/panel/ContextualPanel.tsx
+index f27b213e..ba416bd8 100644
+--- a/ui/src/components/panel/ContextualPanel.tsx
++++ b/ui/src/components/panel/ContextualPanel.tsx
+@@ -24,6 +24,7 @@ import {
+   selectSelection,
+ } from '@/features/ui/uiSlice';
+ import useHidePanelClasses from '@/hooks/useHidePanelClasses';
++import { getCanvasSettings } from '@/utils/drupal-globals';
+ 
+ import type React from 'react';
+ 
+@@ -38,6 +39,9 @@ const ContextualPanel: React.FC = () => {
+   const isTemplateContext = editorFrameContext === EditorFrameContext.TEMPLATE;
+   const mainTabText = isTemplateContext ? 'Template data' : 'Page data';
+ 
++  const hidePageDataPanel =
++    getCanvasSettings()?.hidePageDataPanel === true ||
++    /\/canvas\/editor\/node\/\d+/.test(window.location.pathname);
+   const [activePanel, setActivePanel] = useState('pageData');
+   const offRightClasses = useHidePanelClasses('right');
+   const [hidePanel, setHidePanel] = useState(false);
+@@ -59,12 +63,16 @@ const ContextualPanel: React.FC = () => {
+   }, [dispatch, selectedComponent, isMultiSelect]);
+ 
+   useEffect(() => {
+-    if (isTemplateContext && !isMultiSelect && !selectedComponent) {
++    if (
++      (isTemplateContext || hidePageDataPanel) &&
++      !isMultiSelect &&
++      !selectedComponent
++    ) {
+       setHidePanel(true);
+     } else {
+       setHidePanel(false);
+     }
+-  }, [selectedComponent, isMultiSelect, isTemplateContext]);
++  }, [selectedComponent, isMultiSelect, isTemplateContext, hidePageDataPanel]);
+ 
+   return (
+     <Box
+@@ -90,7 +98,7 @@ const ContextualPanel: React.FC = () => {
+             className={clsx(styles.tabRoot)}
+           >
+             <Tabs.List justify="start" mx="4" size="1">
+-              {!isTemplateContext && (
++              {!isTemplateContext && !hidePageDataPanel && (
+                 <Tabs.Trigger
+                   value="pageData"
+                   data-testid="canvas-contextual-panel--page-data"
+@@ -169,7 +177,7 @@ const ContextualPanel: React.FC = () => {
+                     <Outlet />
+                   </ErrorBoundary>
+                 </Tabs.Content>
+-                {!isTemplateContext && (
++                {!isTemplateContext && !hidePageDataPanel && (
+                   <Tabs.Content
+                     value={'pageData'}
+                     forceMount={true}
+diff --git a/ui/src/components/topbar/Topbar.tsx b/ui/src/components/topbar/Topbar.tsx
+index 880fe0d9..f2e5918b 100644
+--- a/ui/src/components/topbar/Topbar.tsx
++++ b/ui/src/components/topbar/Topbar.tsx
+@@ -107,7 +107,7 @@ const Topbar = () => {
+                 <DropIcon
+                   className={styles.drupalLogo}
+                   height="24"
+-                  width="auto"
++                  width="24"
+                 />
+               </a>
+             </Tooltip>
+diff --git a/ui/src/features/layout/layoutModelSlice.ts b/ui/src/features/layout/layoutModelSlice.ts
+index aae7b266..b28016b9 100644
+--- a/ui/src/features/layout/layoutModelSlice.ts
++++ b/ui/src/features/layout/layoutModelSlice.ts
+@@ -23,7 +23,6 @@ import {
+ import type { PayloadAction } from '@reduxjs/toolkit';
+ import type { StateWithHistory } from 'redux-undo';
+ import type { AppThunk, RootState } from '@/app/store';
+-import type { EditorFrameContext } from '@/features/ui/uiSlice';
+ import type {
+   CanvasComponent,
+   ComponentsList,
+@@ -848,8 +847,9 @@ export const _linkPropToEntityValue =
+       // Do not provide a resolved value with the newly linked prop.
+       delete resolved[propName];
+ 
++      const editorFrameContext = selectEditorFrameContext(state);
+       const valuePayload = {
+-        type: 'template' as EditorFrameContext,
++        type: editorFrameContext,
+         componentInstanceUuid: componentToUpdateId,
+         componentType: `${selectedComponentType}@${version}`,
+         model: {
