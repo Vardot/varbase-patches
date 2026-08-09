@@ -171,9 +171,6 @@
             "drupal/eca_helper": {
                 "fix: #3608313 Guard null event and catch Throwable in Messenger decorator": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/eca_helper--2026-07-04--3608313--mr-16.patch"
             },
-            "drupal/ckeditor_media_resize": {
-                "chore: #3607786 Add Drupal Core ~11.4.0 support in the CKEditor Media Resize module on the 1.1.x branch": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor_media_resize--2026-07-16--3607786--mr-30.patch"
-            },
             "drupal/tagify": {
                 "fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/tagify--2026-07-28--3555084--mr-177.patch"
             }
