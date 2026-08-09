@@ -215,6 +215,55 @@ git apply --check patches/<file>.patch
 - **Stale third-party URL aborts install**: rely on the default allowlist (`["vardot/varbase-patches"]`) or add a wildcard `ignore-dependency-patches` (e.g. `drupal/*`).
 - **`Failed to open stream` on fresh `composer create-project`**: a downstream plugin set `extra.plugin-modifies-downloads` or `extra.plugin-modifies-install-path` and got promoted to early activation before `drupal/core` was extracted. Drop those flags — `vardot/varbase-patches` uses late activation (POST_PACKAGE_INSTALL of itself) on purpose.
 
+## Patch file integrity
+
+- **Every `.patch` file ends with a trailing newline (`0x0a`).** Without it `git apply` returns
+  `error: corrupt patch at line N` (exit 128) and `composer-patches` — which tries `git apply`
+  first — fails the install with `Error: Cannot apply patch …!`, even though the diff is correct.
+  GNU `patch` only survives it with fuzz, which is why a careless local check passes and CI still
+  breaks.
+- **Verify the served file, not your local copy**, after every upload:
+  `curl -sS -o /tmp/p.patch "<raw url>" && wc -c < /tmp/p.patch && tail -c 1 /tmp/p.patch | xxd && git apply --check /tmp/p.patch`
+  (last byte `0a`, `git apply --check` exit 0).
+- **Never write repo files through shell/argument interpolation** — that is how a file ends up
+  holding a literal local path string instead of its content, and it hits `composer.json` and
+  `CHANGELOG.md` as easily as a `.patch`. Base64-encode the bytes into the blob (GitHub
+  `POST /git/blobs` `encoding=base64`; GitLab commit actions `"encoding": "base64"`), then
+  re-fetch the raw URL and diff it.
+- **Re-run CI that predates the fix** (`gh run rerun <id> --failed`). A run started before the
+  merge is still testing the broken file and proves nothing.
+
+## Keep the patch minimal
+
+- Carry only the hunks the consuming module actually needs. Measure it:
+  `grep -rn "<PatchedClass>" web/modules/contrib/<consumer>/src/`
+- A consumer usually depends on one or two extension points, not the whole feature the upstream
+  merge request implements. Keep the full merge request upstream, carry the minimum downstream,
+  and say so in the patch description — a smaller patch re-rolls cleanly.
+- **Skip front-end hunks when the package ships a prebuilt bundle.** Patching front-end sources
+  does nothing while `*.libraries.yml` loads a compiled `dist/` asset, and `composer install`
+  restores the shipped bundle. Check with
+  `grep -c "<symbol>" web/modules/contrib/<pkg>/<shipped bundle>` (0 = inert). Send those changes
+  upstream instead.
+- **Prove it locally BEFORE it goes into `vardot/varbase-patches`.** Never merge the patch file
+  first and test afterwards — once it is on the `patches` branch, every consuming project picks it
+  up. Prove on a pristine checkout: `rm -rf web/modules/contrib/<pkg> && ddev composer install`.
+  A tree that already has the patch reports `Reversed (or previously applied) patch detected!`,
+  which is neither a pass nor a fail. Then verify the behaviour — "applied" is not "works".
+
+## Re-rolling: update the upstream merge request and its issue too
+
+A re-roll is never only a downstream file — the upstream merge request it came from is by
+definition out of date. In the same piece of work:
+
+- Update the upstream merge request so its branch applies to the current release. A patch we carry
+  that upstream can no longer merge is a patch we carry forever.
+- Update the drupal.org issue: what changed, which version it was re-rolled against, what was
+  verified; keep the remaining-tasks marks honest.
+- If the downstream patch was reduced to a subset of the merge request, say so on both the merge
+  request and the issue, and record what was dropped and why.
+- Unrelated fixes that fell out of the re-roll need their own issues, not a ride-along.
+
 ## See also
 
 - Agent: `varbase-patches` — end-to-end Varbase patches workflows by version.

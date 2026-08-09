@@ -301,6 +301,107 @@ Add a wildcard `ignore-dependency-patches` (e.g. `drupal/*`) or list the offendi
 **Plugin not activating on fresh `composer create-project`:**
 The plugin uses *late activation* (POST_PACKAGE_INSTALL of itself) and does NOT declare `extra.plugin-modifies-downloads` or `extra.plugin-modifies-install-path`. If a downstream project tries to add those flags, expect "Plugin initialization failed … Failed to open stream" because Composer's autoloader will require `drupal/core` includes before `drupal/core` has been extracted. Keep the plugin on its late-activation path.
 
+## Patch file integrity — non-negotiable
+
+**Every `.patch` file MUST end with a trailing newline (`0x0a`).** A patch missing its final
+newline is not a cosmetic defect, it is a broken patch:
+
+```
+git apply --check <file>.patch   →  error: corrupt patch at line N   (exit 128)
+patch -p1 < <file>.patch         →  patch unexpectedly ends in middle of line (applies only with fuzz)
+```
+
+`cweagans/composer-patches` tries `git apply` FIRST, so a newline-less file fails the install
+outright with `Error: Cannot apply patch <description> (<url>)!` even though the diff content is
+correct. GNU `patch` masking it with fuzz is why this passes a careless local check and still
+breaks CI and every consuming project.
+
+After ANY upload of a patch file, verify the SERVED artifact, never your local copy:
+
+```bash
+curl -sS -o /tmp/p.patch "<raw url>"
+wc -c < /tmp/p.patch            # expected byte count
+tail -c 1 /tmp/p.patch | xxd    # MUST be 0a
+git apply --check /tmp/p.patch  # MUST be exit 0
+```
+
+**Never write a repository file through a shell/argument interpolation route.** That is how a
+file ends up containing a literal local path string instead of its content — it silently affects
+`composer.json` and `CHANGELOG.md` exactly as easily as a `.patch`. Base64-encode the bytes and
+create the blob directly (GitHub `POST /git/blobs` with `encoding=base64`; GitLab commit actions
+with `"encoding": "base64"`), then re-fetch the raw URL and diff it against the local source
+before reporting success.
+
+**CI that predates a fix is not evidence.** After merging a fix to the `patches` branch, re-run
+the dependent pipeline (`gh run rerun <id> --failed`) before reporting status — a run started
+before the merge is still testing the broken file.
+
+## Keep patches minimal — carry only what the consumer needs
+
+Do not carry an upstream merge request wholesale. Measure what the consuming module actually
+touches, then carry only those hunks:
+
+```bash
+# grep the consumer for every API the patch modifies
+grep -rn "<PatchedClass>\|<PatchedService>" web/modules/contrib/<consumer>/src/
+```
+
+A consumer usually depends on one or two extension points (a class it subclasses, a service it
+swaps, a method it calls), not on the whole feature the merge request implements. Carrying the
+rest buys nothing and costs a hand re-roll on every upstream release. Keep the full merge request
+upstream; carry the minimum downstream, and say so in the patch description.
+
+**Front-end hunks are usually inert — do not carry them.** When a package ships a prebuilt bundle
+referenced from its `*.libraries.yml` (a compiled `dist/` asset rather than the sources), patching
+the front-end sources changes nothing at runtime, and `composer install` restores the shipped
+bundle anyway. Verify before carrying any `*.js`/`*.ts`/`*.tsx`/`*.vue` hunk:
+
+```bash
+grep -c "<symbol the patch adds>" web/modules/contrib/<pkg>/<path to the shipped bundle>   # 0 = inert
+```
+
+Send those changes upstream instead, and note in the patch description that the patch is
+back-end only.
+
+## Prove the patch locally BEFORE it goes into `vardot/varbase-patches`
+
+Never open the patch-file PR first and test afterwards. A patch reaches the `patches` branch only
+after it has been proven on a real local project, because once it is merged every consuming
+project picks it up.
+
+Prove it on a PRISTINE checkout, never the working tree — a tree that already has the patch
+applied reports `Reversed (or previously applied) patch detected!`, which is neither a pass nor a
+fail:
+
+```bash
+rm -rf web/modules/contrib/<pkg>
+ddev composer install --no-interaction     # read the FULL output, not the exit code alone
+```
+
+Then verify the behaviour, not just the apply: exercise the affected route or API and confirm the
+response and the browser console are clean. "The patch applied" is not "the feature works".
+
+Only when that passes: add the file to the `patches` branch, wire it on the version branch, and
+confirm the merged raw URL still satisfies the integrity checks above.
+
+## Re-rolling: update the upstream merge request and its issue too
+
+A re-roll is never only a downstream file. When you re-roll a patch, the upstream merge request it
+came from is by definition out of date — it no longer matches the version people are running.
+In the same piece of work:
+
+- **Update the upstream merge request** so its branch applies to the current release. A patch we
+  carry that upstream can no longer merge is a patch we carry forever.
+- **Update the drupal.org issue**: say what changed, against which version it was re-rolled, and
+  what was verified. Keep the issue summary's remaining-tasks marks honest.
+- **Keep the scopes aligned.** If the downstream patch was reduced to a subset of the merge
+  request, say so on both the merge request and the issue, and record what was dropped and why,
+  so the next person does not silently re-add it.
+- If the re-roll dropped hunks that are genuinely unrelated fixes, they need their own issues
+  rather than riding along.
+
+Downstream and upstream drift apart the moment only one of them is updated.
+
 ## Skills reference
 
 - **varbase-patches** — the `vardot/varbase-patches` plugin controls (allowlist, ignore, var-ccup).
