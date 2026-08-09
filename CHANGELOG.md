@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Drupal Canvas module on feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- minimal re-roll against Canvas 1.10.0, replacing the full 11-file MR !948 re-roll with a 1-file patch limited to the `ComponentTreeLoader` extension point Canvas Override actually depends on ([#3567225](https://git.drupalcode.org/project/canvas/-/work_items/3567225))
+
 ## [11.0.34] - 2026-07-30
 
 - Change a patch for the Drupal Canvas module on feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- re-rolled to add the tolerance guard in `CanvasConfigUpdater::blockComponentInstanceId()`, without which canvas 1.9.0 aborts a site template install with `UnexpectedValueException: Missing component source` when a recipe installs a content template before the Component entities its tree references exist ([#3567225](https://git.drupalcode.org/project/canvas/-/work_items/3567225))
