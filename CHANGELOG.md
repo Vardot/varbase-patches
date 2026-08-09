@@ -179,3 +179,4 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 ## [11.0.1] - 2026-04-28
 
 - Initial tracked release on the `11.0.x` branch.
+
