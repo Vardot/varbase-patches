@@ -1,0 +1,19 @@
+diff --git a/src/Storage/ComponentTreeLoader.php b/src/Storage/ComponentTreeLoader.php
+index d067a2b4..f15997ce 100644
+--- a/src/Storage/ComponentTreeLoader.php
++++ b/src/Storage/ComponentTreeLoader.php
+@@ -15,11 +15,11 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
+ /**
+  * Handles loading a component tree from entities.
+  */
+-final class ComponentTreeLoader {
++class ComponentTreeLoader {
+ 
+   public function __construct(
+-    private readonly EntityFieldManagerInterface $entityFieldManager,
+-    private readonly ModuleHandlerInterface $moduleHandler,
++    protected readonly EntityFieldManagerInterface $entityFieldManager,
++    protected readonly ModuleHandlerInterface $moduleHandler,
+   ) {}
+ 
+   /**
