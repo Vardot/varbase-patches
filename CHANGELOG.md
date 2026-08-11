@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the reCAPTCHA module on fix: #3588269 Make Drupal8Post::submit() compatible with parent (fixed upstream, released in recaptcha 8.x-3.5)
+
 ## [10.0.139] - 2026-07-26
 
 - Remove a patch for the CTools (Chaos Tool Suite) module on fix: #3492432 PHP 8.4 nullable types in MaskContentEntityStorage::doLoadMultiple() (fixed upstream, released in ctools 4.1.1) (#554)
