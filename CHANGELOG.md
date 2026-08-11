@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the reCAPTCHA module on fix: #3588269 Make Drupal8Post::submit() compatible with parent (fixed upstream, released in recaptcha 8.x-3.5)
+
 ## [9.2.97] - 2026-07-26
 
 - Remove the redundant Panels (Panels) patch on fix: #3534531 php 8.4 compatibility issue (already shipped upstream in Panels 8.x-4.10; the commit patch no longer applies). The Panels IPE-forms PHP 8.4 patch is kept (still needed on 8.x-4.10). (#563)
