@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the reCAPTCHA module on fix: #3588269 Make Drupal8Post::submit() compatible with parent (fixed upstream, released in recaptcha 8.x-3.5)
+
 - Remove a patch for the CKEditor5 Media Resize module on chore: #3607786 Add Drupal Core ~11.4.0 support on the 1.1.x branch (fixed upstream, released in ckeditor_media_resize 1.1.1)
 
 
