@@ -6,6 +6,10 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Drupal Canvas module on feat: #3584713 Add Allow Edit Global Regions permission to restrict editing of global page regions -- re-rolled against Canvas 1.10.1 (the 2026-06-09 file no longer applies once a project resolves canvas 1.10.1) ([#3584713](https://git.drupalcode.org/project/canvas/-/work_items/3584713))
+
+- Remove a patch for the Drupal Canvas module on fix: #3591876 Canvas AI: page builder discards the whole build when the LLM names a region that does not exist (fixed upstream, released in canvas 1.10.1) ([#3591876](https://git.drupalcode.org/project/canvas/-/work_items/3591876))
+
 - Change a patch for the Drupal Canvas module on feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- minimal re-roll against Canvas 1.10.0, replacing the full 11-file MR !948 re-roll with a 1-file patch limited to the `ComponentTreeLoader` extension point Canvas Override actually depends on ([#3567225](https://git.drupalcode.org/project/canvas/-/work_items/3567225))
 
 ## [11.0.34] - 2026-07-30
