@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the Drupal Entity API module on fix: #3532309 Fix Deprecation notice from DeleteAction class causes errors in ECA module (committed upstream, released in entity 8.x-1.7)
+
 - Remove a patch for the reCAPTCHA module on fix: #3588269 Make Drupal8Post::submit() compatible with parent (fixed upstream, released in recaptcha 8.x-3.5)
 
 ## [10.0.139] - 2026-07-26

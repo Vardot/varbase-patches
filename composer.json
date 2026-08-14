@@ -129,10 +129,6 @@
         "Issue #3493849: Argument #1 ($array) must be of type array, string given":
         "https://www.drupal.org/files/issues/2025-01-28/fix-array-merge-type-error-block-class-3493849-6.patch"
       },
-      "drupal/entity": {
-        "Issue #3532309: Fix Deprecation notice from DeleteAction class causes errors in ECA module":
-        "https://www.drupal.org/files/issues/2025-06-25/entity-fix-deprecation.patch"
-      },
       "drupal/dropzonejs": {
         "Issue #3542463: Fix TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in DropzoneJsUploadForm::validateUploadElement()":
         "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/dropzonejs--2025-08-21--3542463--mr-24.patch"
