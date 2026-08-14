@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the Drupal Entity API module on fix: #3532309 Fix Deprecation notice from DeleteAction class causes errors in ECA module (committed upstream, released in entity 8.x-1.7)
+
 ## [11.0.36] - 2026-08-13
 
 - Change a patch for the Drupal Canvas module on feat: #3584713 Add Allow Edit Global Regions permission to restrict editing of global page regions -- re-rolled against Canvas 1.10.1 (the 2026-06-09 file no longer applies once a project resolves canvas 1.10.1) ([#3584713](https://git.drupalcode.org/project/canvas/-/work_items/3584713))
