@@ -51,11 +51,13 @@ List of package-name patterns to exclude **after** the allowlist is applied. Use
   "extra": {
     "composer-patches": {
       "allowed-dependency-patches": ["drupal/*", "vardot/*"],
-      "ignore-dependency-patches": ["drupal/ai_context"]
+      "ignore-dependency-patches": ["drupal/example_module"]
     }
   }
 }
 ```
+
+Replace `drupal/example_module` with the dependency whose declared patches you want to skip.
 
 When `allowed-dependency-patches` is set to the default `["vardot/varbase-patches"]`, `ignore-dependency-patches` is redundant — nothing else passes the allowlist.
 
