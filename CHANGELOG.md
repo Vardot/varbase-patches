@@ -6,7 +6,11 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.38] - 2026-08-16
+
 - Remove a patch for the AI Context module on fix: #3586336 Remove the Drupal Canvas patch from the package -- after ai_context 1.0.0-beta4 was released, which already ships without `extra.patches` and without `patches/canvas-3575644-string-long-regex-ai-context-item.patch`, so the patch can no longer apply and aborts every build with `composer-exit-on-patch-failure` ([#3586336](https://git.drupalcode.org/project/ai_context/-/work_items/3586336))
+
+## [11.0.37] - 2026-08-14
 
 - Remove a patch for the Drupal Entity API module on fix: #3532309 Fix Deprecation notice from DeleteAction class causes errors in ECA module (committed upstream, released in entity 8.x-1.7)
 
