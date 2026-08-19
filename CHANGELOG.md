@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.39] - 2026-08-19
+
 - Remove a patch for the Drimage Improved module on fix: #3587334 Missing response and return handling in DrimageSubscriber image delivery (fixed upstream, released in drimage_improved 1.0.10) ([#3587334](https://www.drupal.org/project/drimage_improved/issues/3587334))
 
 ## [11.0.38] - 2026-08-16
@@ -195,4 +197,3 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 ## [11.0.1] - 2026-04-28
 
 - Initial tracked release on the `11.0.x` branch.
-
