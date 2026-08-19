@@ -143,9 +143,6 @@
             "drupal/content_lock": {
                 "feat: #3544019 Form Actions Stay Cached and Disabled After Breaking Lock in Gin Admin Theme": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_lock--2026-06-14--3544019--mr-93.patch"
             },
-            "drupal/drimage_improved": {
-                "fix: #3587334 Missing response and return handling in DrimageSubscriber image delivery": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/drimage_improved--2026-04-28--3587334--mr-25.patch"
-            },
             "drupal/gin": {
                 "fix: #3590827 Sticky form actions appear on node revision revert/delete confirm forms (incomplete exclusion pattern)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2026-05-19--3590827--mp-787.patch"
             },
