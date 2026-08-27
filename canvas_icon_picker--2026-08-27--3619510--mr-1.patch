@@ -1,0 +1,189 @@
+diff --git a/src/Hook/CanvasIconPickerHooks.php b/src/Hook/CanvasIconPickerHooks.php
+--- a/src/Hook/CanvasIconPickerHooks.php
++++ b/src/Hook/CanvasIconPickerHooks.php
+@@ -4,6 +4,7 @@ declare(strict_types=1);
+ 
+ namespace Drupal\canvas_icon_picker\Hook;
+ 
++use Drupal\canvas\PropExpressions\StructuredData\FieldTypePropExpression;
+ use Drupal\canvas\PropShape\CandidateStorablePropShape;
+ use Drupal\Core\Hook\Attribute\Hook;
+ 
+@@ -56,10 +57,26 @@ final class CanvasIconPickerHooks {
+       return;
+     }
+     $storable_prop_shape->fieldWidget = 'canvas_icon_picker';
++    // The picker widget only supports a plain string field. Without forcing the
++    // field type here, a prop that also declares `enum` keeps the
++    // list_string/options_select shape Canvas already chose, the widget is
++    // silently ignored and the editor renders a select list instead.
++    $storable_prop_shape->fieldTypeProp = new FieldTypePropExpression('string', 'value');
++    $storable_prop_shape->fieldStorageSettings = NULL;
++    $instance_settings = [];
+     if ($is_scoped) {
+-      $storable_prop_shape->fieldInstanceSettings = [
+-        'allowed_icon_pack' => array_values(array_filter($x_canvas_icon, 'is_string')),
+-      ];
++      $instance_settings['allowed_icon_pack'] = array_values(array_filter($x_canvas_icon, 'is_string'));
++    }
++    // A prop may constrain itself to a curated set of icons with `enum`. Keep
++    // that constraint: offer only those icons in the picker, and store the
++    // value in the form the schema declares, so the picked value still
++    // validates against the enum.
++    $enum = $schema['enum'] ?? NULL;
++    if (is_array($enum) && $enum !== []) {
++      $instance_settings['allowed_icon_ids'] = array_values(array_filter($enum, 'is_string'));
++    }
++    if ($instance_settings !== []) {
++      $storable_prop_shape->fieldInstanceSettings = $instance_settings;
+     }
+   }
+ 
+diff --git a/src/Plugin/Field/FieldWidget/CanvasIconPickerWidget.php b/src/Plugin/Field/FieldWidget/CanvasIconPickerWidget.php
+--- a/src/Plugin/Field/FieldWidget/CanvasIconPickerWidget.php
++++ b/src/Plugin/Field/FieldWidget/CanvasIconPickerWidget.php
+@@ -28,8 +28,28 @@ final class CanvasIconPickerWidget extends WidgetBase {
+       '#type' => 'canvas_icon_picker',
+       '#default_value' => $items[$delta]->value ?? '',
+       '#allowed_packs' => $this->getFieldSetting('allowed_icon_pack') ?? [],
++      '#allowed_icon_ids' => $this->getFieldSetting('allowed_icon_ids') ?? [],
+     ];
+     return $element;
+   }
+ 
++  /**
++   * {@inheritdoc}
++   */
++  public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
++    $allowed_ids = $this->getFieldSetting('allowed_icon_ids') ?? [];
++    if ($allowed_ids === []) {
++      return $values;
++    }
++    // The picker writes "pack:icon_id". When the prop declares an `enum` of
++    // bare icon ids, store the bare id so the value still validates.
++    foreach ($values as $delta => $value) {
++      $raw = (string) ($value['value'] ?? '');
++      if ($raw !== '' && str_contains($raw, ':')) {
++        $values[$delta]['value'] = substr($raw, strpos($raw, ':') + 1);
++      }
++    }
++    return $values;
++  }
++
+ }
+diff --git a/src/Element/CanvasIconPicker.php b/src/Element/CanvasIconPicker.php
+--- a/src/Element/CanvasIconPicker.php
++++ b/src/Element/CanvasIconPicker.php
+@@ -23,6 +23,7 @@ final class CanvasIconPicker extends Textfield {
+     $info = parent::getInfo();
+     $info['#theme_wrappers'][] = 'canvas_icon_picker';
+     $info['#allowed_packs'] = [];
++    $info['#allowed_icon_ids'] = [];
+     $info['#pre_render'][] = [static::class, 'preRenderPicker'];
+     return $info;
+   }
+@@ -60,6 +61,11 @@ final class CanvasIconPicker extends Textfield {
+ 
+     $allowed_packs = array_values(array_filter((array) ($element['#allowed_packs'] ?? [])));
+     $query = $allowed_packs !== [] ? ['packs' => implode(',', $allowed_packs)] : [];
++    // A prop constrained by `enum` offers only those icons in the grid.
++    $allowed_icon_ids = array_values(array_filter((array) ($element['#allowed_icon_ids'] ?? [])));
++    if ($allowed_icon_ids !== []) {
++      $query['ids'] = implode(',', $allowed_icon_ids);
++    }
+     $element['#index_url'] = Url::fromRoute('canvas_icon_picker.index', [], ['query' => $query])->toString();
+     $element['#sprite_url'] = Url::fromRoute('canvas_icon_picker.sprite', [], ['query' => $query])->toString();
+ 
+diff --git a/src/Controller/IconIndexController.php b/src/Controller/IconIndexController.php
+--- a/src/Controller/IconIndexController.php
++++ b/src/Controller/IconIndexController.php
+@@ -34,9 +34,13 @@ final class IconIndexController extends ControllerBase {
+    */
+   public function index(Request $request = new Request()): CacheableJsonResponse {
+     $packs = $this->resolveRequestedPacks($request);
++    $allowed_icon_ids = $this->resolveRequestedIconIds($request);
+     $icons = [];
+     $present_pack_ids = [];
+     foreach ($this->repository->allIcons($packs) as $full_id => $item) {
++      if (!$this->iconIdIsAllowed((string) $full_id, $allowed_icon_ids)) {
++        continue;
++      }
+       $icons[] = [$full_id, $item['label']];
+       $present_pack_ids[substr($full_id, 0, strpos($full_id, ':'))] = TRUE;
+     }
+@@ -51,7 +55,7 @@ final class IconIndexController extends ControllerBase {
+     $response = new CacheableJsonResponse(['icons' => $icons, 'packs' => $pack_list]);
+     $cache = (new CacheableMetadata())
+       ->addCacheTags(['config:canvas_icon_picker.settings', 'config:icon_pack_list'])
+-      ->addCacheContexts(['languages:language_interface', 'url.query_args:packs']);
++      ->addCacheContexts(['languages:language_interface', 'url.query_args:packs', 'url.query_args:ids']);
+     $response->addCacheableDependency($cache);
+     $response->setMaxAge(3600);
+     $response->setPrivate();
+diff --git a/src/Controller/IconSpriteController.php b/src/Controller/IconSpriteController.php
+--- a/src/Controller/IconSpriteController.php
++++ b/src/Controller/IconSpriteController.php
+@@ -41,10 +41,14 @@ final class IconSpriteController extends ControllerBase {
+    */
+   public function sprite(Request $request = new Request()): CacheableResponse {
+     $packs = $this->resolveRequestedPacks($request);
++    $allowed_icon_ids = $this->resolveRequestedIconIds($request);
+     $symbols = '';
+     $skipped_packs = [];
+ 
+     foreach (array_keys($this->repository->allIcons($packs)) as $full_id) {
++      if (!$this->iconIdIsAllowed((string) $full_id, $allowed_icon_ids)) {
++        continue;
++      }
+       $icon = $this->repository->resolve($full_id);
+       if ($icon === NULL) {
+         continue;
+@@ -75,7 +79,7 @@ final class IconSpriteController extends ControllerBase {
+     $response = new CacheableResponse($svg, 200, ['Content-Type' => 'image/svg+xml']);
+     $cache = (new CacheableMetadata())
+       ->addCacheTags(['config:canvas_icon_picker.settings', 'config:icon_pack_list'])
+-      ->addCacheContexts(['languages:language_interface', 'url.query_args:packs']);
++      ->addCacheContexts(['languages:language_interface', 'url.query_args:packs', 'url.query_args:ids']);
+     $response->addCacheableDependency($cache);
+     $response->setMaxAge(3600);
+     $response->setPrivate();
+diff --git a/src/Controller/ResolvesRequestedPacksTrait.php b/src/Controller/ResolvesRequestedPacksTrait.php
+--- a/src/Controller/ResolvesRequestedPacksTrait.php
++++ b/src/Controller/ResolvesRequestedPacksTrait.php
+@@ -25,4 +25,23 @@ trait ResolvesRequestedPacksTrait {
+     return $allowed !== [] ? $allowed : ['__canvas_icon_picker_no_match__'];
+   }
+ 
++  /**
++   * Bare icon ids a request restricts itself to; empty means unrestricted.
++   */
++  private function resolveRequestedIconIds(Request $request): array {
++    $requested = array_filter(explode(',', (string) $request->query->get('ids', '')));
++    return array_values(array_unique(array_map('trim', $requested)));
++  }
++
++  /**
++   * Whether a full "pack:icon_id" passes the requested id restriction.
++   */
++  private function iconIdIsAllowed(string $full_id, array $allowed_icon_ids): bool {
++    if ($allowed_icon_ids === []) {
++      return TRUE;
++    }
++    $bare_id = str_contains($full_id, ':') ? substr($full_id, strpos($full_id, ':') + 1) : $full_id;
++    return in_array($bare_id, $allowed_icon_ids, TRUE) || in_array($full_id, $allowed_icon_ids, TRUE);
++  }
++
+ }
+diff --git a/config/schema/canvas_icon_picker.schema.yml b/config/schema/canvas_icon_picker.schema.yml
+--- a/config/schema/canvas_icon_picker.schema.yml
++++ b/config/schema/canvas_icon_picker.schema.yml
+@@ -21,3 +21,9 @@ field.field_settings.string:
+       sequence:
+         type: string
+         label: 'Icon pack ID'
++    allowed_icon_ids:
++      type: sequence
++      label: 'Allowed icon IDs for this field, from the prop schema enum'
++      sequence:
++        type: string
++        label: 'Icon ID'
