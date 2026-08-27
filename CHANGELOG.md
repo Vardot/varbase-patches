@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Canvas Icon Picker module on fix: #3619510 The icon picker is silently ignored on a prop that also declares an enum -- materialized from the alternative MR !2, which keeps the prop `enum` shape (`list_string`) and reads the allowed ids from the field's own `allowed_values_function`, so a theme keeps its curated icon `enum` lists with no new field setting and no config schema change ([#3619510](https://www.drupal.org/project/canvas_icon_picker/issues/3619510))
+
 ## [11.0.39] - 2026-08-19
 
 - Remove a patch for the Drimage Improved module on fix: #3587334 Missing response and return handling in DrimageSubscriber image delivery (fixed upstream, released in drimage_improved 1.0.10) ([#3587334](https://www.drupal.org/project/drimage_improved/issues/3587334))

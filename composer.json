@@ -140,6 +140,9 @@
                 "fix: #3591751 Compile on serve when a code component's compiled JS is empty": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-07-26--3591751--mr-1424.patch",
                 "fix: #3560889 JsComponent crash renders Canvas Editor unusable when Image Props have relative example URLs": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-07-26--3560889--mr-1425.patch"
             },
+            "drupal/canvas_icon_picker": {
+                "fix: #3619510 The icon picker is silently ignored on a prop that also declares an enum": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas_icon_picker--2026-08-27--3619510--mr-2.patch"
+            },
             "drupal/content_lock": {
                 "feat: #3544019 Form Actions Stay Cached and Disabled After Breaking Lock in Gin Admin Theme": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_lock--2026-06-14--3544019--mr-93.patch"
             },
