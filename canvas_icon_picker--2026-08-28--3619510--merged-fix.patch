@@ -1,0 +1,478 @@
+diff --git a/README.md b/README.md
+index 119767bdcfbd7bdef748049caa4acce6f8bf1f08..30f88637bd0194d77d576b9a54b39513f309a1b0 100644
+--- a/README.md
++++ b/README.md
+@@ -67,6 +67,21 @@ prop to specific packs, narrower than the site-wide allow list:
+       x-canvas-icon: ['bootstrap_icons']
+ ```
+ 
++A prop may also carry a JSON Schema `enum` to curate the exact icons an
++editor can choose. Canvas would normally turn an `enum` into a select list;
++with `x-canvas-icon` the picker wins and offers only those icons, and stores
++the value in the form the `enum` declares — a `pack:icon` id verbatim, a bare
++icon id without its pack. A bare id matches that icon in every allowed pack,
++so pair it with the array form of `x-canvas-icon` when packs overlap:
++
++```yaml
++    icon:
++      type: string
++      title: Icon
++      enum: ['sun', 'umbrella']
++      x-canvas-icon: true
++```
++
+ The widget renders a `canvas_icon_picker` form element (chip + hidden
+ textfield); JavaScript populates the drawer from two endpoints:
+ 
+diff --git a/assets/canvas-icon-picker.js b/assets/canvas-icon-picker.js
+index c92712fbfe5a1011fa84e21b4e232b9b6e8f39cd..d7b14312831bd8bf2d39cc0cdb7026ffe1edbdcd 100644
+--- a/assets/canvas-icon-picker.js
++++ b/assets/canvas-icon-picker.js
+@@ -276,6 +276,19 @@
+     const count = picker.querySelector('[data-canvas-icon-picker-count]');
+ 
+     const byId = new Map(icons);
++    // A prop `enum` may list bare ids; Canvas validates the input against it
++    // client-side, so a "pack:id" value would be rejected before it is saved.
++    const allowedIds = (picker.dataset.canvasIconPickerAllowedIds || '')
++      .split(',')
++      .filter(Boolean);
++
++    function storedValueFor(fullId) {
++      if (!allowedIds.length || allowedIds.includes(fullId)) {
++        return fullId;
++      }
++      const bareId = fullId.slice(fullId.indexOf(':') + 1);
++      return allowedIds.includes(bareId) ? bareId : fullId;
++    }
+     let recent = loadRecent();
+     let isOpen = false;
+     let hasRenderedGrid = false;
+@@ -529,7 +542,7 @@
+     }
+ 
+     function selectIcon(fullId) {
+-      setValue(input, fullId);
++      setValue(input, storedValueFor(fullId));
+       recent = [fullId].concat(recent.filter((r) => r !== fullId)).slice(0, 6);
+       saveRecent(recent);
+       markSelected(fullId);
+diff --git a/config/schema/canvas_icon_picker.schema.yml b/config/schema/canvas_icon_picker.schema.yml
+index d5d532ff8e6e3bb651396bebac8f6692cb029d97..2d91278fb918483e8002967439b6634e34c96e24 100644
+--- a/config/schema/canvas_icon_picker.schema.yml
++++ b/config/schema/canvas_icon_picker.schema.yml
+@@ -21,3 +21,9 @@ field.field_settings.string:
+       sequence:
+         type: string
+         label: 'Icon pack ID'
++    allowed_icon_ids:
++      type: sequence
++      label: 'Allowed icon IDs for this field, from the prop schema enum'
++      sequence:
++        type: string
++        label: 'Icon ID'
+diff --git a/src/Controller/IconIndexController.php b/src/Controller/IconIndexController.php
+index 64b564d2839ccfefdc44153e55b884a7056b0f17..40cda3f7f80c8b0158a9ff78136c3649d839cc7a 100644
+--- a/src/Controller/IconIndexController.php
++++ b/src/Controller/IconIndexController.php
+@@ -34,9 +34,13 @@ final class IconIndexController extends ControllerBase {
+    */
+   public function index(Request $request = new Request()): CacheableJsonResponse {
+     $packs = $this->resolveRequestedPacks($request);
++    $allowed_icon_ids = $this->resolveRequestedIconIds($request);
+     $icons = [];
+     $present_pack_ids = [];
+     foreach ($this->repository->allIcons($packs) as $full_id => $item) {
++      if (!$this->iconIdIsAllowed((string) $full_id, $allowed_icon_ids)) {
++        continue;
++      }
+       $icons[] = [$full_id, $item['label']];
+       $present_pack_ids[substr($full_id, 0, strpos($full_id, ':'))] = TRUE;
+     }
+@@ -51,7 +55,7 @@ final class IconIndexController extends ControllerBase {
+     $response = new CacheableJsonResponse(['icons' => $icons, 'packs' => $pack_list]);
+     $cache = (new CacheableMetadata())
+       ->addCacheTags(['config:canvas_icon_picker.settings', 'config:icon_pack_list'])
+-      ->addCacheContexts(['languages:language_interface', 'url.query_args:packs']);
++      ->addCacheContexts(['languages:language_interface', 'url.query_args:packs', 'url.query_args:ids']);
+     $response->addCacheableDependency($cache);
+     $response->setMaxAge(3600);
+     $response->setPrivate();
+diff --git a/src/Controller/IconSpriteController.php b/src/Controller/IconSpriteController.php
+index 366d0b484be0a1289a78b6aa91b122b7c67a84b2..1f43efde0ec9c94f47bee26a4acf4847c61d84b1 100644
+--- a/src/Controller/IconSpriteController.php
++++ b/src/Controller/IconSpriteController.php
+@@ -41,10 +41,14 @@ final class IconSpriteController extends ControllerBase {
+    */
+   public function sprite(Request $request = new Request()): CacheableResponse {
+     $packs = $this->resolveRequestedPacks($request);
++    $allowed_icon_ids = $this->resolveRequestedIconIds($request);
+     $symbols = '';
+     $skipped_packs = [];
+ 
+     foreach (array_keys($this->repository->allIcons($packs)) as $full_id) {
++      if (!$this->iconIdIsAllowed((string) $full_id, $allowed_icon_ids)) {
++        continue;
++      }
+       $icon = $this->repository->resolve($full_id);
+       if ($icon === NULL) {
+         continue;
+@@ -75,7 +79,7 @@ final class IconSpriteController extends ControllerBase {
+     $response = new CacheableResponse($svg, 200, ['Content-Type' => 'image/svg+xml']);
+     $cache = (new CacheableMetadata())
+       ->addCacheTags(['config:canvas_icon_picker.settings', 'config:icon_pack_list'])
+-      ->addCacheContexts(['languages:language_interface', 'url.query_args:packs']);
++      ->addCacheContexts(['languages:language_interface', 'url.query_args:packs', 'url.query_args:ids']);
+     $response->addCacheableDependency($cache);
+     $response->setMaxAge(3600);
+     $response->setPrivate();
+diff --git a/src/Controller/ResolvesRequestedPacksTrait.php b/src/Controller/ResolvesRequestedPacksTrait.php
+index 8b6f3424f87a838d98435511a9c0ae1fdd67eec0..4b14522b1fd673196bb8d1a4eb99596de4195f7d 100644
+--- a/src/Controller/ResolvesRequestedPacksTrait.php
++++ b/src/Controller/ResolvesRequestedPacksTrait.php
+@@ -25,4 +25,23 @@ trait ResolvesRequestedPacksTrait {
+     return $allowed !== [] ? $allowed : ['__canvas_icon_picker_no_match__'];
+   }
+ 
++  /**
++   * Bare icon ids a request restricts itself to; empty means unrestricted.
++   */
++  private function resolveRequestedIconIds(Request $request): array {
++    $requested = array_filter(explode(',', (string) $request->query->get('ids', '')));
++    return array_values(array_unique(array_map('trim', $requested)));
++  }
++
++  /**
++   * Whether a full "pack:icon_id" passes the requested id restriction.
++   */
++  private function iconIdIsAllowed(string $full_id, array $allowed_icon_ids): bool {
++    if ($allowed_icon_ids === []) {
++      return TRUE;
++    }
++    $bare_id = str_contains($full_id, ':') ? substr($full_id, strpos($full_id, ':') + 1) : $full_id;
++    return in_array($bare_id, $allowed_icon_ids, TRUE) || in_array($full_id, $allowed_icon_ids, TRUE);
++  }
++
+ }
+diff --git a/src/Element/CanvasIconPicker.php b/src/Element/CanvasIconPicker.php
+index a85f97616847aeae106c357dbc79d2fec2d61226..e6d867d22676f9c9e4b11a25c2f7ce4116f816f3 100644
+--- a/src/Element/CanvasIconPicker.php
++++ b/src/Element/CanvasIconPicker.php
+@@ -23,6 +23,7 @@ final class CanvasIconPicker extends Textfield {
+     $info = parent::getInfo();
+     $info['#theme_wrappers'][] = 'canvas_icon_picker';
+     $info['#allowed_packs'] = [];
++    $info['#allowed_icon_ids'] = [];
+     $info['#pre_render'][] = [static::class, 'preRenderPicker'];
+     return $info;
+   }
+@@ -36,7 +37,8 @@ final class CanvasIconPicker extends Textfield {
+     $repository = \Drupal::service('canvas_icon_picker.repository');
+ 
+     $value = (string) ($element['#value'] ?? $element['#default_value'] ?? '');
+-    $selected = $value === '' ? NULL : $repository->resolve($value);
++    $allowed_packs = array_values(array_filter((array) ($element['#allowed_packs'] ?? [])));
++    $selected = $value === '' ? NULL : $repository->resolve($value, $allowed_packs);
+ 
+     // Set explicitly: preRenderTextfield() already ran and only copies #value.
+     $element['#attributes']['value'] = $value;
+@@ -58,8 +60,12 @@ final class CanvasIconPicker extends Textfield {
+     $element['#chip_label'] = $selected?->getLabel() ?? '';
+     $element['#chip_icon_id'] = $selected?->getIconId() ?? '';
+ 
+-    $allowed_packs = array_values(array_filter((array) ($element['#allowed_packs'] ?? [])));
+     $query = $allowed_packs !== [] ? ['packs' => implode(',', $allowed_packs)] : [];
++    // A prop constrained by `enum` offers only those icons in the grid.
++    $allowed_icon_ids = array_values(array_filter((array) ($element['#allowed_icon_ids'] ?? [])));
++    if ($allowed_icon_ids !== []) {
++      $query['ids'] = implode(',', $allowed_icon_ids);
++    }
+     $element['#index_url'] = Url::fromRoute('canvas_icon_picker.index', [], ['query' => $query])->toString();
+     $element['#sprite_url'] = Url::fromRoute('canvas_icon_picker.sprite', [], ['query' => $query])->toString();
+ 
+diff --git a/src/Hook/CanvasIconPickerHooks.php b/src/Hook/CanvasIconPickerHooks.php
+index bf800326e700e80794e949079936bf5776f5c2e1..2a2a4a314049c25e8ce84c975dcd644d8f5437c8 100644
+--- a/src/Hook/CanvasIconPickerHooks.php
++++ b/src/Hook/CanvasIconPickerHooks.php
+@@ -4,6 +4,7 @@ declare(strict_types=1);
+ 
+ namespace Drupal\canvas_icon_picker\Hook;
+ 
++use Drupal\canvas\PropExpressions\StructuredData\FieldTypePropExpression;
+ use Drupal\canvas\PropShape\CandidateStorablePropShape;
+ use Drupal\Core\Hook\Attribute\Hook;
+ 
+@@ -56,10 +57,26 @@ final class CanvasIconPickerHooks {
+       return;
+     }
+     $storable_prop_shape->fieldWidget = 'canvas_icon_picker';
++    // The picker widget only supports a plain string field. Without forcing the
++    // field type here, a prop that also declares `enum` keeps the
++    // list_string/options_select shape Canvas already chose, the widget is
++    // silently ignored and the editor renders a select list instead.
++    $storable_prop_shape->fieldTypeProp = new FieldTypePropExpression('string', 'value');
++    $storable_prop_shape->fieldStorageSettings = NULL;
++    $instance_settings = [];
+     if ($is_scoped) {
+-      $storable_prop_shape->fieldInstanceSettings = [
+-        'allowed_icon_pack' => array_values(array_filter($x_canvas_icon, 'is_string')),
+-      ];
++      $instance_settings['allowed_icon_pack'] = array_values(array_filter($x_canvas_icon, 'is_string'));
++    }
++    // A prop may constrain itself to a curated set of icons with `enum`. Keep
++    // that constraint: offer only those icons in the picker, and store the
++    // value in the form the schema declares, so the picked value still
++    // validates against the enum.
++    $enum = $schema['enum'] ?? NULL;
++    if (is_array($enum) && $enum !== []) {
++      $instance_settings['allowed_icon_ids'] = array_values(array_filter($enum, 'is_string'));
++    }
++    if ($instance_settings !== []) {
++      $storable_prop_shape->fieldInstanceSettings = $instance_settings;
+     }
+   }
+ 
+diff --git a/src/IconRepository.php b/src/IconRepository.php
+index 51d7481920d7e7b7999d4263afd4e602c4a596bb..ab261ad61f8bf5e34fca1682164dea033c1db684 100644
+--- a/src/IconRepository.php
++++ b/src/IconRepository.php
+@@ -45,7 +45,7 @@ final class IconRepository {
+   /**
+    * Resolves `pack:icon_id` or a bare `icon_id` against the pack order.
+    */
+-  public function resolve(string $value): ?IconDefinitionInterface {
++  public function resolve(string $value, array $packs = []): ?IconDefinitionInterface {
+     $value = trim($value);
+     if ($value === '') {
+       return NULL;
+@@ -57,7 +57,7 @@ final class IconRepository {
+       }
+       $value = substr($value, strpos($value, ':') + 1);
+     }
+-    foreach (array_keys($this->getPacks()) as $pack_id) {
++    foreach (array_unique(array_merge($packs, array_keys($this->getPacks()))) as $pack_id) {
+       $icon = $this->iconPackManager->getIcon($pack_id . ':' . $value);
+       if ($icon !== NULL) {
+         return $icon;
+diff --git a/src/Plugin/Field/FieldWidget/CanvasIconPickerWidget.php b/src/Plugin/Field/FieldWidget/CanvasIconPickerWidget.php
+index 3b01adb45008a8aa781076f1637f263e256c9c11..3990ffa95f20224b558efd57afe131a143576034 100644
+--- a/src/Plugin/Field/FieldWidget/CanvasIconPickerWidget.php
++++ b/src/Plugin/Field/FieldWidget/CanvasIconPickerWidget.php
+@@ -28,6 +28,7 @@ final class CanvasIconPickerWidget extends WidgetBase {
+       '#type' => 'canvas_icon_picker',
+       '#default_value' => $items[$delta]->value ?? '',
+       '#allowed_packs' => $this->getFieldSetting('allowed_icon_pack') ?? [],
++      '#allowed_icon_ids' => $this->getFieldSetting('allowed_icon_ids') ?? [],
+     ];
+     return $element;
+   }
+diff --git a/templates/canvas-icon-picker.html.twig b/templates/canvas-icon-picker.html.twig
+index 18d0708bc88eb244910c5ad40848a5a50cfbd47a..1625f94db4346376264fa038207d24f28f0ea354 100644
+--- a/templates/canvas-icon-picker.html.twig
++++ b/templates/canvas-icon-picker.html.twig
+@@ -3,6 +3,7 @@
+   data-canvas-icon-picker
+   data-canvas-icon-picker-index-url="{{ element['#index_url'] }}"
+   data-canvas-icon-picker-sprite-url="{{ element['#sprite_url'] }}"
++  data-canvas-icon-picker-allowed-ids="{{ element['#allowed_icon_ids']|join(',') }}"
+ >
+   <div class="canvas-icon-picker__header">
+     <div class="canvas-icon-picker__field">
+diff --git a/tests/src/Kernel/IconIdScopingTest.php b/tests/src/Kernel/IconIdScopingTest.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..b6474e68c58af93faa37c90a7220a082c42a3afe
+--- /dev/null
++++ b/tests/src/Kernel/IconIdScopingTest.php
+@@ -0,0 +1,142 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\Tests\canvas_icon_picker\Kernel;
++
++use Drupal\canvas_icon_picker\Controller\IconIndexController;
++use Drupal\canvas_icon_picker\Controller\IconSpriteController;
++use Drupal\KernelTests\KernelTestBase;
++use Symfony\Component\HttpFoundation\Request;
++
++/**
++ * Tests per-prop icon id scoping, driven by a prop schema `enum`.
++ *
++ * @group canvas_icon_picker
++ */
++final class IconIdScopingTest extends KernelTestBase {
++
++  /**
++   * Modules to enable.
++   *
++   * @var array<int, string>
++   */
++  protected static $modules = ['system', 'user', 'canvas_icon_picker_test', 'canvas_icon_picker'];
++
++  /**
++   * {@inheritdoc}
++   */
++  protected function setUp(): void {
++    parent::setUp();
++    $this->installConfig(['canvas_icon_picker']);
++  }
++
++  /**
++   * Tests that the index narrows to bare ids across every pack.
++   */
++  public function testIndexNarrowsToRequestedBareIds(): void {
++    $controller = IconIndexController::create($this->container);
++    $data = json_decode($controller->index(new Request(['ids' => 'star,cloud']))->getContent(), TRUE);
++    self::assertSame([['test_pack:star', 'Star'], ['test_pack_two:cloud', 'Cloud']], $data['icons']);
++    self::assertSame(['test_pack', 'test_pack_two'], array_column($data['packs'], 0));
++  }
++
++  /**
++   * Tests that a full "pack:icon" id is honoured as-is.
++   */
++  public function testIndexAcceptsFullIds(): void {
++    $controller = IconIndexController::create($this->container);
++    $data = json_decode($controller->index(new Request(['ids' => 'test_pack:heart']))->getContent(), TRUE);
++    self::assertSame([['test_pack:heart', 'Heart']], $data['icons']);
++  }
++
++  /**
++   * Tests that ids compose with packs instead of replacing them.
++   */
++  public function testIdsIntersectWithRequestedPacks(): void {
++    $controller = IconIndexController::create($this->container);
++    $data = json_decode($controller->index(new Request(['packs' => 'test_pack_two', 'ids' => 'star,cloud']))->getContent(), TRUE);
++    self::assertSame([['test_pack_two:cloud', 'Cloud']], $data['icons']);
++  }
++
++  /**
++   * Tests that an id matching nothing yields an empty grid, not everything.
++   */
++  public function testUnknownIdsYieldNoIcons(): void {
++    $controller = IconIndexController::create($this->container);
++    $data = json_decode($controller->index(new Request(['ids' => 'nope']))->getContent(), TRUE);
++    self::assertSame([], $data['icons']);
++    self::assertSame([], $data['packs']);
++  }
++
++  /**
++   * Tests that the sprite narrows to the same ids as the index.
++   */
++  public function testSpriteNarrowsToRequestedIds(): void {
++    $controller = IconSpriteController::create($this->container);
++    $body = $controller->sprite(new Request(['ids' => 'star']))->getContent();
++    self::assertStringContainsString('<symbol id="test_pack:star"', $body);
++    self::assertSame(1, substr_count($body, '<symbol'));
++  }
++
++  /**
++   * Tests that both endpoints vary their cache on the ids query argument.
++   */
++  public function testEndpointsVaryCacheOnIdsQueryArg(): void {
++    $index = IconIndexController::create($this->container)->index();
++    $sprite = IconSpriteController::create($this->container)->sprite();
++    self::assertContains('url.query_args:ids', $index->getCacheableMetadata()->getCacheContexts());
++    self::assertContains('url.query_args:ids', $sprite->getCacheableMetadata()->getCacheContexts());
++  }
++
++  /**
++   * Tests that the element forwards allowed ids to both endpoint URLs.
++   */
++  public function testElementForwardsAllowedIdsToEndpointUrls(): void {
++    $element = [
++      '#type' => 'canvas_icon_picker',
++      '#name' => 'icon',
++      '#allowed_packs' => ['test_pack'],
++      '#allowed_icon_ids' => ['star', 'heart'],
++    ];
++    $html = (string) $this->container->get('renderer')->renderInIsolation($element);
++    // cspell:disable-next-line
++    self::assertStringContainsString('data-canvas-icon-picker-index-url="/canvas-icon-picker/index?packs=test_pack&amp;ids=star%2Cheart"', $html);
++    // cspell:disable-next-line
++    self::assertStringContainsString('data-canvas-icon-picker-sprite-url="/canvas-icon-picker/sprite?packs=test_pack&amp;ids=star%2Cheart"', $html);
++  }
++
++  /**
++   * Tests that the element hands the allowed ids to the JS.
++   *
++   * The JS stores the value in the form the enum expects, because Canvas
++   * validates the input client-side before anything reaches the server.
++   */
++  public function testElementExposesAllowedIdsToJs(): void {
++    $element = [
++      '#type' => 'canvas_icon_picker',
++      '#name' => 'icon',
++      '#allowed_icon_ids' => ['star', 'heart'],
++    ];
++    $html = (string) $this->container->get('renderer')->renderInIsolation($element);
++    self::assertStringContainsString('data-canvas-icon-picker-allowed-ids="star,heart"', $html);
++  }
++
++  /**
++   * Tests that a bare id on a pack-scoped prop resolves in that pack first.
++   */
++  public function testBareIdResolvesAgainstPropPacksFirst(): void {
++    $element = [
++      '#type' => 'canvas_icon_picker',
++      '#name' => 'icon',
++      '#default_value' => 'cloud',
++      '#allowed_packs' => ['test_pack_two'],
++    ];
++    $html = (string) $this->container->get('renderer')->renderInIsolation($element);
++    self::assertStringContainsString('Cloud', $html);
++    $repository = $this->container->get('canvas_icon_picker.repository');
++    self::assertSame('test_pack_two', $repository->resolve('cloud', ['test_pack_two'])?->getPackId());
++    self::assertSame('test_pack', $repository->resolve('star', ['test_pack_two'])?->getPackId(), 'Falls back to the site-wide pack order.');
++  }
++
++}
+diff --git a/tests/src/Kernel/PropShapeAlterTest.php b/tests/src/Kernel/PropShapeAlterTest.php
+index 85756220558efd0886df771acf43d1fc50610016..ff7c6aff8661c46c0d1ef81da12186b3b5d73b90 100644
+--- a/tests/src/Kernel/PropShapeAlterTest.php
++++ b/tests/src/Kernel/PropShapeAlterTest.php
+@@ -36,7 +36,7 @@ final class PropShapeAlterTest extends KernelTestBase {
+   public function testIconPropGetsThePickerWidget(): void {
+     $candidate = $this->candidate(['type' => 'string', 'x-canvas-icon' => TRUE]);
+     self::assertSame('canvas_icon_picker', $candidate->fieldWidget);
+-    self::assertStringContainsString('string', (string) $candidate->fieldTypeProp, 'The field type must stay core string.');
++    self::assertSame('string', $candidate->fieldTypeProp->getFieldType(), 'The field type must stay core string.');
+   }
+ 
+   /**
+@@ -86,4 +86,36 @@ final class PropShapeAlterTest extends KernelTestBase {
+     self::assertNotSame('canvas_icon_picker', $this->candidate(['type' => 'string', 'x-canvas-icon' => []])->fieldWidget);
+   }
+ 
++  /**
++   * Tests that an enum-constrained prop still gets the picker on a string.
++   *
++   * Canvas maps `enum` to list_string + options_select first; the picker widget
++   * only handles `string`, so the alter must swap the field type too or the
++   * widget is silently dropped.
++   */
++  public function testEnumPropGetsThePickerOnStringField(): void {
++    $candidate = $this->candidate(['type' => 'string', 'enum' => ['sun', 'umbrella'], 'x-canvas-icon' => TRUE]);
++    self::assertSame('canvas_icon_picker', $candidate->fieldWidget);
++    self::assertSame('string', $candidate->fieldTypeProp->getFieldType());
++    self::assertNull($candidate->fieldStorageSettings, 'list_string allowed_values_function must not leak onto the string field.');
++    self::assertSame(['allowed_icon_ids' => ['sun', 'umbrella']], $candidate->fieldInstanceSettings);
++  }
++
++  /**
++   * Tests that enum and pack scoping combine into one instance-settings array.
++   */
++  public function testEnumAndPackScopingCombine(): void {
++    $candidate = $this->candidate(['type' => 'string', 'enum' => ['sun'], 'x-canvas-icon' => ['test_pack']]);
++    self::assertSame(['allowed_icon_pack' => ['test_pack'], 'allowed_icon_ids' => ['sun']], $candidate->fieldInstanceSettings);
++  }
++
++  /**
++   * Tests that an enum without the opt-in keeps Canvas's select list.
++   */
++  public function testEnumWithoutOptInKeepsTheSelectList(): void {
++    $candidate = $this->candidate(['type' => 'string', 'enum' => ['sun', 'umbrella']]);
++    self::assertSame('options_select', $candidate->fieldWidget);
++    self::assertSame('list_string', $candidate->fieldTypeProp->getFieldType());
++  }
++
+ }
