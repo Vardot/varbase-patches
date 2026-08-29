@@ -1,0 +1,47 @@
+diff --git a/assets/canvas-icon-picker.js b/assets/canvas-icon-picker.js
+index d7b1431..677006b 100644
+--- a/assets/canvas-icon-picker.js
++++ b/assets/canvas-icon-picker.js
+@@ -283,10 +283,13 @@
+       .filter(Boolean);
+ 
+     function storedValueFor(fullId) {
+-      if (!allowedIds.length || allowedIds.includes(fullId)) {
++      if (allowedIds.includes(fullId)) {
+         return fullId;
+       }
+       const bareId = fullId.slice(fullId.indexOf(':') + 1);
++      if (!allowedIds.length) {
++        return bareId;
++      }
+       return allowedIds.includes(bareId) ? bareId : fullId;
+     }
+     let recent = loadRecent();
+diff --git a/tests/src/Kernel/IconIdScopingTest.php b/tests/src/Kernel/IconIdScopingTest.php
+index b6474e6..7c98cee 100644
+--- a/tests/src/Kernel/IconIdScopingTest.php
++++ b/tests/src/Kernel/IconIdScopingTest.php
+@@ -122,6 +122,23 @@ public function testElementExposesAllowedIdsToJs(): void {
+     self::assertStringContainsString('data-canvas-icon-picker-allowed-ids="star,heart"', $html);
+   }
+ 
++  /**
++   * Tests that a prop with no allowed ids exposes an empty allow list.
++   *
++   * The JS keys off this attribute: with no ids to match against it stores the
++   * bare id, because the prop holds bare ids and would reject "pack:id".
++   */
++  public function testElementExposesAnEmptyAllowListWhenUnscoped(): void {
++    $element = [
++      '#type' => 'canvas_icon_picker',
++      '#name' => 'icon',
++      '#allowed_packs' => ['test_pack'],
++    ];
++    $html = (string) $this->container->get('renderer')->renderInIsolation($element);
++    self::assertStringContainsString('data-canvas-icon-picker-allowed-ids=""', $html);
++    self::assertStringNotContainsString('&amp;ids=', $html, 'The endpoints stay unfiltered.');
++  }
++
+   /**
+    * Tests that a bare id on a pack-scoped prop resolves in that pack first.
+    */
