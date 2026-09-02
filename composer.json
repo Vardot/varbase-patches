@@ -133,7 +133,6 @@
             },
             "drupal/canvas": {
                 "feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- minimal re-roll against Canvas 1.10.0 (ComponentTreeLoader extension point only)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-08-09--3567225--mr-948-minimal.patch",
-                "feat: #3584713 Add Allow Edit Global Regions permission to restrict editing of global page regions": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-08-13--3584713--mr-911.patch",
                 "fix: #3584883 Undefined array key placeholder warning in Component::getSlotDefinitions() when versioned_properties lacks last_active_version key": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-15--3584883--mr-916.patch",
                 "feat: #3585221 Fall back to active version when stored component version is not available": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-04-21--3585221--mr-927.patch",
                 "fix: #3591751 Compile JSX server-side for AI-created/edited code components (fixes [object Object])": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/canvas--2026-07-10--3591751--mr-1315.patch",
