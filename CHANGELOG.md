@@ -6,8 +6,19 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
-- Add a patch for the Canvas Icon Picker module on fix: #3619510 The icon picker is silently ignored on a prop that also declares an enum -- the merged 1.0.3 to 1.0.x fix, carried only until canvas_icon_picker 1.0.4 is released ([#3619510](https://www.drupal.org/project/canvas_icon_picker/issues/3619510))
+## [11.0.42] - 2026-09-02
+
+- Remove a patch for the Drupal Canvas module on feat: #3585221 Fall back to active version when stored component version is not available -- the upstream MR !927 has been open and unmerged since 2026-04-16, and the patch silently converted a dangling `component_version` into a fallback instead of surfacing it, making Varbase and plain Drupal CMS behave differently on the same content ([#3585221](https://git.drupalcode.org/project/canvas/-/work_items/3585221), [#622](https://github.com/Vardot/varbase-patches/issues/622))
+
+## [11.0.41] - 2026-09-02
+
+- Remove a patch for the Drupal Canvas module on feat: #3584713 Add Allow Edit Global Regions permission to restrict editing of global page regions -- the `edit canvas global regions` permission is not upstream, so it existed only where varbase-patches is applied; paired with removing the `site_admin` grant in `varbase_content_base` ([#3620408](https://www.drupal.org/project/varbase_content_base/issues/3620408)) ([#3584713](https://git.drupalcode.org/project/canvas/-/work_items/3584713), [#620](https://github.com/Vardot/varbase-patches/issues/620))
+
 - Add a patch for the Canvas Icon Picker module on fix: #3619785 Icon changes are silently discarded when the prop has no allowed icon ids -- carried only until canvas_icon_picker 1.0.4 is released ([#3619785](https://www.drupal.org/project/canvas_icon_picker/issues/3619785))
+
+## [11.0.40] - 2026-08-28
+
+- Add a patch for the Canvas Icon Picker module on fix: #3619510 The icon picker is silently ignored on a prop that also declares an enum -- the merged 1.0.3 to 1.0.x fix, carried only until canvas_icon_picker 1.0.4 is released ([#3619510](https://www.drupal.org/project/canvas_icon_picker/issues/3619510))
 
 ## [11.0.39] - 2026-08-19
 
