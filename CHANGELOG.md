@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Drupal Canvas module on fix: #3560889 JsComponent crash renders Canvas Editor unusable when Image Props have relative example URLs -- re-rolled against Canvas 1.11.0, which restructured `validateExampleUrl()` around a new `EXAMPLE_URL_ALLOW_LIST` constant, so the 2026-07-26 file no longer applies and every `composer install` resolving canvas 1.11.0 aborts with `No available patcher was able to apply patch`; the re-roll also guards `rewriteExampleUrl()` so a root-relative managed file is passed through instead of being rewritten into the canvas module folder ([#3560889](https://git.drupalcode.org/project/canvas/-/work_items/3560889), [#626](https://github.com/Vardot/varbase-patches/issues/626))
+
 ## [11.0.42] - 2026-09-02
 
 - Remove a patch for the Drupal Canvas module on feat: #3585221 Fall back to active version when stored component version is not available -- the upstream MR !927 has been open and unmerged since 2026-04-16, and the patch silently converted a dangling `component_version` into a fallback instead of surfacing it, making Varbase and plain Drupal CMS behave differently on the same content ([#3585221](https://git.drupalcode.org/project/canvas/-/work_items/3585221), [#622](https://github.com/Vardot/varbase-patches/issues/622))
