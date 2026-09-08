@@ -1,0 +1,35 @@
+diff --git a/src/Plugin/Canvas/ComponentSource/JsComponent.php b/src/Plugin/Canvas/ComponentSource/JsComponent.php
+index 6f2cff7..f401330 100644
+--- a/src/Plugin/Canvas/ComponentSource/JsComponent.php
++++ b/src/Plugin/Canvas/ComponentSource/JsComponent.php
+@@ -707,8 +707,15 @@ final class JsComponent extends JsonSchemaPropsComponentSourceBase implements Ur
+ 
+     // Allow the example URL to be one of the hardcoded relative URLs, and
+     // rewrite them to operational root-relative URLs.
+-    $file_path = $this->extensionPathResolver->getPath('module', 'canvas') . $url;
+-    return Url::fromUri('base:/' . $file_path)->toString(TRUE);
++    if (\in_array($url, self::EXAMPLE_URL_ALLOW_LIST, TRUE)) {
++      $file_path = $this->extensionPathResolver->getPath('module', 'canvas') . $url;
++      return Url::fromUri('base:/' . $file_path)->toString(TRUE);
++    }
++
++    // Any other root-relative URL (e.g. a managed file under
++    // /sites/default/files) already resolves against the current host, so pass
++    // it through unchanged instead of resolving it inside the module folder.
++    return (new GeneratedUrl())->setGeneratedUrl($url);
+   }
+ 
+   /**
+@@ -729,6 +736,12 @@ final class JsComponent extends JsonSchemaPropsComponentSourceBase implements Ur
+     if (\in_array($url, self::EXAMPLE_URL_ALLOW_LIST, TRUE)) {
+       return;
+     }
++    // Allow root-relative paths (e.g. managed files under /sites/default/files)
++    // which resolve on the current host at runtime; reject scheme-relative
++    // "//host" URLs, which stay ambiguous.
++    if (\str_starts_with($url, '/') && !\str_starts_with($url, '//')) {
++      return;
++    }
+     throw new \InvalidArgumentException('Default images for Javascript Components must be a fully-qualified URL with both scheme and host.');
+   }
+ 
