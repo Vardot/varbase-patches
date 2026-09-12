@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.44] - 2026-09-12
+
 - Remove a patch for the Drupal Canvas module on feat: #3567225 Allow per-node override of Content Template via checkbox in node selector -- `drupal/canvas_override` 1.0.x no longer needs it: it ships a gated copy of Canvas's `ComponentTreeLoader` (`canvas-compat/ComponentTreeLoader.php`, Canvas's file with `final` removed and the constructor properties made `protected`), loaded under Canvas's own class name by a prepended autoloader registered from the package's Composer `autoload.files` entry, and used only while the installed Canvas still declares that class `final`; verified in a browser on plain Drupal 11.4.6 and on Varbase 11 with Varbase Starter, both on unpatched canvas 1.11.0. Removing it also ends the per-Canvas-release re-roll this patch has needed since Canvas 1.4.0 ([#3567225](https://git.drupalcode.org/project/canvas/-/work_items/3567225), [#3621557](https://www.drupal.org/project/canvas_override/issues/3621557), [#631](https://github.com/Vardot/varbase-patches/issues/631))
 
 ## [11.0.43] - 2026-09-08
