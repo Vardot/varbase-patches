@@ -6,14 +6,21 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [10.1.89] - 2026-09-16
+
 - Remove a patch for the Schemata module on fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated (fixed upstream, released in schemata 8.x-1.1) ([#3523349](https://www.drupal.org/project/schemata/issues/3523349), [#635](https://github.com/Vardot/varbase-patches/issues/635))
+
+## [10.1.88] - 2026-08-14
 
 - Remove a patch for the Drupal Entity API module on fix: #3532309 Fix Deprecation notice from DeleteAction class causes errors in ECA module (committed upstream, released in entity 8.x-1.7)
 
+## [10.1.87] - 2026-08-11
+
 - Remove a patch for the reCAPTCHA module on fix: #3588269 Make Drupal8Post::submit() compatible with parent (fixed upstream, released in recaptcha 8.x-3.5)
 
-- Remove a patch for the CKEditor5 Media Resize module on chore: #3607786 Add Drupal Core ~11.4.0 support on the 1.1.x branch (fixed upstream, released in ckeditor_media_resize 1.1.1)
+## [10.1.86] - 2026-08-10
 
+- Remove a patch for the CKEditor5 Media Resize module on chore: #3607786 Add Drupal Core ~11.4.0 support on the 1.1.x branch (fixed upstream, released in ckeditor_media_resize 1.1.1)
 
 ## [10.1.85] - 2026-07-28
 
