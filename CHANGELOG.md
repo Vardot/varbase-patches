@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the Schemata module on fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated (fixed upstream, released in schemata 8.x-1.1) ([#3523349](https://www.drupal.org/project/schemata/issues/3523349), [#635](https://github.com/Vardot/varbase-patches/issues/635))
+
 - Remove a patch for the Drupal Entity API module on fix: #3532309 Fix Deprecation notice from DeleteAction class causes errors in ECA module (committed upstream, released in entity 8.x-1.7)
 
 - Remove a patch for the reCAPTCHA module on fix: #3588269 Make Drupal8Post::submit() compatible with parent (fixed upstream, released in recaptcha 8.x-3.5)
