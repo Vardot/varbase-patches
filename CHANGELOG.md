@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Restore the php-css-lint library patch removed in [#648](https://github.com/Vardot/varbase-patches/pull/648) and released in 9.2.101 - it was removed in error: this branch also serves Varbase 9.1 sites (`vardot/varbase` 9.1.x requires `vardot/varbase-patches:~9.2.0`), which install php-css-lint **v3.2.0**, whose `\CssLint\Properties $oProperties = null` constructor is exactly what the patch fixes ([#653](https://github.com/Vardot/varbase-patches/issues/653))
+
 ## [9.2.101] - 2026-09-16
 
 - Remove all patches for the php-css-lint library - obsolete, `src/CssLint/Linter.php` was rewritten upstream and the patched constructor no longer exists in php-css-lint v7.2.0 ([#644](https://github.com/Vardot/varbase-patches/issues/644))
