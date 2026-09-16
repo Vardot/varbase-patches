@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [9.2.101] - 2026-09-16
+
 - Remove all patches for the php-css-lint library - obsolete, `src/CssLint/Linter.php` was rewritten upstream and the patched constructor no longer exists in php-css-lint v7.2.0 ([#644](https://github.com/Vardot/varbase-patches/issues/644))
 - Remove all patches for the UI Patterns Settings module on Issue #3414084: Fix UI Patterns Settings issue of TypeError: array_unshift(): Argument #1 ($array) must be of type array, null given in array_unshift() Caused by Deprecated Hooks in Drupal ~10.2.0 - fixed upstream and released in ui_patterns_settings 8.x-2.4 ([#3414084](https://www.drupal.org/project/ui_patterns_settings/issues/3414084), [#644](https://github.com/Vardot/varbase-patches/issues/644))
 
