@@ -133,9 +133,6 @@
             "drupal/openapi": {
                 "fix: #3523346 PHP 8.4: Implicitly nullable parameter declarations deprecated": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/openapi--2025-12-08--3523346--mr-22.patch"
             },
-            "drupal/schemata": {
-                "fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemata--2025-12-09--3523349--mr-17.patch"
-            },
             "drupal/simple_oauth": {
                 "fix: #3565011 Install oauth2_scope entity type during simple_oauth_install() to prevent EntityTypeManager errors": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/simple_oauth--2026-01-05--3565011--mr-203.patch"
             },
