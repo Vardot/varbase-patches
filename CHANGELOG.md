@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove all patches for the php-css-lint library - obsolete, `src/CssLint/Linter.php` was rewritten upstream and the patched constructor no longer exists in php-css-lint v7.2.0 ([#644](https://github.com/Vardot/varbase-patches/issues/644))
+
 ## [10.1.89] - 2026-09-16
 
 - Remove a patch for the Schemata module on fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated (fixed upstream, released in schemata 8.x-1.1) ([#3523349](https://www.drupal.org/project/schemata/issues/3523349), [#635](https://github.com/Vardot/varbase-patches/issues/635))
