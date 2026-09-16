@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.45] - 2026-09-16
+
 - Remove a patch for the Schemata module on fix: #3523349 PHP 8.4: Implicitly nullable parameter declarations deprecated (fixed upstream, released in schemata 8.x-1.1) ([#3523349](https://www.drupal.org/project/schemata/issues/3523349), [#635](https://github.com/Vardot/varbase-patches/issues/635))
 
 ## [11.0.44] - 2026-09-12
