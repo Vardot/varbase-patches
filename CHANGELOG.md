@@ -6,7 +6,13 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.48] - 2026-10-08
+
 - Change a patch for the Tagify module on fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable -- re-rolled against Tagify 2.0.4, from upstream MR [!270](https://git.drupalcode.org/project/tagify/-/merge_requests/270) on the 2.0.x branch, which ports MR !177 unchanged: the 2026-07-28 file applies only to Tagify 1.2.54, and a fresh Drupal CMS 2.2.3 site requires `drupal/tagify` ^2.0.4, so every `composer install` that resolves Tagify 2 with these patches aborts with `No available patcher was able to apply patch`; the patch test project now requires `drupal/tagify` ~2 instead of `drupal/drupal_cms_admin_ui`, which pinned Tagify 1 ([#3555084](https://www.drupal.org/project/tagify/issues/3555084), [#658](https://github.com/Vardot/varbase-patches/issues/658))
+
+## [11.0.47] - 2026-09-24
+
+- Remove a patch for the Drupal CMS Helper module on fix: #3573589 Activate Full Content view mode for all new content types -- `drupal/drupal_cms_helper` installs as `dev-2.x`, a moving branch, and a 2.x commit rewrote the code around both hunks, so the patch stopped applying and every Drupal CMS build failed at `composer require` ([#656](https://github.com/Vardot/varbase-patches/issues/656))
 
 ## [11.0.46] - 2026-09-16
 
