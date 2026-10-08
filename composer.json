@@ -139,7 +139,7 @@
                 "fix: #3590827 Sticky form actions appear on node revision revert/delete confirm forms (incomplete exclusion pattern)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2026-05-19--3590827--mp-787.patch"
             },
             "drupal/tagify": {
-                "fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/tagify--2026-07-28--3555084--mr-177.patch"
+                "fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/tagify--2026-10-08--3555084--mr-270.patch"
             }
         }
     }
