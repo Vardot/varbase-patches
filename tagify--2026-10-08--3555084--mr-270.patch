@@ -1,0 +1,123 @@
+diff --git a/js/tagify.js b/js/tagify.js
+index bcca509aa27a81887313e35bc7991d30479b3ebf..c43d83e4672540f76c4f38589468c14c0dd80178 100644
+--- a/js/tagify.js
++++ b/js/tagify.js
+@@ -209,6 +209,38 @@
+         const isInGinSidebar = !!input.closest('#gin_sidebar');
+ 
+         // Tagify initialization.
++        // Accessibility: Associate the input with a visible label/legend.
++        (() => {
++          try {
++            const inpId = input?.getAttribute ? input.getAttribute('id') : null;
++            let labelEl = null;
++            if (inpId && typeof CSS !== 'undefined' && CSS.escape) {
++              labelEl = document.querySelector(`label[for="${CSS.escape(inpId)}"]`);
++            }
++            if (!labelEl) {
++              const container = input.closest('.js-form-item, .form-item, .form-group, fieldset');
++              if (container) {
++                labelEl = container.querySelector('label');
++                if (!labelEl) {
++                  labelEl = container.querySelector('legend, legend .fieldset__label, legend span');
++                }
++              }
++            }
++            if (labelEl) {
++              if (!input.id) input.id = `tagify-input-${Math.random().toString(36).slice(2)}`;
++              if (!labelEl.id) labelEl.id = `${input.id}__label`;
++              input.setAttribute('aria-labelledby', labelEl.id);
++            } else {
++              let fallback = input.getAttribute?.('aria-label');
++              if (!fallback) {
++                const c = input.closest('.js-form-item, .form-item, .form-group');
++                if (c?.getAttribute) fallback = c.getAttribute('aria-label');
++              }
++              if (fallback && !input.hasAttribute('aria-label')) input.setAttribute('aria-label', fallback);
++            }
++          } catch (e) { /* noop */ }
++        })();
++
+         // eslint-disable-next-line no-undef
+         const tagify = new Tagify(input, {
+           dropdown: {
+@@ -248,6 +280,22 @@
+           pasteAsTags: false,
+         });
+ 
++        // Copy programmatic name onto Tagify's contenteditable input and wrapper.
++        try {
++          const labelledby = input.getAttribute('aria-labelledby');
++          const ariaLabel = input.getAttribute('aria-label');
++          if (tagify?.DOM) {
++            const ce = tagify.DOM.input || tagify.DOM.scope?.querySelector('.tagify__input');
++            if (ce) {
++              if (labelledby && !ce.hasAttribute('aria-labelledby')) ce.setAttribute('aria-labelledby', labelledby);
++              if (ariaLabel && !ce.hasAttribute('aria-label')) ce.setAttribute('aria-label', ariaLabel);
++            }
++            if (tagify.DOM.scope && labelledby && !tagify.DOM.scope.hasAttribute('aria-labelledby')) {
++              tagify.DOM.scope.setAttribute('aria-labelledby', labelledby);
++            }
++          }
++        } catch (e) { /* noop */ }
++
+         // Prevent BEF from autosubmitting when typing in Tagify.
+         if (tagify.DOM.input) {
+           tagify.DOM.input.setAttribute('data-bef-auto-submit-exclude', '1');
+@@ -777,6 +825,33 @@
+         input.value = JSON.stringify(selected);
+         select.before(input);
+ 
++        // Accessibility: Associate input with the original select's label or a nearby legend.
++        (() => {
++          try {
++            const selectId = select?.getAttribute ? select.getAttribute('id') : null;
++            let labelEl = null;
++            if (selectId && typeof CSS !== 'undefined' && CSS.escape) {
++              labelEl = document.querySelector(`label[for="${CSS.escape(selectId)}"]`);
++            }
++            if (!labelEl) {
++              const container = select.closest('.js-form-item, .form-item, .form-group, fieldset');
++              if (container) {
++                labelEl = container.querySelector('label');
++                if (!labelEl) {
++                  labelEl = container.querySelector('legend, legend .fieldset__label, legend span');
++                }
++              }
++            }
++            if (labelEl) {
++              if (!input.id) input.id = selectId ? `${selectId}--tagify` : `tagify-input-${Math.random().toString(36).slice(2)}`;
++              if (!labelEl.id) labelEl.id = `${input.id}__label`;
++              input.setAttribute('aria-labelledby', labelEl.id);
++            } else {
++              const fallback = select && (select.getAttribute('aria-label') || select.getAttribute('title'));
++              if (fallback && !input.hasAttribute('aria-label')) input.setAttribute('aria-label', fallback);
++            }
++          } catch (e) { /* noop */ }
++        })();
+         // eslint-disable-next-line no-undef
+         const tagify = new Tagify(input, {
+           mode,
+@@ -811,6 +886,22 @@
+           pasteAsTags: false,
+         });
+ 
++        // Copy programmatic name onto Tagify's contenteditable input and wrapper.
++        try {
++          const labelledby2 = input.getAttribute('aria-labelledby');
++          const ariaLabel2 = input.getAttribute('aria-label');
++          if (tagify?.DOM) {
++            const ce2 = tagify.DOM.input || tagify.DOM.scope?.querySelector('.tagify__input');
++            if (ce2) {
++              if (labelledby2 && !ce2.hasAttribute('aria-labelledby')) ce2.setAttribute('aria-labelledby', labelledby2);
++              if (ariaLabel2 && !ce2.hasAttribute('aria-label')) ce2.setAttribute('aria-label', ariaLabel2);
++            }
++            if (tagify.DOM.scope && labelledby2 && !tagify.DOM.scope.hasAttribute('aria-labelledby')) {
++              tagify.DOM.scope.setAttribute('aria-labelledby', labelledby2);
++            }
++          }
++        } catch (e) { /* noop */ }
++
+         // Custom function to group taxonomy terms in the dropdown
+         tagify.dropdown.createListHTML = (suggestionsList) => {
+           if (isTagLimitReached() && !mode) {
