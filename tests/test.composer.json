@@ -28,6 +28,7 @@
         "drupal/ai_provider_anthropic": "~1",
         "drupal/block_class": "~4",
         "drupal/canvas": "~1.8",
+        "drupal/ckeditor5_premium_features": "~1.8",
         "drupal/coffee": "~2",
         "drupal/content_lock": "~3",
         "drupal/core-composer-scaffold": "~11.4.0",

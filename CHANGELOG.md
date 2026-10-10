@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the CKEditor 5 Premium Features module on fix: #3629880 Premium plugins fail to load on Drupal 11.4.9: the CDN path uses core's 47.6.3-drupal.1 version -- from upstream MR [!52](https://git.drupalcode.org/project/ckeditor5_premium_features/-/merge_requests/52): Drupal core 11.4.9 versions the ckeditor5 library `47.6.3-drupal.1`, and 1.8.5 builds its CDN URLs from that string, which 404, so the premium plugins fail to load; the patch strips the suffix before the version mapping. Applies to 1.8.4 and 1.8.5 ([#3629880](https://www.drupal.org/project/ckeditor5_premium_features/issues/3629880), [#670](https://github.com/Vardot/varbase-patches/issues/670))
+
 ## [11.0.48] - 2026-10-08
 
 - Change a patch for the Tagify module on fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable -- re-rolled against Tagify 2.0.4, from upstream MR [!270](https://git.drupalcode.org/project/tagify/-/merge_requests/270) on the 2.0.x branch, which ports MR !177 unchanged: the 2026-07-28 file applies only to Tagify 1.2.54, and a fresh Drupal CMS 2.2.3 site requires `drupal/tagify` ^2.0.4, so every `composer install` that resolves Tagify 2 with these patches aborts with `No available patcher was able to apply patch`; the patch test project now requires `drupal/tagify` ~2 instead of `drupal/drupal_cms_admin_ui`, which pinned Tagify 1 ([#3555084](https://www.drupal.org/project/tagify/issues/3555084), [#658](https://github.com/Vardot/varbase-patches/issues/658))
