@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.50] - 2026-10-10
+
 - Add a patch for the Trash module on fix: #3624638 Get "The "facets_facet" entity type does not exist" when using trash -- from upstream MR [!157](https://git.drupalcode.org/project/trash/-/merge_requests/157): Trash 3.1.0 decorates `entity_type.manager`, which moves its plugin cache clear after Canvas's block manager, so during a module install Canvas rebuilds its components and Views data before the new module's entity types are known, and core skips that module's optional views (on Varbase 11, AI Context's `views.view.ai_context_usage`, so `/admin/config/ai/context/items` fails with `RouteNotFoundException`); the patch clears entity types first. Applies to Trash 3.1.0, not 3.0.x, so a site locked to Trash 3.0.x must update Trash with this release; the patch test project now requires `drupal/trash` ~3.1 ([#3624638](https://www.drupal.org/project/trash/issues/3624638), [#676](https://github.com/Vardot/varbase-patches/issues/676))
 
 ## [11.0.49] - 2026-10-10
