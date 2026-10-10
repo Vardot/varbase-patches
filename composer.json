@@ -160,7 +160,7 @@
                 "fix: #3608313 Guard null event and catch Throwable in Messenger decorator": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/eca_helper--2026-07-04--3608313--mr-16.patch"
             },
             "drupal/tagify": {
-                "fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/tagify--2026-07-28--3555084--mr-177.patch"
+                "fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/tagify--2026-10-08--3555084--mr-270.patch"
             }
         }
     }
