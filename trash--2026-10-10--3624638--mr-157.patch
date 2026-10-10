@@ -1,0 +1,66 @@
+diff --git a/tests/src/Kernel/TrashEntityTypeManagerTest.php b/tests/src/Kernel/TrashEntityTypeManagerTest.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..1642bb8f1e30d0bdfa2ce604c46503c23fad5dbd
+--- /dev/null
++++ b/tests/src/Kernel/TrashEntityTypeManagerTest.php
+@@ -0,0 +1,41 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\Tests\trash\Kernel;
++
++use Drupal\Core\Plugin\CachedDiscoveryClearer;
++use Drupal\KernelTests\KernelTestBase;
++use Drupal\trash\TrashEntityTypeManager;
++use PHPUnit\Framework\Attributes\CoversClass;
++use PHPUnit\Framework\Attributes\Group;
++use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
++
++/**
++ * Tests the 'entity_type.manager' decorator.
++ */
++#[CoversClass(TrashEntityTypeManager::class)]
++#[Group('trash')]
++#[RunTestsInSeparateProcesses]
++class TrashEntityTypeManagerTest extends KernelTestBase {
++
++  /**
++   * {@inheritdoc}
++   */
++  protected static $modules = [
++    'trash',
++    'user',
++  ];
++
++  /**
++   * Tests that the plugin cache clearer clears entity types first.
++   *
++   * @see https://www.drupal.org/node/3624638
++   */
++  public function testClearedFirst(): void {
++    $clearer = $this->container->get('plugin.cache_clearer');
++    $discoveries = (new \ReflectionProperty(CachedDiscoveryClearer::class, 'cachedDiscoveries'))->getValue($clearer);
++    static::assertInstanceOf(TrashEntityTypeManager::class, iterator_to_array($discoveries, FALSE)[0]);
++  }
++
++}
+diff --git a/trash.services.yml b/trash.services.yml
+index 3e93754bac8d6b016639f67e0a0a4913fd709d42..7bfc3cb48a82d048ac41b79e6587caedcd8caf9a 100644
+--- a/trash.services.yml
++++ b/trash.services.yml
+@@ -86,6 +86,14 @@ services:
+ 
+   Drupal\trash\TrashEntityTypeManager:
+     decorates: 'entity_type.manager'
++    # Symfony moves the inner service's tags to the decorator, which puts this
++    # service late in the plugin cache clearer's list. Some plugin managers
++    # read entity types when their cache is cleared, for example the Canvas
++    # block manager rebuilds its components. During a module install they would
++    # get the entity type definitions from before the install, so clear these
++    # first.
++    tags:
++      - { name: plugin_manager_cache_clear, priority: 1000 }
+   # Expose the decorated inner 'entity_type.manager' under a public alias so
+   # ReverseContainer can resolve it when serializing TrashEntityTypeManager via
+   # DependencySerializationTrait. Symfony's DecoratorServicePass forces the
