@@ -143,6 +143,9 @@
             },
             "drupal/ckeditor5_premium_features": {
                 "Issue #3629880: Premium plugins fail to load on Drupal 11.4.9: the CDN path uses core's 47.6.3-drupal.1 version": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ckeditor5_premium_features--2026-10-10--3629880--mr-52.patch"
+            },
+            "drupal/trash": {
+                "Issue #3624638: Get \"The \"facets_facet\" entity type does not exist\" when using trash": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/trash--2026-10-10--3624638--mr-157.patch"
             }
         }
     }

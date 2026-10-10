@@ -59,6 +59,7 @@
         "drupal/social_auth_facebook": "~4",
         "drupal/social_auth_linkedin": "~4",
         "drupal/tagify": "~2",
+        "drupal/trash": "~3.1",
         "drupal/views_bulk_edit": "~3",
         "drupal/webp": "~1",
         "neilime/php-css-lint": "~3.2",
