@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the Paragraphs Previewer module on fix: #3538671 PHP 8.4 compatibility with implicit nullable parameters in ParagraphsPreviewController -- after Paragraphs Previewer 8.x-1.10 was released: 8.x-1.10 includes the fix, so the patch no longer applies and every build that resolves 8.x-1.10 stops at patching ([#3538671](https://www.drupal.org/project/paragraphs_previewer/issues/3538671), [#665](https://github.com/Vardot/varbase-patches/issues/665))
+
 - Restore the php-css-lint library patch removed in [#648](https://github.com/Vardot/varbase-patches/pull/648) and released in 9.2.101 - it was removed in error: this branch also serves Varbase 9.1 sites (`vardot/varbase` 9.1.x requires `vardot/varbase-patches:~9.2.0`), which install php-css-lint **v3.2.0**, whose `\CssLint\Properties $oProperties = null` constructor is exactly what the patch fixes ([#653](https://github.com/Vardot/varbase-patches/issues/653))
 
 ## [9.2.101] - 2026-09-16

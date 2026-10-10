@@ -93,8 +93,7 @@
                 "Issue #3090200: Paragraph access check using incorrect revision of its parent, leading to issues editing and viewing paragraphs when content moderation is involved.": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs--2026-06-25--3090200--mr264.patch"
             },
             "drupal/paragraphs_previewer": {
-                "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch": "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch",
-                "fix: #3538671 PHP 8.4 compatibility with implicit nullable parameters in ParagraphsPreviewController": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/paragraphs_previewer--2025-12-08--3538671--mr-5.patch"
+                "Issue #2904917: Make paragraph previewer work with new UI/UX improvement patch": "https://www.drupal.org/files/issues/2019-02-20/2904917-8.patch"
             },
             "drupal/redirect": {
                 "Issue #2879648: Redirects from aliased paths aren't triggered (Drupal 11.4, RedirectPathProcessorManager approach)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/redirect--2026-07-05--2879648--mr-202.patch"
