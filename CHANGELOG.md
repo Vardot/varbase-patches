@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Tagify module on fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable -- use the Tagify 2.x patch on every branch: point the entry at `tagify--2026-10-08--3555084--mr-270.patch`, the same file 11.0.x uses, from upstream MR [!270](https://git.drupalcode.org/project/tagify/-/merge_requests/270) on the 2.0.x branch; the 2026-07-28 file applies only to Tagify 1.2.53 and 1.2.54, and every Varbase consumer moves to `drupal/tagify` ~2.0; the patch test project now requires `drupal/tagify` ~2, so CI applies the patch ([#3555084](https://www.drupal.org/project/tagify/issues/3555084), [#662](https://github.com/Vardot/varbase-patches/issues/662))
+
 ## [10.1.90] - 2026-09-16
 
 - Remove all patches for the php-css-lint library - obsolete, `src/CssLint/Linter.php` was rewritten upstream and the patched constructor no longer exists in php-css-lint v7.2.0 ([#644](https://github.com/Vardot/varbase-patches/issues/644))
