@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.51] - 2026-10-13
+
 - Remove a patch for the Trash module on fix: #3624638 Get "The "facets_facet" entity type does not exist" when using trash -- after Trash 3.1.1 was released: 3.1.1 contains the upstream fix (MR [!157](https://git.drupalcode.org/project/trash/-/merge_requests/157)) in full, so `trash--2026-10-10--3624638--mr-157.patch` no longer applies forward and would stop `composer install`; the patch file stays on the `patches` branch for existing pins. A site locked to Trash 3.1.0 has the bug again until it runs `composer update drupal/trash` ([#3624638](https://www.drupal.org/project/trash/issues/3624638), [#680](https://github.com/Vardot/varbase-patches/issues/680))
 
 ## [11.0.50] - 2026-10-10
