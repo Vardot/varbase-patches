@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the CKEditor 5 Premium Features module on fix: #3629880 Premium plugins fail to load on Drupal 11.4.9: the CDN path uses core's 47.6.3-drupal.1 version -- after CKEditor 5 Premium Features 1.8.6 was released: 1.8.6 contains the upstream fix (MR [!52](https://git.drupalcode.org/project/ckeditor5_premium_features/-/merge_requests/52)) in full, so `ckeditor5_premium_features--2026-10-10--3629880--mr-52.patch` no longer applies forward and would stop `composer install`; the patch file stays on the `patches` branch for existing pins. A site locked to 1.8.5 has the bug again until it runs `composer update drupal/ckeditor5_premium_features` ([#3629880](https://www.drupal.org/project/ckeditor5_premium_features/issues/3629880), [#683](https://github.com/Vardot/varbase-patches/issues/683))
+
 ## [10.1.92] - 2026-10-10
 
 - Add a patch for the CKEditor 5 Premium Features module on fix: #3629880 Premium plugins fail to load on Drupal 11.4.9: the CDN path uses core's 47.6.3-drupal.1 version -- from upstream MR [!52](https://git.drupalcode.org/project/ckeditor5_premium_features/-/merge_requests/52): Drupal core 11.4.9 versions the ckeditor5 library `47.6.3-drupal.1`, and 1.8.5 builds its CDN URLs from that string, which 404, so the premium plugins fail to load; the patch strips the suffix before the version mapping. Applies to 1.8.4 and 1.8.5 ([#3629880](https://www.drupal.org/project/ckeditor5_premium_features/issues/3629880), [#670](https://github.com/Vardot/varbase-patches/issues/670))
