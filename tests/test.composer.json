@@ -72,6 +72,11 @@
         "vardot/varbase-patches": "10.1.x-dev"
     },
     "config": {
+        "audit": {
+            "ignore": {
+                "SA-CONTRIB-2026-193": "ECA Helper is unsupported and has no fixed release; this build only proves its patch still applies."
+            }
+        },
         "sort-packages": true,
         "allow-plugins": {
             "composer/installers": true,
