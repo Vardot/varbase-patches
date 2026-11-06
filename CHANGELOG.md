@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove a patch for the Shield module on fix: #3562392 PHP 8.4 - Implicit nullable parameters for Shield -- after Shield 8.x-1.9 was released: 8.x-1.9, 8.x-1.10 and 8.x-1.11 already carry the explicit `?KeyPluginManager` constructor argument, so `shield--2025-12-10--3562392--mr-30.patch` no longer applies forward and would stop `composer install`; the patch file stays on the `patches` branch for existing pins. A site locked to 8.x-1.8 gets the PHP 8.4 deprecation back until it runs `composer update drupal/shield` ([#3562392](https://www.drupal.org/project/shield/issues/3562392), [#688](https://github.com/Vardot/varbase-patches/issues/688))
+
 ## [10.0.145] - 2026-10-10
 
 - Remove a patch for the Paragraphs Previewer module on fix: #3538671 PHP 8.4 compatibility with implicit nullable parameters in ParagraphsPreviewController -- after Paragraphs Previewer 8.x-1.10 was released: 8.x-1.10 includes the fix, so the patch no longer applies and every build that resolves 8.x-1.10 stops at patching ([#3538671](https://www.drupal.org/project/paragraphs_previewer/issues/3538671), [#665](https://github.com/Vardot/varbase-patches/issues/665))
