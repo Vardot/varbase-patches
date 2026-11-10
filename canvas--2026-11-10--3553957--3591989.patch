@@ -1,0 +1,112 @@
+Canvas 1.12.0: let form flow-control exceptions escape component rendering.
+
+Combines:
+- Issue #3553957 / MR !701: rethrow a FormAjaxException or EnforcedResponseException
+  that Twig wrapped in a RuntimeError (an AJAX webform in a component slot).
+  Extended here to walk the whole getPrevious() chain, not one level.
+- Issue #3591989 / MR !1558: let BrokenPostRequestException through too.
+
+Applied in RenderSafeComponentContainer, ComponentTreeItemList and Component.
+Runtime only, no tests. Drop once !701 and !1558 are merged and released.
+
+diff --git a/src/Element/RenderSafeComponentContainer.php b/src/Element/RenderSafeComponentContainer.php
+index 66bd36f..6a5718a 100644
+--- a/src/Element/RenderSafeComponentContainer.php
++++ b/src/Element/RenderSafeComponentContainer.php
+@@ -7,6 +7,7 @@ namespace Drupal\canvas\Element;
+ use Drupal\Component\Utility\Xss;
+ use Drupal\Core\Cache\CacheableMetadata;
+ use Drupal\Core\Form\EnforcedResponseException;
++use Drupal\Core\Form\Exception\BrokenPostRequestException;
+ use Drupal\Core\Form\FormAjaxException;
+ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+ use Drupal\Core\Render\Attribute\RenderElement;
+@@ -66,10 +67,21 @@ final class RenderSafeComponentContainer extends RenderElementBase implements Co
+         return $this->renderer->render($element['#component']);
+       }
+       // @todo Remove when https://www.drupal.org/i/2367555 is fixed.
+-      catch (EnforcedResponseException | FormAjaxException $e) {
++      catch (EnforcedResponseException | FormAjaxException | BrokenPostRequestException $e) {
++        // BrokenPostRequestException is flow control too: core's guard for an
++        // AJAX form request whose POST body was dropped.
++        // @see \Drupal\Core\Form\EventSubscriber\FormAjaxSubscriber::onException()
+         throw $e;
+       }
+       catch (\Throwable $e) {
++        // Twig wraps an exception thrown while rendering a template (for example
++        // a slot holding a form block) in a RuntimeError. Rethrow a wrapped
++        // flow-control exception, so it still reaches its subscriber.
++        for ($previous = $e->getPrevious(); $previous; $previous = $previous->getPrevious()) {
++          if ($previous instanceof EnforcedResponseException || $previous instanceof FormAjaxException || $previous instanceof BrokenPostRequestException) {
++            throw $previous;
++          }
++        }
+         // In this scenario because rendering fails the context isn't updated or
+         // bubbled.
+         // TRICKY: depending on where an exception is thrown, it is possible
+diff --git a/src/Entity/Component.php b/src/Entity/Component.php
+index c45ad0a..eac771e 100644
+--- a/src/Entity/Component.php
++++ b/src/Entity/Component.php
+@@ -27,6 +27,7 @@ use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Extension\ThemeHandlerInterface;
+ use Drupal\Core\Form\EnforcedResponseException;
++use Drupal\Core\Form\Exception\BrokenPostRequestException;
+ use Drupal\Core\Form\FormAjaxException;
+ use Drupal\Core\Render\Markup;
+ use Drupal\Core\Render\RendererInterface;
+@@ -364,10 +365,19 @@ final class Component extends VersionedConfigEntityBase implements ComponentInte
+     // them through.
+     // @see \Drupal\canvas\Element\RenderSafeComponentContainer::renderComponent()
+     // @todo Remove this catch when https://www.drupal.org/i/2367555 is fixed.
+-    catch (EnforcedResponseException | FormAjaxException $e) {
++    catch (EnforcedResponseException | FormAjaxException | BrokenPostRequestException $e) {
++      // @see \Drupal\canvas\Element\RenderSafeComponentContainer::renderComponent()
+       throw $e;
+     }
+     catch (\Throwable $e) {
++      // Twig wraps an exception thrown while rendering a template (for example
++      // a slot holding a form block) in a RuntimeError. Rethrow a wrapped
++      // flow-control exception, so it still reaches its subscriber.
++      for ($previous = $e->getPrevious(); $previous; $previous = $previous->getPrevious()) {
++        if ($previous instanceof EnforcedResponseException || $previous instanceof FormAjaxException || $previous instanceof BrokenPostRequestException) {
++          throw $previous;
++        }
++      }
+       $build = RenderSafeComponentContainer::handleComponentException(
+         $e,
+         componentContext: $component_context,
+diff --git a/src/Plugin/Field/FieldType/ComponentTreeItemList.php b/src/Plugin/Field/FieldType/ComponentTreeItemList.php
+index cc5e48a..f43f83a 100644
+--- a/src/Plugin/Field/FieldType/ComponentTreeItemList.php
++++ b/src/Plugin/Field/FieldType/ComponentTreeItemList.php
+@@ -23,6 +23,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
+ use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
+ use Drupal\Core\Field\FieldItemList;
+ use Drupal\Core\Form\EnforcedResponseException;
++use Drupal\Core\Form\Exception\BrokenPostRequestException;
+ use Drupal\Core\Form\FormAjaxException;
+ use Drupal\Core\Render\Markup;
+ use Drupal\Core\Render\RenderableInterface;
+@@ -358,10 +359,19 @@ final class ComponentTreeItemList extends FieldItemList implements RenderableInt
+           ];
+         }
+         // @todo Remove when https://www.drupal.org/i/2367555 is fixed.
+-        catch (EnforcedResponseException | FormAjaxException $e) {
++        catch (EnforcedResponseException | FormAjaxException | BrokenPostRequestException $e) {
++          // @see \Drupal\canvas\Element\RenderSafeComponentContainer::renderComponent()
+           throw $e;
+         }
+         catch (\Throwable $e) {
++          // Twig wraps an exception thrown while rendering a template (for example
++          // a slot holding a form block) in a RuntimeError. Rethrow a wrapped
++          // flow-control exception, so it still reaches its subscriber.
++          for ($previous = $e->getPrevious(); $previous; $previous = $previous->getPrevious()) {
++            if ($previous instanceof EnforcedResponseException || $previous instanceof FormAjaxException || $previous instanceof BrokenPostRequestException) {
++              throw $previous;
++            }
++          }
+           // @todo Remove all the wrapping-in-RenderSafeComponentContainer complexity and make ComponentSourceInterface::renderComponent() for that instead in https://www.drupal.org/i/3521041
+           $build[$component_subtree_uuid][$component_instance_uuid] = RenderSafeComponentContainer::handleComponentException(
+             $e,
