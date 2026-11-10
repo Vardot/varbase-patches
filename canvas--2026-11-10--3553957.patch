@@ -1,0 +1,20 @@
+diff --git a/src/Element/RenderSafeComponentContainer.php b/src/Element/RenderSafeComponentContainer.php
+index 66bd36f..1d5b26b 100644
+--- a/src/Element/RenderSafeComponentContainer.php
++++ b/src/Element/RenderSafeComponentContainer.php
+@@ -70,6 +70,15 @@ final class RenderSafeComponentContainer extends RenderElementBase implements Co
+         throw $e;
+       }
+       catch (\Throwable $e) {
++        // Twig wraps an exception thrown while rendering a template (for
++        // example a slot holding a form block) in a RuntimeError. Rethrow a
++        // wrapped form exception, so the AJAX and enforced responses still
++        // reach their subscribers.
++        for ($previous = $e->getPrevious(); $previous; $previous = $previous->getPrevious()) {
++          if ($previous instanceof EnforcedResponseException || $previous instanceof FormAjaxException) {
++            throw $previous;
++          }
++        }
+         // In this scenario because rendering fails the context isn't updated or
+         // bubbled.
+         // TRICKY: depending on where an exception is thrown, it is possible
