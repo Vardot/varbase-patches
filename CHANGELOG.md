@@ -6,7 +6,10 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [10.1.94] - 2026-11-15
+
 - Remove a patch for the Shield module on fix: #3562392 PHP 8.4 - Implicit nullable parameters for Shield -- after Shield 8.x-1.9 was released: 8.x-1.9, 8.x-1.10 and 8.x-1.11 already carry the explicit `?KeyPluginManager` constructor argument, so `shield--2025-12-10--3562392--mr-30.patch` no longer applies forward and would stop `composer install`; the patch file stays on the `patches` branch for existing pins. A site locked to 8.x-1.8 gets the PHP 8.4 deprecation back until it runs `composer update drupal/shield` ([#3562392](https://www.drupal.org/project/shield/issues/3562392), [#688](https://github.com/Vardot/varbase-patches/issues/688))
+- ci: Let the patch test build install ECA Helper under SA-CONTRIB-2026-193 — ECA Helper is marked unsupported with no fixed release, so Composer blocked every release and the "Patches apply" jobs stopped at dependency resolution; the advisory is ignored in `tests/test.composer.json` only, and Varbase sites are not affected ([#688](https://github.com/Vardot/varbase-patches/issues/688))
 
 ## [10.1.93] - 2026-10-14
 
