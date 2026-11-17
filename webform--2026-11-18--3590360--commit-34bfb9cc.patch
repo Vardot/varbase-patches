@@ -1,0 +1,12 @@
+diff --git a/src/Element/WebformHtmlEditor.php b/src/Element/WebformHtmlEditor.php
+index cd26dff556916b0411869c3206653048bb682cb8..47b78031f3a27888ee30b14afe0df8897f555692 100644
+--- a/src/Element/WebformHtmlEditor.php
++++ b/src/Element/WebformHtmlEditor.php
+@@ -301,6 +301,7 @@ class WebformHtmlEditor extends FormElementBase implements TrustedCallbackInterf
+       // Hide the format select widget if there is now only one available format
+       // and it is the default value.
+       if (count($element['format']['format']['#options']) <= 1
++        && isset($element['format']['format']['#default_value'])
+         && isset($element['format']['format']['#options'][$element['format']['format']['#default_value']])) {
+         $element['format']['format']['#access'] = FALSE;
+       }
