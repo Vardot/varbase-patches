@@ -1,0 +1,40 @@
+diff --git a/ds.module b/ds.module
+index 25764ee..14266bf 100644
+--- a/ds.module
++++ b/ds.module
+@@ -723,7 +723,7 @@ function ds_contextual_links_view_alter(&$element, $items) {
+       $view_mode = $element['#contextual_links'][$entity_type]['metadata']['ds_view_mode'];
+ 
+       $route_name = "entity.entity_view_display.$entity_type.view_mode";
+-      $type = $def[$entity_type]->getBundleEntityType();
++      $type = $def[$entity_type]->getBundleEntityType() ?? '';
+       $route_params = [
+         $type => $bundle,
+         'view_mode_name' => $view_mode,
+@@ -1163,7 +1163,7 @@ function ds_field_formatter_settings_summary_alter(&$summary, $context) {
+       $field_function = $plugin_settings['id'] ?? $default_field_function;
+     }
+ 
+-    if (!isset($functions[$field_function])) {
++    if ($field_function === NULL || !isset($functions[$field_function])) {
+       $field_function = $default_field_function;
+     }
+ 
+diff --git a/modules/ds_switch_view_mode/ds_switch_view_mode.module b/modules/ds_switch_view_mode/ds_switch_view_mode.module
+index e6e5053..5e0006d 100644
+--- a/modules/ds_switch_view_mode/ds_switch_view_mode.module
++++ b/modules/ds_switch_view_mode/ds_switch_view_mode.module
+@@ -117,11 +117,8 @@ function ds_switch_view_mode_form_node_form_alter(&$form, FormStateInterface $fo
+         '#suffix' => '</div>',
+       ];
+ 
+-      $mode = $form_state->getValue('ds_switch');
+-      if (!$mode) {
+-        $mode = $node->get('ds_switch')->value;
+-      }
+-      $chosen_layout = $layouts[$mode];
++      $mode = $form_state->getValue('ds_switch') ?: $node->get('ds_switch')->value;
++      $chosen_layout = !empty($mode) ? ($layouts[$mode] ?? NULL) : NULL;
+       if (empty($chosen_layout)) {
+         $chosen_layout = $layouts['full'] ?? $layouts[''];
+       }
