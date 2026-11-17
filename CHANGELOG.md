@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Schema.org Blueprints module on fix: #3629682 Replace the non-canonical (boolean) casts deprecated in PHP 8.5: Schema.org Blueprints 1.0.0-alpha39 still has 12 `(boolean)` casts in 9 files, deprecated on PHP 8.5; from upstream MR [!325](https://git.drupalcode.org/project/schemadotorg/-/merge_requests/325); the patch test project now requires `drupal/schemadotorg` ~1 ([#3629682](https://git.drupalcode.org/project/schemadotorg/-/work_items/3629682), [#737](https://github.com/Vardot/varbase-patches/issues/737))
+
 ## [10.1.96] - 2026-11-18
 
 - Add a patch for the Webform module on fix: #3590360 Make tests pass on PHP 8.5: Webform 6.3.1's `WebformHtmlEditor::processTextFormat()` uses a `null` default format as an array offset on PHP 8.5; from the merged 6.3.x commit [34bfb9cc](https://git.drupalcode.org/project/webform/-/commit/34bfb9cc1e3b2ec11d72733b708604055521d0ca), unreleased, drop once Webform 6.3.2 ships; the patch test project now requires `drupal/webform` ~6.3.0 ([#3590360](https://www.drupal.org/project/webform/issues/3590360), [#712](https://github.com/Vardot/varbase-patches/issues/712))

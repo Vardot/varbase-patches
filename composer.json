@@ -172,6 +172,9 @@
             },
             "drupal/webform": {
                 "fix: #3590360 Make tests pass on PHP 8.5": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webform--2026-11-18--3590360--commit-34bfb9cc.patch"
+            },
+            "drupal/schemadotorg": {
+                "fix: #3629682 Replace the non-canonical (boolean) casts deprecated in PHP 8.5": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemadotorg--2026-11-18--3629682--mr-325.patch"
             }
         }
     }
