@@ -142,6 +142,9 @@
             },
             "drupal/ai": {
                 "fix: #3586873 PHP 8.5: AiAssistantForm uses a NULL entity ID as an array offset when adding an assistant": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai--2026-11-18--3586873--mr-2204.patch"
+            },
+            "drupal/easy_email": {
+                "fix: #3611615 Non-canonical cast (boolean) in EmailAttachmentEvaluator is deprecated in PHP 8.4": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/easy_email--2026-11-18--3611615--mr-69.patch"
             }
         }
     }
