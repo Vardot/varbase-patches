@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Drop `ReflectionProperty::setAccessible()` from the Composer plugin: it has had no effect since PHP 8.1 and is deprecated in PHP 8.5, where every `composer install` printed a deprecation notice from `VarbasePatchesPlugin.php`; same behaviour on every supported PHP ([#699](https://github.com/Vardot/varbase-patches/issues/699))
+
 ## [11.0.53] - 2026-11-10
 
 - Add a patch for the Canvas module on fix: #3553957 Unable to use Ajax submission for a Webform block inside another component's slot: Twig wraps a `FormAjaxException` thrown by a webform in a Canvas slot in a `RuntimeError`, and Canvas 1.12.0 swallows it, so an AJAX submit shows "Oops, something went wrong" instead of the form's validation. `canvas--2026-11-10--3553957--3591989.patch` combines upstream MR [!701](https://git.drupalcode.org/project/canvas/-/merge_requests/701) (walking the whole exception chain, not one level) with MR [!1558](https://git.drupalcode.org/project/canvas/-/merge_requests/1558) from [#3591989](https://www.drupal.org/project/canvas/issues/3591989), which also lets `BrokenPostRequestException` through, in `RenderSafeComponentContainer`, `ComponentTreeItemList` and `Component`; runtime only, drop once both land ([#3553957](https://git.drupalcode.org/project/canvas/-/work_items/3553957), [#693](https://github.com/Vardot/varbase-patches/issues/693))
