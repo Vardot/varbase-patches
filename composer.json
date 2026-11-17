@@ -150,6 +150,9 @@
             },
             "drupal/varbase_layout_builder": {
                 "fix: #3638604 PHP 8.5: Bootstrap layout deriver builds layouts without a provider": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/varbase_layout_builder--2026-11-18--3638604--mr-122.patch"
+            },
+            "drupal/webform": {
+                "fix: #3590360 Make tests pass on PHP 8.5": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webform--2026-11-18--3590360--commit-34bfb9cc.patch"
             }
         }
     }
