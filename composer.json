@@ -158,6 +158,9 @@
             },
             "drupal/tagify": {
                 "fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/tagify--2026-10-08--3555084--mr-270.patch"
+            },
+            "drupal/ds": {
+                "fix: #3616070 PHP 8.5 Using null as an array offset is deprecated": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ds--2026-11-18--3616070--mr-68.patch"
             }
         }
     }
