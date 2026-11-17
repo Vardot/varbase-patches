@@ -139,6 +139,9 @@
             },
             "drupal/tagify": {
                 "fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/tagify--2026-10-08--3555084--mr-270.patch"
+            },
+            "drupal/ai": {
+                "fix: #3586873 PHP 8.5: AiAssistantForm uses a NULL entity ID as an array offset when adding an assistant": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ai--2026-11-18--3586873--mr-2204.patch"
             }
         }
     }

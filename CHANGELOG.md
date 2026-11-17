@@ -6,6 +6,7 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the AI (Artificial Intelligence) module on fix: #3586873 PHP 8.5: AiAssistantForm uses a NULL entity ID as an array offset when adding an assistant: AI 1.5.2's `AiAssistantForm` uses a new assistant's `null` id as an array offset on PHP 8.5 at `/admin/config/ai/ai-assistant/add`; from upstream MR [!2204](https://git.drupalcode.org/project/ai/-/merge_requests/2204) ([#3586873](https://git.drupalcode.org/project/ai/-/work_items/3586873), [#709](https://github.com/Vardot/varbase-patches/issues/709))
 - Add a patch for The Gin Admin theme on fix: #3583491 Using null as an array offset is deprecated error on admin/content and admin/people: Gin 5.0.16's `views-view-field--status.html.twig` passes a `null` langcode to `hasTranslation()`, a `null` array offset on PHP 8.5 on `/admin/dashboard`; from upstream MR [!785](https://git.drupalcode.org/project/gin/-/merge_requests/785) ([#3583491](https://git.drupalcode.org/project/gin/-/work_items/3583491), [#707](https://github.com/Vardot/varbase-patches/issues/707))
 
 ## [11.0.54] - 2026-11-17
