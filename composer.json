@@ -134,7 +134,8 @@
             },
             "drupal/content_planner": {
                 "Issue #3545519: Fix Prevent fatal error when entity cannot be loaded": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-09-08--3545519--mr-62.patch",
-                "fix: #3542886 PHP 8.4 Support fixes": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-12-09--3542886--mr-63.patch"
+                "fix: #3542886 PHP 8.4 Support fixes": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2025-12-09--3542886--mr-63.patch",
+                "fix: #3559532 PHP 8.5: Kanban filter form passes NULL to getStorage() for entity types without a bundle entity type": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_planner--2026-11-18--3559532--mr-70.patch"
             },
             "drupal/webp": {
                 "fix: #3561953 PHP 8.4 implicit nullable & constructor parameter order issues in WebP FileDownloadController": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webp--2026-04-15--3561953--mr-54.patch"
