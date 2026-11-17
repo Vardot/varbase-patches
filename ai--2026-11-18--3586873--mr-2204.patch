@@ -1,0 +1,13 @@
+diff --git a/modules/ai_assistant_api/src/Form/AiAssistantForm.php b/modules/ai_assistant_api/src/Form/AiAssistantForm.php
+index bcb7c85..3d55464 100644
+--- a/modules/ai_assistant_api/src/Form/AiAssistantForm.php
++++ b/modules/ai_assistant_api/src/Form/AiAssistantForm.php
+@@ -300,7 +300,7 @@ final class AiAssistantForm extends EntityForm {
+         }
+ 
+         // Remove own agent if it exists.
+-        if (isset($agent_options[$entity->id()])) {
++        if (!$entity->isNew() && isset($agent_options[$entity->id()])) {
+           unset($agent_options[$entity->id()]);
+         }
+ 
