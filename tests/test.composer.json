@@ -36,6 +36,7 @@
         "drupal/default_content": "~2",
         "drupal/dropzonejs": "~2",
         "drupal/ds": "~3",
+        "drupal/easy_email": "~3",
         "drupal/eca_helper": "~3",
         "drupal/embed": "~1",
         "drupal/entity": "~1",
