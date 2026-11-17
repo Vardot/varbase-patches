@@ -1,0 +1,144 @@
+diff --git a/modules/schemadotorg_additional_type/src/EventSubscriber/SchemaDotOrgAdditionalTypeEventSubscriber.php b/modules/schemadotorg_additional_type/src/EventSubscriber/SchemaDotOrgAdditionalTypeEventSubscriber.php
+index 7d5803aee0bcabb6c1cf81602b4ec42ca3e91f05..075551d82874fdcbec42df5355e18e4127dd9024 100644
+--- a/modules/schemadotorg_additional_type/src/EventSubscriber/SchemaDotOrgAdditionalTypeEventSubscriber.php
++++ b/modules/schemadotorg_additional_type/src/EventSubscriber/SchemaDotOrgAdditionalTypeEventSubscriber.php
+@@ -91,7 +91,7 @@ class SchemaDotOrgAdditionalTypeEventSubscriber extends ServiceProviderBase impl
+     // Header.
+     // Add 'Schema.org additional type' to header after 'Schema.org type'.
+     // @see \Drupal\schemadotorg\SchemaDotOrgMappingTypeListBuilder::buildHeader
+-    $details_toggle = (boolean) ($event->getRequest()->query->get('details') ?? 0);
++    $details_toggle = (bool) ($event->getRequest()->query->get('details') ?? 0);
+     $header_width = $details_toggle ? '10%' : '27%';
+     $header =& $result['table']['#header'];
+     $header['bundle_label']['width'] = $header_width;
+diff --git a/modules/schemadotorg_jsonapi/src/EventSubscriber/SchemaDotOrgJsonApiEventSubscriber.php b/modules/schemadotorg_jsonapi/src/EventSubscriber/SchemaDotOrgJsonApiEventSubscriber.php
+index 4bc21b6189a053db3966856d598ebef13e27cf1e..d999bb79d47bc5983744bbd22be168ada39f088b 100644
+--- a/modules/schemadotorg_jsonapi/src/EventSubscriber/SchemaDotOrgJsonApiEventSubscriber.php
++++ b/modules/schemadotorg_jsonapi/src/EventSubscriber/SchemaDotOrgJsonApiEventSubscriber.php
+@@ -62,7 +62,7 @@ class SchemaDotOrgJsonApiEventSubscriber extends ServiceProviderBase implements
+     // Header.
+     // Add 'JSON:API' to header after 'Name'.
+     // @see \Drupal\schemadotorg\SchemaDotOrgMappingTypeListBuilder::buildHeader
+-    $details_toggle = (boolean) ($event->getRequest()->query->get('details') ?? 0);
++    $details_toggle = (bool) ($event->getRequest()->query->get('details') ?? 0);
+     $header_width = $details_toggle ? '10%' : '27%';
+     $header =& $result['table']['#header'];
+     $header['bundle_label']['width'] = $header_width;
+diff --git a/modules/schemadotorg_jsonld_custom/schemadotorg_jsonld_custom.module b/modules/schemadotorg_jsonld_custom/schemadotorg_jsonld_custom.module
+index 2e8c58817133b53a222425c276520ea50e43e734..1f93c0d8a4cf63d5ad693a445292644d48983b66 100644
+--- a/modules/schemadotorg_jsonld_custom/schemadotorg_jsonld_custom.module
++++ b/modules/schemadotorg_jsonld_custom/schemadotorg_jsonld_custom.module
+@@ -66,7 +66,7 @@ function schemadotorg_jsonld_custom_form_schemadotorg_mapping_form_alter(array &
+   $form['mapping']['third_party_settings']['schemadotorg_jsonld_custom'] = [
+     '#type' => 'details',
+     '#title' => t('Schema.org JSON-LD custom'),
+-    '#open' => (boolean) $json,
++    '#open' => (bool) $json,
+   ];
+   $form['mapping']['third_party_settings']['schemadotorg_jsonld_custom']['json'] = [
+     '#type' => 'schemadotorg_settings',
+diff --git a/modules/schemadotorg_report/src/Form/SchemaDotOrgReportRelationshipsFilterForm.php b/modules/schemadotorg_report/src/Form/SchemaDotOrgReportRelationshipsFilterForm.php
+index 93bbef4c09b8b9dcbb2281a86e8c531535064252..80fa336405cb588f600ac5c120dffb63d1f263ff 100644
+--- a/modules/schemadotorg_report/src/Form/SchemaDotOrgReportRelationshipsFilterForm.php
++++ b/modules/schemadotorg_report/src/Form/SchemaDotOrgReportRelationshipsFilterForm.php
+@@ -81,7 +81,7 @@ class SchemaDotOrgReportRelationshipsFilterForm extends FormBase {
+     $form['filter'] = [
+       '#type' => 'details',
+       '#title' => $this->t('Filter Schema.org relationships'),
+-      '#open' => (boolean) $query,
++      '#open' => (bool) $query,
+     ];
+ 
+     if ($this->getRequest()->query->get('category')) {
+diff --git a/modules/schemadotorg_ui/tests/src/Functional/SchemaDotOrgUiRouteTest.php b/modules/schemadotorg_ui/tests/src/Functional/SchemaDotOrgUiRouteTest.php
+index 425975b9b443e093ce1e57fbb53b9a0bd566d086..e2c7e02534aa37c53e0cee488fc879d8d2f72f20 100644
+--- a/modules/schemadotorg_ui/tests/src/Functional/SchemaDotOrgUiRouteTest.php
++++ b/modules/schemadotorg_ui/tests/src/Functional/SchemaDotOrgUiRouteTest.php
+@@ -173,7 +173,7 @@ class SchemaDotOrgUiRouteTest extends SchemaDotOrgBrowserTestBase {
+    */
+   protected function assertRouteExists(string $name): void {
+     $router = $this->container->get('router');
+-    $this->assertTrue((boolean) $router->getRouteCollection()->get($name));
++    $this->assertTrue((bool) $router->getRouteCollection()->get($name));
+   }
+ 
+   /**
+@@ -184,7 +184,7 @@ class SchemaDotOrgUiRouteTest extends SchemaDotOrgBrowserTestBase {
+    */
+   protected function assertRouteNotExists(string $name): void {
+     $router = $this->container->get('router');
+-    $this->assertFalse((boolean) $router->getRouteCollection()->get($name));
++    $this->assertFalse((bool) $router->getRouteCollection()->get($name));
+   }
+ 
+ }
+diff --git a/src/Entity/SchemaDotOrgMapping.php b/src/Entity/SchemaDotOrgMapping.php
+index edb09d95566a3870a4c634c63e7e8c03dd964935..912c07e53bc6cb7872c1df70c1f99ab76b3508a2 100644
+--- a/src/Entity/SchemaDotOrgMapping.php
++++ b/src/Entity/SchemaDotOrgMapping.php
+@@ -191,7 +191,7 @@ class SchemaDotOrgMapping extends ConfigEntityBase implements SchemaDotOrgMappin
+    * {@inheritdoc}
+    */
+   public function isTargetEntityTypeBundle(): bool {
+-    return (boolean) $this->getTargetEntityTypeBundleId();
++    return (bool) $this->getTargetEntityTypeBundleId();
+   }
+ 
+   /**
+diff --git a/src/SchemaDotOrgConfigEntityListBuilderBase.php b/src/SchemaDotOrgConfigEntityListBuilderBase.php
+index 085433c2831997fc4df69ebd35771d3de60e1864..faa5c74e086ab6cfd94dc9ba8630501e387f5fef 100644
+--- a/src/SchemaDotOrgConfigEntityListBuilderBase.php
++++ b/src/SchemaDotOrgConfigEntityListBuilderBase.php
+@@ -92,7 +92,7 @@ abstract class SchemaDotOrgConfigEntityListBuilderBase extends ConfigEntityListB
+    *   The current request details toggle state.
+    */
+   protected function getDetailsToggle(): bool {
+-    return (boolean) ($this->request->query->get('details') ?? 0);
++    return (bool) ($this->request->query->get('details') ?? 0);
+   }
+ 
+   /**
+diff --git a/src/SchemaDotOrgMappingStorage.php b/src/SchemaDotOrgMappingStorage.php
+index 58e6ba6478a8a2171d4d2aec17cccd376979ddad..62fb0cc8a96eedddb55495cf5c209d50d96e9ff3 100644
+--- a/src/SchemaDotOrgMappingStorage.php
++++ b/src/SchemaDotOrgMappingStorage.php
+@@ -65,7 +65,7 @@ class SchemaDotOrgMappingStorage extends ConfigEntityStorage implements SchemaDo
+    * {@inheritdoc}
+    */
+   public function isBundleMapped(string $entity_type_id, string $bundle): bool {
+-    return (boolean) $this->getQuery()
++    return (bool) $this->getQuery()
+       ->condition('target_entity_type_id', $entity_type_id)
+       ->condition('target_bundle', $bundle)
+       ->execute();
+@@ -176,7 +176,7 @@ class SchemaDotOrgMappingStorage extends ConfigEntityStorage implements SchemaDo
+       return FALSE;
+     }
+ 
+-    return (boolean) $this->getQuery()
++    return (bool) $this->getQuery()
+       ->condition('target_entity_type_id', $entity_type_id)
+       ->condition('schema_type', $schema_type)
+       ->execute();
+diff --git a/src/SchemaDotOrgSchemaTypeManager.php b/src/SchemaDotOrgSchemaTypeManager.php
+index c18ac0cbe6bd6883f7fe3055daa9d5ed65a99d52..9aa1232fdba4195979ee3d969e500f13df5f228a 100644
+--- a/src/SchemaDotOrgSchemaTypeManager.php
++++ b/src/SchemaDotOrgSchemaTypeManager.php
+@@ -236,7 +236,7 @@ class SchemaDotOrgSchemaTypeManager implements SchemaDotOrgSchemaTypeManagerInte
+    * {@inheritdoc}
+    */
+   public function isEnumerationType(string $id): bool {
+-    return (boolean) $this->database->select('schemadotorg_types', 'types')
++    return (bool) $this->database->select('schemadotorg_types', 'types')
+       ->fields('types', ['id'])
+       ->condition('enumerationtype', $this->getUri($id))
+       ->countQuery()
+@@ -792,7 +792,7 @@ class SchemaDotOrgSchemaTypeManager implements SchemaDotOrgSchemaTypeManagerInte
+    */
+   public function hasSubtypes(string $type): bool {
+     $type_definition = $this->getType($type);
+-    return (boolean) $type_definition['sub_types'];
++    return (bool) $type_definition['sub_types'];
+   }
+ 
+   /**
