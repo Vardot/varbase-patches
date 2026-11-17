@@ -1,0 +1,13 @@
+diff --git a/src/Service/EmailAttachmentEvaluator.php b/src/Service/EmailAttachmentEvaluator.php
+index fc93b37..163cf06 100644
+--- a/src/Service/EmailAttachmentEvaluator.php
++++ b/src/Service/EmailAttachmentEvaluator.php
+@@ -321,7 +321,7 @@ class EmailAttachmentEvaluator implements EmailAttachmentEvaluatorInterface {
+     ];
+     $pattern = '#^' . strtr(preg_quote($pattern, '#'), $transforms) . '$#i';
+ 
+-    return (boolean) preg_match($pattern, $string);
++    return (bool) preg_match($pattern, $string);
+   }
+ 
+   /**
