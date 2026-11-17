@@ -1,0 +1,19 @@
+diff --git a/modules/content_kanban/src/Form/KanbanFilterForm.php b/modules/content_kanban/src/Form/KanbanFilterForm.php
+index a4dbdcf..788532b 100644
+--- a/modules/content_kanban/src/Form/KanbanFilterForm.php
++++ b/modules/content_kanban/src/Form/KanbanFilterForm.php
+@@ -237,8 +237,13 @@ class KanbanFilterForm extends FormBase {
+ 
+     foreach ($entityTypes as $entityTypeId => $bundles) {
+       $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
++      $bundleEntityType = $entityType->getBundleEntityType();
++      if ($bundleEntityType === NULL) {
++        // An entity type without bundle entities has no bundles to list.
++        continue;
++      }
+       $bundleEntities = $this->entityTypeManager
+-        ->getStorage($entityType->getBundleEntityType())
++        ->getStorage($bundleEntityType)
+         ->loadMultiple($bundles);
+ 
+       foreach ($bundleEntities as $bundle => $entity) {
