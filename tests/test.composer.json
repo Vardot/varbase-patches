@@ -37,6 +37,7 @@
         "drupal/drimage_improved": "~1",
         "drupal/dropzonejs": "~2",
         "drupal/drupal_cms_helper": "~2",
+        "drupal/easy_email": "~3",
         "drupal/eca_helper": "~3",
         "drupal/embed": "~1",
         "drupal/entity": "~1",
