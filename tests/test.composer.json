@@ -62,6 +62,7 @@
         "drupal/tagify": "~2",
         "drupal/trash": "~3.1",
         "drupal/views_bulk_edit": "~3",
+        "drupal/webform": "~6.3.0",
         "drupal/webp": "~1",
         "neilime/php-css-lint": "~3.2",
         "oomphinc/composer-installers-extender": "~2",

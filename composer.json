@@ -145,6 +145,9 @@
             },
             "drupal/easy_email": {
                 "fix: #3611615 Non-canonical cast (boolean) in EmailAttachmentEvaluator is deprecated in PHP 8.4": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/easy_email--2026-11-18--3611615--mr-69.patch"
+            },
+            "drupal/webform": {
+                "fix: #3590360 Make tests pass on PHP 8.5": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webform--2026-11-18--3590360--commit-34bfb9cc.patch"
             }
         }
     }
