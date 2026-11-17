@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Drop `ReflectionProperty::setAccessible()` from the Composer plugin: it has had no effect since PHP 8.1 and is deprecated in PHP 8.5, where every `composer install` printed a deprecation notice from `VarbasePatchesPlugin.php`; same behaviour on every supported PHP ([#699](https://github.com/Vardot/varbase-patches/issues/699))
+
 ## [9.2.104] - 2026-11-15
 
 - Remove a patch for the Shield module on fix: #3562392 PHP 8.4 - Implicit nullable parameters for Shield -- after Shield 8.x-1.9 was released: 8.x-1.9, 8.x-1.10 and 8.x-1.11 already carry the explicit `?KeyPluginManager` constructor argument, so `shield--2026-07-05--php-8.4-implicit-nullable.patch` no longer applies forward and would stop `composer install`; the patch file stays on the `patches` branch for existing pins. A site locked to 8.x-1.8 gets the PHP 8.4 deprecation back until it runs `composer update drupal/shield` ([#3562392](https://www.drupal.org/project/shield/issues/3562392), [#688](https://github.com/Vardot/varbase-patches/issues/688))

@@ -144,7 +144,6 @@ class VarbasePatchesPlugin implements PluginInterface, EventSubscriberInterface,
             return;
         }
         $prop = $rc->getProperty('patches');
-        $prop->setAccessible(true);
         $prop->setValue($cw, $newPatches);
 
         if (!$this->v1Mutated) {
@@ -322,13 +321,11 @@ class VarbasePatchesPlugin implements PluginInterface, EventSubscriberInterface,
 
         $r = new \ReflectionClass($cweagans);
         $lockerProp = $r->getProperty('locker');
-        $lockerProp->setAccessible(true);
         $locker = $lockerProp->getValue($cweagans);
         $locker->setLockData($newCollection, true);
 
         if ($r->hasProperty('patchCollection')) {
             $pcProp = $r->getProperty('patchCollection');
-            $pcProp->setAccessible(true);
             $pcProp->setValue($cweagans, $newCollection);
         }
     }
