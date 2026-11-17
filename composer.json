@@ -146,6 +146,9 @@
             },
             "drupal/ds": {
                 "fix: #3616070 PHP 8.5 Using null as an array offset is deprecated": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/ds--2026-11-18--3616070--mr-68.patch"
+            },
+            "drupal/varbase_layout_builder": {
+                "fix: #3638604 PHP 8.5: Bootstrap layout deriver builds layouts without a provider": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/varbase_layout_builder--2026-11-18--3638604--mr-122.patch"
             }
         }
     }
