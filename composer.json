@@ -134,7 +134,8 @@
                 "feat: #3544019 Form Actions Stay Cached and Disabled After Breaking Lock in Gin Admin Theme": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/content_lock--2026-06-14--3544019--mr-93.patch"
             },
             "drupal/gin": {
-                "fix: #3590827 Sticky form actions appear on node revision revert/delete confirm forms (incomplete exclusion pattern)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2026-05-19--3590827--mp-787.patch"
+                "fix: #3590827 Sticky form actions appear on node revision revert/delete confirm forms (incomplete exclusion pattern)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2026-05-19--3590827--mp-787.patch",
+                "fix: #3583491 Using null as an array offset is deprecated error on admin/content and admin/people": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/gin--2026-11-18--3583491--mr-785.patch"
             },
             "drupal/tagify": {
                 "fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/tagify--2026-10-08--3555084--mr-270.patch"

@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for The Gin Admin theme on fix: #3583491 Using null as an array offset is deprecated error on admin/content and admin/people: Gin 5.0.16's `views-view-field--status.html.twig` passes a `null` langcode to `hasTranslation()`, a `null` array offset on PHP 8.5 on `/admin/dashboard`; from upstream MR [!785](https://git.drupalcode.org/project/gin/-/merge_requests/785) ([#3583491](https://git.drupalcode.org/project/gin/-/work_items/3583491), [#707](https://github.com/Vardot/varbase-patches/issues/707))
+
 ## [11.0.54] - 2026-11-17
 
 - Drop `ReflectionProperty::setAccessible()` from the Composer plugin: it has had no effect since PHP 8.1 and is deprecated in PHP 8.5, where every `composer install` printed a deprecation notice from `VarbasePatchesPlugin.php`; same behaviour on every supported PHP ([#699](https://github.com/Vardot/varbase-patches/issues/699))
