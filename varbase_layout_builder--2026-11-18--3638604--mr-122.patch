@@ -1,0 +1,12 @@
+diff --git a/src/Plugin/Deriver/VarbaseLayoutBuilderBootstrapLayoutDeriver.php b/src/Plugin/Deriver/VarbaseLayoutBuilderBootstrapLayoutDeriver.php
+index a7bf50ba665cd7bd1fae717e57f19c5b34e850c8..5293684d776d5f47d81e8731b7c6e7dc96b3e472 100644
+--- a/src/Plugin/Deriver/VarbaseLayoutBuilderBootstrapLayoutDeriver.php
++++ b/src/Plugin/Deriver/VarbaseLayoutBuilderBootstrapLayoutDeriver.php
+@@ -59,6 +59,7 @@ class VarbaseLayoutBuilderBootstrapLayoutDeriver extends DeriverBase implements
+           'regions' => $this->getRegions($layout->getNumberOfColumns()),
+           'theme_hook' => 'blb_section',
+           'icon_map' => $this->getIconMap($layout->getNumberOfColumns()),
++          'provider' => 'varbase_layout_builder',
+         ]);
+       }
+     }
