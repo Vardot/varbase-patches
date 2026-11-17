@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [9.2.105] - 2026-11-17
+
 - Drop `ReflectionProperty::setAccessible()` from the Composer plugin: it has had no effect since PHP 8.1 and is deprecated in PHP 8.5, where every `composer install` printed a deprecation notice from `VarbasePatchesPlugin.php`; same behaviour on every supported PHP ([#699](https://github.com/Vardot/varbase-patches/issues/699))
 
 ## [9.2.104] - 2026-11-15
