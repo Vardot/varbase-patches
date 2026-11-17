@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Display Suite module on fix: #3616070 PHP 8.5 Using null as an array offset is deprecated: Display Suite 8.x-3.37 uses `null` as an array offset in `ds_field_formatter_settings_summary_alter()`, contextual links and Switch View Mode on PHP 8.5; the patch carries only the PHP 8.5 fix commits of upstream MR [!68](https://git.drupalcode.org/project/ds/-/merge_requests/68), not its CI clean-up; the patch test project now requires `drupal/ds` ~3 ([#3616070](https://www.drupal.org/project/ds/issues/3616070), [#706](https://github.com/Vardot/varbase-patches/issues/706))
+
 ## [9.2.105] - 2026-11-17
 
 - Drop `ReflectionProperty::setAccessible()` from the Composer plugin: it has had no effect since PHP 8.1 and is deprecated in PHP 8.5, where every `composer install` printed a deprecation notice from `VarbasePatchesPlugin.php`; same behaviour on every supported PHP ([#699](https://github.com/Vardot/varbase-patches/issues/699))
