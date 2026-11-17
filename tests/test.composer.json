@@ -24,6 +24,7 @@
     "require": {
         "composer/installers": "~2",
         "cweagans/composer-patches": "~2.0",
+        "drupal/ai": "^1.5",
         "drupal/block_class": "~4",
         "drupal/ckeditor5_premium_features": "~1.8",
         "drupal/coffee": "~2",
