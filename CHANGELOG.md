@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Webform Views Integration module on task: #3578380 Fix "null as array offset" deprecation in WebformSubmissionViewsData::getViewsData(): Webform Views Integration 8.x-5.6 uses a `null` foreign table as an array offset on PHP 8.5 when an entity type has no base or data table; from upstream MR [!42](https://git.drupalcode.org/project/webform_views/-/merge_requests/42), unreleased; the patch test project now requires `drupal/webform_views` ~5 ([#3578380](https://www.drupal.org/i/3578380), [#740](https://github.com/Vardot/varbase-patches/issues/740))
+
 ## [9.2.106] - 2026-11-18
 
 - Add a patch for the Webform module on fix: #3590360 Make tests pass on PHP 8.5: Webform 6.3.1's `WebformHtmlEditor::processTextFormat()` uses a `null` default format as an array offset on PHP 8.5; from the merged 6.3.x commit [34bfb9cc](https://git.drupalcode.org/project/webform/-/commit/34bfb9cc1e3b2ec11d72733b708604055521d0ca), unreleased, drop once Webform 6.3.2 ships; the patch test project now requires `drupal/webform` ~6.3.0 ([#3590360](https://www.drupal.org/project/webform/issues/3590360), [#712](https://github.com/Vardot/varbase-patches/issues/712))
