@@ -175,6 +175,9 @@
             },
             "drupal/schemadotorg": {
                 "fix: #3629682 Replace the non-canonical (boolean) casts deprecated in PHP 8.5": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/schemadotorg--2026-11-18--3629682--mr-325.patch"
+            },
+            "drupal/webform_views": {
+                "task: #3578380 Fix \"null as array offset\" deprecation in WebformSubmissionViewsData::getViewsData()": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/webform_views--2026-11-18--3578380--mr-42.patch"
             }
         }
     }
