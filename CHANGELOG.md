@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [10.1.98] - 2026-11-18
+
 - Remove all patches for the Embed module after Embed 8.x-1.11 was released - obsolete and no longer applying to the released code: 8.x-1.11 and 8.x-1.12 already carry the PSR-4 namespace fix for `EmbedCKEditor5PluginBase`, so `embed--2025-06-30--3517882--mr-26.patch` no longer applies forward and stops `composer install`. A site locked to 8.x-1.10 gets the bug back until it runs `composer update drupal/embed` ([#3517882](https://www.drupal.org/project/embed/issues/3517882), [#749](https://github.com/Vardot/varbase-patches/issues/749))
 
 ## [10.1.97] - 2026-11-18
