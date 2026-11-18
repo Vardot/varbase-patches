@@ -133,9 +133,6 @@
             "drupal/jsonapi_extras": {
                 "fix: #3508142 installation error with JSON:API Extra in custom Drupal 11 profiles due to missing synthetic service kernel": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/jsonapi_extras--2026-01-21--3508142--mr-65.patch"
             },
-            "drupal/embed": {
-                "Issue #3517882: The namespace of EmbedCKEditor5PluginBase does not respect PSR4": "https://www.drupal.org/files/issues/2025-06-30/embed--2025-06-30--3517882--mr-26.patch"
-            },
             "drupal/coffee": {
                 "Issue #3535874: Add Navigation Top Bar integration for Coffee module in Drupal ~11.2.0 and Gin ~5.0": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/coffee--2025-07-30--3535874--mr-19.patch"
             },
