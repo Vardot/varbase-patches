@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove all patches for the Embed module after Embed 8.x-1.11 was released - obsolete and no longer applying to the released code: 8.x-1.11 and 8.x-1.12 already carry the PSR-4 namespace fix for `EmbedCKEditor5PluginBase`, so `embed--2025-06-30--3517882--mr-26.patch` no longer applies forward and stops `composer install`. A site locked to 8.x-1.10 gets the bug back until it runs `composer update drupal/embed` ([#3517882](https://www.drupal.org/project/embed/issues/3517882), [#749](https://github.com/Vardot/varbase-patches/issues/749))
+
 ## [10.0.146] - 2026-11-18
 
 - Remove a patch for the Shield module on fix: #3562392 PHP 8.4 - Implicit nullable parameters for Shield -- after Shield 8.x-1.9 was released: 8.x-1.9, 8.x-1.10 and 8.x-1.11 already carry the explicit `?KeyPluginManager` constructor argument, so `shield--2025-12-10--3562392--mr-30.patch` no longer applies forward and would stop `composer install`; the patch file stays on the `patches` branch for existing pins. A site locked to 8.x-1.8 gets the PHP 8.4 deprecation back until it runs `composer update drupal/shield` ([#3562392](https://www.drupal.org/project/shield/issues/3562392), [#688](https://github.com/Vardot/varbase-patches/issues/688))
