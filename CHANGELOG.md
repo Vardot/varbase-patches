@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Remove all patches for the Embed module after Embed 8.x-1.11 was released - obsolete and no longer applying to the released code: 8.x-1.11 and 8.x-1.12 already carry the PSR-4 namespace fix for `EmbedCKEditor5PluginBase`, so `embed--2025-06-30--3517882--mr-26.patch` no longer applies forward and stops `composer install`. A site locked to 8.x-1.10 gets the bug back until it runs `composer update drupal/embed` ([#3517882](https://www.drupal.org/project/embed/issues/3517882), [#749](https://github.com/Vardot/varbase-patches/issues/749))
+
 ## [11.0.56] - 2026-11-18
 
 - Add a patch for the Webform Views Integration module on task: #3578380 Fix "null as array offset" deprecation in WebformSubmissionViewsData::getViewsData(): Webform Views Integration 8.x-5.6 uses a `null` foreign table as an array offset on PHP 8.5 when an entity type has no base or data table; from upstream MR [!42](https://git.drupalcode.org/project/webform_views/-/merge_requests/42), unreleased; the patch test project now requires `drupal/webform_views` ~5 ([#3578380](https://www.drupal.org/i/3578380), [#740](https://github.com/Vardot/varbase-patches/issues/740))
