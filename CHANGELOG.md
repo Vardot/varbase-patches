@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [10.1.97] - 2026-11-18
+
 - Add a patch for the Webform Views Integration module on task: #3578380 Fix "null as array offset" deprecation in WebformSubmissionViewsData::getViewsData(): Webform Views Integration 8.x-5.6 uses a `null` foreign table as an array offset on PHP 8.5 when an entity type has no base or data table; from upstream MR [!42](https://git.drupalcode.org/project/webform_views/-/merge_requests/42), unreleased; the patch test project now requires `drupal/webform_views` ~5 ([#3578380](https://www.drupal.org/i/3578380), [#740](https://github.com/Vardot/varbase-patches/issues/740))
 
 - Add a patch for the Schema.org Blueprints module on fix: #3629682 Replace the non-canonical (boolean) casts deprecated in PHP 8.5: Schema.org Blueprints 1.0.0-alpha39 still has 12 `(boolean)` casts in 9 files, deprecated on PHP 8.5; from upstream MR [!325](https://git.drupalcode.org/project/schemadotorg/-/merge_requests/325); the patch test project now requires `drupal/schemadotorg` ~1 ([#3629682](https://git.drupalcode.org/project/schemadotorg/-/work_items/3629682), [#737](https://github.com/Vardot/varbase-patches/issues/737))
