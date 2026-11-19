@@ -73,7 +73,7 @@
             "drupal/layout_library": {
                 "fix: #3075067 Duplicate entry for key 'block_content_field__uuid__value'": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3075067--mr-1.patch",
                 "Issue #3273160: Support inline blocks in layout": "https://www.drupal.org/files/issues/2022-12-14/3273160-9.patch",
-                "Issue #3561874 : Add missing isSupported method to Library class for SupportAwareSectionStorageInterface compatibility with Drupal ~11.3.0": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-01-21--3561874--mr-21.patch"
+                "fix: #3561874 Add missing isSupported method to Library class for SupportAwareSectionStorageInterface compatibility with Drupal ~11.3.0 (corrected namespace)": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/layout_library--2026-07-02--3561874--mr-21.patch"
             },
             "drupal/paragraphs": {
                 "Issue #2924774: Let Editors add/delete/clone paragraphs When [Editing a translation]": "https://www.drupal.org/files/issues/2018-06-03/2924774-29.patch",
