@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Field Validation module on fix: #3634371 Non-canonical (double) casts are deprecated in PHP 8.5 in the legacy Numeric validation rule: Field Validation 3.0.0 still uses three `(double)` casts in the legacy `NumericFieldValidationRule::valid_number_step()`, deprecated on PHP 8.5; Varbase 11.0.x pulls it through the AI module (AI Validations) and Varbase AI Safety. From upstream MR [!34](https://git.drupalcode.org/project/field_validation/-/merge_requests/34), unreleased; the patch test project now requires `drupal/field_validation` ~3.0 ([#3634371](https://git.drupalcode.org/project/field_validation/-/work_items/3634371), [#767](https://github.com/Vardot/varbase-patches/issues/767))
+
 ## [11.0.58] - 2026-11-19
 
 - Add a patch for the Social API module on fix: #3593752 Deprecated function: Drupal\social_api\AuthManager\OAuth2Manager::__construct(): Implicitly marking parameter $request as nullable is deprecated, the explicit nullable type must be used instead in include() (line 576 of vendor/composer/ClassLoader.php): Social API 4.1.0-beta1, the latest release, still declares `Request $request = NULL` in `OAuth2Manager::__construct()`, implicitly nullable and deprecated since PHP 8.4; Varbase 11 pulls it through Social Auth. Wires the existing `social_api--2026-07-17--3593752--mr-17.patch` (upstream MR [!17](https://git.drupalcode.org/project/social_api/-/merge_requests/17)) already used on `10.1.x` ([#3593752](https://www.drupal.org/i/3593752), [#763](https://github.com/Vardot/varbase-patches/issues/763))
