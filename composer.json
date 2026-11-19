@@ -179,6 +179,9 @@
             },
             "drupal/field_validation": {
                 "fix: #3634371 Non-canonical (double) casts are deprecated in PHP 8.5 in the legacy Numeric validation rule": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/field_validation--2026-11-19--3634371--mr-34.patch"
+            },
+            "drupal/panels": {
+                "Fix PHP 8.4 implicit-nullable deprecations in Panels IPE forms": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/panels--2026-07-05--php-8.4-implicit-nullable.patch"
             }
         }
     }

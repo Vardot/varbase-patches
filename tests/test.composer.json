@@ -52,6 +52,7 @@
         "drupal/layout_library": "~1",
         "drupal/node_edit_protection": "~1",
         "drupal/openapi": "~2",
+        "drupal/panels": "~4",
         "drupal/paragraphs": "~1",
         "drupal/paragraphs_previewer": "~1",
         "drupal/password_policy": "~4",
