@@ -6,6 +6,7 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Drupal Canvas module on fix: #3591751 Compile JSX server-side for AI-created/edited code components (fixes [object Object]) -- re-rolled against Canvas 1.13.0: Canvas 1.13.0 moved the `compiledJs` line in `EditComponentJs.php` inside an `if ($component instanceof JavaScriptComponent)` block, so `canvas--2026-07-10--3591751--mr-1315.patch` no longer applies and stops `composer install`; `canvas--2026-11-19--3591751--mr-1315.patch` re-rolls that hunk, the rest of MR [!1315](https://git.drupalcode.org/project/canvas/-/merge_requests/1315) is unchanged and still unmerged upstream. The new file does not apply to Canvas 1.12.x, so a site locked to 1.12.x updates `drupal/canvas` to 1.13.0 together with this release ([#3591751](https://git.drupalcode.org/project/canvas/-/work_items/3591751), [#758](https://github.com/Vardot/varbase-patches/issues/758))
 - Remove all patches for the Embed module after Embed 8.x-1.11 was released - obsolete and no longer applying to the released code: 8.x-1.11 and 8.x-1.12 already carry the PSR-4 namespace fix for `EmbedCKEditor5PluginBase`, so `embed--2025-06-30--3517882--mr-26.patch` no longer applies forward and stops `composer install`. A site locked to 8.x-1.10 gets the bug back until it runs `composer update drupal/embed` ([#3517882](https://www.drupal.org/project/embed/issues/3517882), [#749](https://github.com/Vardot/varbase-patches/issues/749))
 
 ## [11.0.56] - 2026-11-18
