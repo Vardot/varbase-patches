@@ -1,0 +1,26 @@
+diff --git a/modules/schemadotorg_diagram/src/SchemaDotOrgDiagramBuilder.php b/modules/schemadotorg_diagram/src/SchemaDotOrgDiagramBuilder.php
+index 4872c9e..5fbc070 100644
+--- a/modules/schemadotorg_diagram/src/SchemaDotOrgDiagramBuilder.php
++++ b/modules/schemadotorg_diagram/src/SchemaDotOrgDiagramBuilder.php
+@@ -338,7 +338,7 @@ class SchemaDotOrgDiagramBuilder implements SchemaDotOrgDiagramBuilderInterface
+ 
+       case static::PARENT_NODE:
+       case static::CHILD_NODE:
+-      default;
++      default:
+         // Rectangle.
+         $output[] = $id . '["`' . $node_title . '`"]';
+         break;
+diff --git a/src/Element/SchemaDotOrgSettings.php b/src/Element/SchemaDotOrgSettings.php
+index ca2f45c..f0a7198 100644
+--- a/src/Element/SchemaDotOrgSettings.php
++++ b/src/Element/SchemaDotOrgSettings.php
+@@ -402,7 +402,7 @@ class SchemaDotOrgSettings extends Textarea {
+         }
+         return;
+ 
+-      default;
++      default:
+         throw new \Exception('Unknown "' . $mode . '" settings mode.');
+     }
+   }
