@@ -7,6 +7,7 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 ## [Unreleased]
 
 - Add a patch for the Field Validation module on fix: #3634371 Non-canonical (double) casts are deprecated in PHP 8.5 in the legacy Numeric validation rule: Field Validation 3.0.0 still uses three `(double)` casts in the legacy `NumericFieldValidationRule::valid_number_step()`, deprecated on PHP 8.5; Varbase 10.1.x pulls it through the AI module (AI Validations). From upstream MR [!34](https://git.drupalcode.org/project/field_validation/-/merge_requests/34), unreleased; the patch test project now requires `drupal/field_validation` ~3.0 ([#3634371](https://git.drupalcode.org/project/field_validation/-/work_items/3634371), [#767](https://github.com/Vardot/varbase-patches/issues/767))
+- Add a patch for the Schema.org Blueprints module on fix: #3629683 Replace the case statements followed by a semicolon, deprecated in PHP 8.5: Schema.org Blueprints 1.0.0-alpha39 still has two `default;` labels, deprecated on PHP 8.5; from upstream MR [!326](https://git.drupalcode.org/project/schemadotorg/-/merge_requests/326), applied after the mr-325 patch ([#3629683](https://git.drupalcode.org/project/schemadotorg/-/work_items/3629683), [#771](https://github.com/Vardot/varbase-patches/issues/771))
 
 ## [10.1.99] - 2026-11-19
 
