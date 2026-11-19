@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Field Validation module on fix: #3634371 Non-canonical (double) casts are deprecated in PHP 8.5 in the legacy Numeric validation rule: Field Validation 3.0.0 still uses three `(double)` casts in the legacy `NumericFieldValidationRule::valid_number_step()`, deprecated on PHP 8.5; Varbase 10.1.x pulls it through the AI module (AI Validations). From upstream MR [!34](https://git.drupalcode.org/project/field_validation/-/merge_requests/34), unreleased; the patch test project now requires `drupal/field_validation` ~3.0 ([#3634371](https://git.drupalcode.org/project/field_validation/-/work_items/3634371), [#767](https://github.com/Vardot/varbase-patches/issues/767))
+
 ## [10.1.99] - 2026-11-19
 
 - Change a patch for the Layout library module on fix: #3561874 corrected SupportAwareSectionStorageInterface namespace for Varbase 10.1.x: `layout_library--2026-01-21--3561874--mr-21.patch` imported `Drupal\layout_builder\SectionStorage\SupportAwareSectionStorageInterface`, which does not exist, so the `Library` section storage plugin never loaded and `/admin/structure/layouts` returned HTTP 500 on every fresh Varbase 10.1.x site. `10.1.x` now uses `layout_library--2026-07-02--3561874--mr-21.patch`, the corrected file 9.2.x already uses ([#3561874](https://git.drupalcode.org/project/layout_library/-/work_items/3561874), [#761](https://github.com/Vardot/varbase-patches/issues/761))
