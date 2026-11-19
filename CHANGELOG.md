@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Update patches for the Entity Embed module after Entity Embed 8.x-1.8 was released: 8.x-1.8 needs Drupal ^11.3 and moved its hooks into OOP classes, so none of the three patches applied and `composer install` stopped. #3070343 and #2679875 are re-rolled for 1.8.0 as `entity_embed--2026-11-20--3070343--reroll-1.8.0.patch` and `entity_embed--2026-11-20--2679875--reroll-1.8.0.patch`; #3531672 is removed, fixed in 1.8 by MR [!62](https://git.drupalcode.org/project/entity_embed/-/merge_requests/62). The patch test project now requires `drupal/entity_embed` ~1.8. A site locked to 1.7.0 must update `drupal/entity_embed` together with this release ([#3070343](https://www.drupal.org/project/entity_embed/issues/3070343), [#2679875](https://www.drupal.org/project/entity_embed/issues/2679875), [#3531672](https://www.drupal.org/project/entity_embed/issues/3531672), [#776](https://github.com/Vardot/varbase-patches/issues/776))
+
 ## [9.2.108] - 2026-11-18
 
 - Remove all patches for the Embed module after Embed 8.x-1.11 was released - obsolete and no longer applying to the released code: 8.x-1.11 and 8.x-1.12 already carry the PSR-4 namespace fix for `EmbedCKEditor5PluginBase`, so `embed--2025-06-30--3517882--mr-26.patch` no longer applies forward and stops `composer install`. A site locked to 8.x-1.10 gets the bug back until it runs `composer update drupal/embed` ([#3517882](https://www.drupal.org/project/embed/issues/3517882), [#749](https://github.com/Vardot/varbase-patches/issues/749))
