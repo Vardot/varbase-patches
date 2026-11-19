@@ -42,7 +42,7 @@
         "drupal/embed": "~1",
         "drupal/entity": "~1",
         "drupal/entity_clone": "~2",
-        "drupal/entity_embed": "~1",
+        "drupal/entity_embed": "~1.8",
         "drupal/field_validation": "~3.0",
         "drupal/gin": "~5",
         "drupal/google_analytics": "~4",
