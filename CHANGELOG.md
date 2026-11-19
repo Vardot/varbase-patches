@@ -6,6 +6,10 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [10.1.99] - 2026-11-19
+
+- Change a patch for the Layout library module on fix: #3561874 corrected SupportAwareSectionStorageInterface namespace for Varbase 10.1.x: `layout_library--2026-01-21--3561874--mr-21.patch` imported `Drupal\layout_builder\SectionStorage\SupportAwareSectionStorageInterface`, which does not exist, so the `Library` section storage plugin never loaded and `/admin/structure/layouts` returned HTTP 500 on every fresh Varbase 10.1.x site. `10.1.x` now uses `layout_library--2026-07-02--3561874--mr-21.patch`, the corrected file 9.2.x already uses ([#3561874](https://git.drupalcode.org/project/layout_library/-/work_items/3561874), [#761](https://github.com/Vardot/varbase-patches/issues/761))
+
 ## [10.1.98] - 2026-11-18
 
 - Remove all patches for the Embed module after Embed 8.x-1.11 was released - obsolete and no longer applying to the released code: 8.x-1.11 and 8.x-1.12 already carry the PSR-4 namespace fix for `EmbedCKEditor5PluginBase`, so `embed--2025-06-30--3517882--mr-26.patch` no longer applies forward and stops `composer install`. A site locked to 8.x-1.10 gets the bug back until it runs `composer update drupal/embed` ([#3517882](https://www.drupal.org/project/embed/issues/3517882), [#749](https://github.com/Vardot/varbase-patches/issues/749))
