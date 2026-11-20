@@ -1,0 +1,141 @@
+diff --git a/src/Health/Inventory.php b/src/Health/Inventory.php
+index bcf50d859755efdcaebf2fc383c88848ae3dc4f2..552bd695db49cc73baa4d04682837c6f1c7696ac 100644
+--- a/src/Health/Inventory.php
++++ b/src/Health/Inventory.php
+@@ -280,6 +280,10 @@ final readonly class Inventory {
+    * old drafts, old published versions — so those get checked too, without
+    * checking any revision twice.
+    *
++   * Like defaultRevisionItems() and forwardRevisionItems(), this skips
++   * entities whose default revision entity queries do not return, such as
++   * entities soft-deleted by the Trash module.
++   *
+    * @return list<CheckEntity>
+    *   Sorted by entity type ID, then revision ID. Each has $revisionId set
+    *   to the past revision's ID.
+@@ -313,12 +317,19 @@ final readonly class Inventory {
+         TRUE,
+       );
+ 
++      // An entity query alter can hide an entity's default revision while
++      // allRevisions() still returns its older ones: the Trash module does
++      // this for soft-deleted entities, which then do not load either.
++      // Validating such a revision crashes (the PathAlias constraint expects
++      // the entity to load), so skip entities without a default revision.
++      $entity_ids_with_default = \array_fill_keys(\array_map('strval', $default_rid_map), TRUE);
++
+       // Revision queries return revision_id => entity_id.
+       $all_rid_map = $storage->getQuery()->accessCheck(FALSE)->allRevisions()->execute();
+       foreach ($all_rid_map as $rid => $entity_id) {
+         $rid = (string) $rid;
+         $entity_id = (string) $entity_id;
+-        if (!isset($excluded_rids[$rid])) {
++        if (!isset($excluded_rids[$rid]) && isset($entity_ids_with_default[$entity_id])) {
+           $past[] = new CheckEntity($entity_type, $entity_id, revisionId: $rid);
+         }
+       }
+diff --git a/tests/src/Kernel/Health/CanvasDoctorTest.php b/tests/src/Kernel/Health/CanvasDoctorTest.php
+index 8ff1449bcaa5165b45ac6d3ce0e76a3154a1a568..8475973a057ba52a1f6a1426ab2b887526582574 100644
+--- a/tests/src/Kernel/Health/CanvasDoctorTest.php
++++ b/tests/src/Kernel/Health/CanvasDoctorTest.php
+@@ -18,8 +18,11 @@ use Drupal\canvas\Health\Inventory;
+ use Drupal\canvas\Hook\HealthHooks;
+ use Drupal\Component\Datetime\TimeInterface;
+ use Drupal\Core\Cache\CacheTagsChecksumInterface;
++use Drupal\Core\Database\Query\SelectInterface;
+ use Drupal\Core\Entity\EntityTypeManagerInterface;
++use Drupal\Core\Entity\Query\QueryInterface;
+ use Drupal\Core\Entity\RevisionableStorageInterface;
++use Drupal\Core\Hook\Attribute\Hook;
+ use Drupal\Core\Site\Settings;
+ use Drupal\Tests\canvas\Kernel\CanvasKernelTestBase;
+ use Drupal\Tests\canvas\Kernel\Traits\PageTrait;
+@@ -51,6 +54,15 @@ final class CanvasDoctorTest extends CanvasKernelTestBase {
+   private Doctor $validator;
+   private HealthRecords $healthRecords;
+ 
++  /**
++   * Page revision IDs that entity queries and entity loads skip.
++   *
++   * @var list<int>
++   *
++   * @see testSoftDeletedEntityPastRevisionsAreSkipped()
++   */
++  private array $softDeletedRevisionIds = [];
++
+   /**
+    * {@inheritdoc}
+    */
+@@ -62,6 +74,30 @@ final class CanvasDoctorTest extends CanvasKernelTestBase {
+     $this->healthRecords = $this->container->get(HealthRecords::class);
+   }
+ 
++  /**
++   * Hides soft-deleted Page revisions from entity queries, like Trash does.
++   *
++   * @see https://www.drupal.org/project/trash
++   */
++  #[Hook('entity_query_canvas_page_alter')]
++  public function hideSoftDeletedRevisionsFromEntityQueries(QueryInterface $query): void {
++    if ($this->softDeletedRevisionIds !== []) {
++      $query->condition('revision_id', $this->softDeletedRevisionIds, 'NOT IN');
++    }
++  }
++
++  /**
++   * Prevents loading soft-deleted Page revisions, like Trash does.
++   *
++   * @see \Drupal\Core\Entity\Sql\SqlContentEntityStorage::buildQuery()
++   */
++  #[Hook('query_canvas_page_load_multiple_alter')]
++  public function hideSoftDeletedRevisionsFromEntityLoads(SelectInterface $query): void {
++    if ($this->softDeletedRevisionIds !== []) {
++      $query->condition('revision.revision_id', $this->softDeletedRevisionIds, 'NOT IN');
++    }
++  }
++
+   /**
+    * A clean site has no violations (Config and Content both ran); an invalid content revision is reported.
+    */
+@@ -273,6 +309,41 @@ final class CanvasDoctorTest extends CanvasKernelTestBase {
+     self::assertGreaterThanOrEqual(3, $this->healthRecords->getSummary()['total_items']);
+   }
+ 
++  /**
++   * Past revisions of a soft-deleted entity (e.g. by the Trash module) are not checked: the entity does not load, so validating them would crash cron.
++   *
++   * @see https://www.drupal.org/project/canvas/issues/3592058
++   */
++  public function testSoftDeletedEntityPastRevisionsAreSkipped(): void {
++    $live = self::createValidPage('Live page');
++    $live_past_rid = $live->getRevisionId();
++    $live->setNewRevision(TRUE);
++    $live->save();
++
++    $trashed = self::createValidPage('Trashed page');
++    $trashed_id = $trashed->id();
++    $trashed_past_rid = $trashed->getRevisionId();
++    self::assertNotNull($trashed_id);
++    self::assertNotNull($trashed_past_rid);
++    $trashed->setNewRevision(TRUE);
++    $trashed->save();
++    // Soft-delete it like Trash: a new default revision that entity queries
++    // and entity loads skip. Its older revisions still load.
++    $trashed->setNewRevision(TRUE);
++    $trashed->save();
++    $this->softDeletedRevisionIds = [(int) $trashed->getRevisionId()];
++    $page_storage = $this->container->get(EntityTypeManagerInterface::class)->getStorage(Page::ENTITY_TYPE_ID);
++    \assert($page_storage instanceof RevisionableStorageInterface);
++    self::assertNull($page_storage->loadUnchanged($trashed_id));
++    self::assertNotNull($page_storage->loadRevision($trashed_past_rid));
++
++    // Only the live page's past revision is listed and validated.
++    self::assertSame(1, $this->validator->countCheckItems(HealthCheck::ContentPastRevisions));
++    $items = \iterator_to_array($this->validator->runDataChecks([HealthCheck::ContentPastRevisions]), FALSE);
++    self::assertSame([\sprintf('%s:%s:%s', Page::ENTITY_TYPE_ID, $live->id(), $live_past_rid)], \array_column($items, 'key'));
++    self::assertSame([], self::failingFindings($items));
++  }
++
+   /**
+    * RunCronWindow() bounds work to $limit items, advances across calls, and wraps at the end of the stream (the three pages form the whole content stream).
+    */
