@@ -35,7 +35,7 @@
         "drupal/embed": "~1",
         "drupal/entity": "~1",
         "drupal/entity_clone": "~2",
-        "drupal/entity_embed": "~1",
+        "drupal/entity_embed": "~1.8",
         "drupal/google_analytics": "~4",
         "drupal/inline_entity_form": "~3",
         "drupal/jsonapi_extras": "~3",

@@ -67,9 +67,8 @@
                 "Issue #3185778: Fix TypeError: Cannot read property 'anyOf' of undefined": "https://www.drupal.org/files/issues/2020-12-21/add_required_keyword_8.x_2.x-3185778-5.patch"
             },
             "drupal/entity_embed": {
-                "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor": "https://www.drupal.org/files/issues/2023-11-02/entity-embed-add-link-image-entity-3070343-37.patch",
-                "Issue #2679875: Inline Entity Form integration": "https://www.drupal.org/files/issues/2023-11-08/2679875-27.patch",
-                "Issue #3531672:  Drupal 10.5/11.2 compatability (tooltip broken, cannot edit embedded entities)": "https://www.drupal.org/files/issues/2025-06-30/entity_embed--2025-06-30--3531672--mr-62.patch"
+                "Issue #3070343: Allow to add a Drupal core link with Link Widget for Image entities using Entity Embed Dialog in CKEditor": "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/entity_embed--2026-11-20--3070343--reroll-1.8.0.patch",
+                "Issue #2679875: Inline Entity Form integration": "https://raw.githubusercontent.com/Vardot/varbase-patches/refs/heads/patches/entity_embed--2026-11-20--2679875--reroll-1.8.0.patch"
             },
             "drupal/linkit": {
                 "Issue #3158783: Links around media images break when edited, using Linkit and CKeditor": "https://www.drupal.org/files/issues/2023-04-25/3158783-24.patch",
