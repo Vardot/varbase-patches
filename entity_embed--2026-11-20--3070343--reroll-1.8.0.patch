@@ -1,0 +1,238 @@
+diff --git a/src/Hook/EntityEmbedHooks.php b/src/Hook/EntityEmbedHooks.php
+index 53f6b42..c71eb7b 100644
+--- a/src/Hook/EntityEmbedHooks.php
++++ b/src/Hook/EntityEmbedHooks.php
+@@ -5,6 +5,7 @@ declare(strict_types=1);
+ namespace Drupal\entity_embed\Hook;
+ 
+ use Drupal\Component\Serialization\Json;
++use Drupal\Component\Utility\UrlHelper;
+ use Drupal\Core\Entity\EntityTypeManagerInterface;
+ use Drupal\Core\Extension\ModuleExtensionList;
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+@@ -12,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
+ use Drupal\Core\Hook\Attribute\Hook;
+ use Drupal\Core\Routing\RouteMatchInterface;
+ use Drupal\Core\StringTranslation\StringTranslationTrait;
++use Drupal\Core\Url;
+ 
+ /**
+  * Hook implementations for entity_embed.
+@@ -76,6 +78,31 @@ class EntityEmbedHooks {
+     $variables['attributes'] = $variables['element']['#attributes'];
+     $variables['children'] = $variables['element']['#children'];
+ 
++    if (!empty($variables['element']['#context']['data-entity-embed-display-settings']['link_url']) && \Drupal::routeMatch()->getRouteName() != 'embed.preview') {
++      $link = UrlHelper::filterBadProtocol($variables['element']['#context']['data-entity-embed-display-settings']['link_url']);
++      if (!UrlHelper::isExternal($link)) {
++        $link = 'internal:/' . ltrim($link, '/');
++      }
++
++      $link = Url::fromUri($link);
++      $attributes = [];
++      if (!empty($variables['element']['#context']['data-entity-embed-display-settings']['link_url_target']) && $variables['element']['#context']['data-entity-embed-display-settings']['link_url_target'] == 1) {
++        $attributes = [
++          'attributes' => [
++            'target' => '_blank',
++          ],
++        ];
++      }
++
++      $variables['children'] = [
++        [
++          '#type' => 'link',
++          '#title' => $variables['children'],
++          '#options' => $attributes,
++          '#url' => $link,
++        ]
++      ];
++    }
+     // Ensure the display settings get converted to a JSON string again.
+     if (isset($variables['attributes']['data-entity-embed-display-settings']) && is_array($variables['attributes']['data-entity-embed-display-settings'])) {
+       $variables['attributes']['data-entity-embed-display-settings'] = Json::encode($variables['attributes']['data-entity-embed-display-settings']);
+diff --git a/src/Plugin/entity_embed/EntityEmbedDisplay/ImageFieldFormatter.php b/src/Plugin/entity_embed/EntityEmbedDisplay/ImageFieldFormatter.php
+index 059c9de..9594f50 100644
+--- a/src/Plugin/entity_embed/EntityEmbedDisplay/ImageFieldFormatter.php
++++ b/src/Plugin/entity_embed/EntityEmbedDisplay/ImageFieldFormatter.php
+@@ -2,6 +2,8 @@
+ 
+ namespace Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay;
+ 
++use Drupal\Component\Serialization\Json;
++use Drupal\Component\Utility\Html;
+ use Drupal\Core\Access\AccessResult;
+ use Drupal\Core\Form\FormStateInterface;
+ use Drupal\Core\Session\AccountInterface;
+@@ -9,6 +11,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
+ use Drupal\entity_embed\Attribute\EntityEmbedDisplay;
+ use Drupal\entity_embed\Plugin\Derivative\FieldFormatterDeriver;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
++use Drupal\Core\Entity\Element\EntityAutocomplete;
+ 
+ /**
+  * Entity Embed Display reusing image field formatters.
+@@ -110,16 +113,40 @@ class ImageFieldFormatter extends FileFieldFormatter {
+    */
+   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+     $form = parent::buildConfigurationForm($form, $form_state);
+-
++    $entity_element = $form_state->get('entity_element');
+     // File field support descriptions, but images do not.
+     unset($form['description']);
+ 
+     // Ensure that the 'Link image to: Content' setting is not available.
+-    if ($this->getDerivativeId() == 'image') {
++    if ($this->getDerivativeId() == 'image' || $this->getDerivativeId() == 'responsive_image') {
+       unset($form['image_link']['#options']['content']);
++      if (empty($entity_element['data-entity-embed-display-settings'])) {
++        $entity_element['data-entity-embed-display-settings'] = [];
++      }
++      elseif (is_string($entity_element['data-entity-embed-display-settings'])) {
++        $entity_element['data-entity-embed-display-settings'] = Json::decode($entity_element['data-entity-embed-display-settings']) ?: [];
++      }
++      $form['link_url'] = [
++        '#title' => t('Link to'),
++        '#type' => 'entity_autocomplete',
++        '#target_type' => 'node',
++        '#attributes' => [
++          'data-autocomplete-first-character-blacklist' => '/#?'
++        ],
++        '#element_validate' => [[get_called_class(), 'validateUriElement']],
++        '#process_default_value' => FALSE,
++        '#description' => $this->t('Start typing the title of a piece of content to select it. You can also enter an internal path such as %add-node or an external URL such as %url. Enter %front to link to the front page.', ['%front' => '<front>', '%add-node' => '/node/add', '%url' => 'http://example.com']),
++        '#default_value' => isset($entity_element['data-entity-embed-display-settings']['link_url']) ? $this->getUriAsDisplayableString($entity_element['data-entity-embed-display-settings']['link_url']) : '',
++        '#maxlength' => 2048,
++      ];
++      $form['link_url_target'] = [
++        '#title' => t('Open in a new window?'),
++        '#type' => 'checkbox',
++        '#default_value' => isset($entity_element['data-entity-embed-display-settings']['link_url_target']) ? Html::decodeEntities($entity_element['data-entity-embed-display-settings']['link_url_target']) : '',
++      ];
+     }
+ 
+-    $entity_element = $form_state->get('entity_element');
++
+     // The alt attribute is *required*, but we allow users to opt-in to empty
+     // alt attributes for the very rare edge cases where that is valid by
+     // specifying two double quotes as the alternative text in the dialog.
+@@ -177,4 +204,120 @@ class ImageFieldFormatter extends FileFieldFormatter {
+     }
+   }
+ 
++  /**
++   * Gets the URI without the 'internal:' or 'entity:' scheme.
++   *
++   * The following two forms of URIs are transformed:
++   * - 'entity:' URIs: to entity autocomplete ("label (entity id)") strings;
++   * - 'internal:' URIs: the scheme is stripped.
++   *
++   * This method is the inverse of ::getUserEnteredStringAsUri().
++   *
++   * @param string $uri
++   *   The URI to get the displayable string for.
++   *
++   * @return string
++   *
++   * @see static::getUserEnteredStringAsUri()
++   */
++  protected function getUriAsDisplayableString($uri) {
++    $uri = Html::decodeEntities($uri);
++    $scheme = parse_url($uri, PHP_URL_SCHEME);
++
++    // By default, the displayable string is the URI.
++    $displayable_string = $uri;
++
++    // A different displayable string may be chosen in case of the 'internal:'
++    // or 'entity:' built-in schemes.
++    if ($scheme === 'internal') {
++      $uri_reference = explode(':', $uri, 2)[1];
++
++      // @todo '<front>' is valid input for BC reasons, may be removed by
++      //   https://www.drupal.org/node/2421941
++      $path = parse_url($uri, PHP_URL_PATH);
++      if ($path === '/') {
++        $uri_reference = '<front>' . substr($uri_reference, 1);
++      }
++
++      $displayable_string = $uri_reference;
++    }
++    elseif ($scheme === 'entity') {
++      list($entity_type, $entity_id) = explode('/', substr($uri, 7), 2);
++      // Show the 'entity:' URI as the entity autocomplete would.
++      // @todo Support entity types other than 'node'. Will be fixed in
++      //    https://www.drupal.org/node/2423093.
++      if ($entity_type == 'node' && $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id)) {
++        $displayable_string = EntityAutocomplete::getEntityLabels([$entity]);
++      }
++    }
++
++    return $displayable_string;
++  }
++
++  /**
++   * Gets the user-entered string as a URI.
++   *
++   * The following two forms of input are mapped to URIs:
++   * - entity autocomplete ("label (entity id)") strings: to 'entity:' URIs;
++   * - strings without a detectable scheme: to 'internal:' URIs.
++   *
++   * This method is the inverse of ::getUriAsDisplayableString().
++   *
++   * @param string $string
++  +   *   The user-entered string.
++  +   *
++  +   * @return string
++  +   *   The URI, if a non-empty $uri was passed.
++  +   *
++  +   * @see static::getUriAsDisplayableString()
++  +   */
++  protected static function getUserEnteredStringAsUri($string) {
++    // By default, assume the entered string is an URI.
++    $uri = $string;
++
++    // Detect entity autocomplete string, map to 'entity:' URI.
++    $entity_id = EntityAutocomplete::extractEntityIdFromAutocompleteInput($string);
++    if ($entity_id !== NULL) {
++      // @todo Support entity types other than 'node'. Will be fixed in
++      //    https://www.drupal.org/node/2423093.
++      $uri = 'entity:node/' . $entity_id;
++    }
++    // Detect a schemeless string, map to 'internal:' URI.
++    elseif (!empty($string) && parse_url($string, PHP_URL_SCHEME) === NULL) {
++      // @todo '<front>' is valid input for BC reasons, may be removed by
++      //   https://www.drupal.org/node/2421941
++      // - '<front>' -> '/'
++      // - '<front>#foo' -> '/#foo'
++      if (strpos($string, '<front>') === 0) {
++        $string = '/' . substr($string, strlen('<front>'));
++      }
++      $uri = 'internal:' . $string;
++    }
++
++    return $uri;
++  }
++
++  /**
++   * Form element validation handler for the 'uri' element.
++   *
++   * Disallows saving inaccessible or untrusted URLs.
++   */
++  public static function validateUriElement($element, FormStateInterface $form_state, $form) {
++    $uri = static::getUserEnteredStringAsUri($element['#value']);
++    $form_state->setValueForElement($element, $uri);
++
++    // If getUserEnteredStringAsUri() mapped the entered value to a 'internal:'
++    // URI , ensure the raw value begins with '/', '?' or '#'.
++    // @todo '<front>' is valid input for BC reasons, may be removed by
++    //   https://www.drupal.org/node/2421941
++    if (parse_url($uri, PHP_URL_SCHEME) === 'internal' && !in_array($element['#value'][0], ['/', '?', '#'], TRUE) && substr($element['#value'], 0, 7) !== '<front>') {
++      $form_state->setError($element, t('Manually entered paths should start with /, ? or #.'));
++      return;
++    }
++
++    if (!empty($uri) && str_starts_with($uri, 'http')  && !preg_match('/^http[s]?:\/\/[\w\W]+/', $uri)) {
++      $form_state->setError($element, t('Manually entered paths should start with http:// or https://'));
++      return;
++    }
++  }
+ }
