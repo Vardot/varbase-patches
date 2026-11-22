@@ -1,0 +1,43 @@
+diff --git a/src/Plugin/ImageToolkit/ImagemagickToolkit.php b/src/Plugin/ImageToolkit/ImagemagickToolkit.php
+index 4303c1f..fd7411f 100644
+--- a/src/Plugin/ImageToolkit/ImagemagickToolkit.php
++++ b/src/Plugin/ImageToolkit/ImagemagickToolkit.php
+@@ -9,6 +9,8 @@ use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
+ use Drupal\Component\Serialization\Yaml;
+ use Drupal\Component\Utility\Html;
+ use Drupal\Core\Config\ConfigFactoryInterface;
++use Drupal\Core\File\FileExists;
++use Drupal\Core\File\FileSystemInterface;
+ use Drupal\Core\Form\FormStateInterface;
+ use Drupal\Core\ImageToolkit\Attribute\ImageToolkit;
+ use Drupal\Core\ImageToolkit\ImageToolkitBase;
+@@ -114,6 +116,7 @@ class ImagemagickToolkit extends ImageToolkitBase {
+     protected readonly FileMetadataManagerInterface $fileMetadataManager,
+     protected readonly ImagemagickExecManagerInterface $execManager,
+     protected readonly EventDispatcherInterface $eventDispatcher,
++    protected readonly FileSystemInterface $fileSystem,
+   ) {
+     parent::__construct($configuration, $pluginId, $pluginDefinition, $operationManager, $logger, $configFactory);
+     $this->arguments = new ImagemagickExecArguments($this->execManager);
+@@ -134,6 +137,7 @@ class ImagemagickToolkit extends ImageToolkitBase {
+       $container->get(FileMetadataManagerInterface::class),
+       $container->get(ImagemagickExecManagerInterface::class),
+       $container->get(EventDispatcherInterface::class),
++      $container->get(FilesystemInterface::class),
+     );
+   }
+ 
+@@ -687,10 +691,13 @@ class ImagemagickToolkit extends ImageToolkitBase {
+    * {@inheritdoc}
+    */
+   public function save($destination): bool {
++    $originalDestination = $destination;
++    $destination = $this->fileSystem->tempnam($this->fileSystem->getTempDirectory(), 'im_');
+     $this->arguments()->setDestination($destination);
+     if ($ret = $this->convert()) {
+       // Allow modules to alter the destination file.
+       $this->eventDispatcher->dispatch(new ImagemagickExecutionEvent($this->arguments), ImagemagickExecutionEvent::POST_SAVE);
++      $this->fileSystem->move($destination, $originalDestination, FileExists::Replace);
+       // Reset local path to allow saving to other file.
+       $this->arguments()->setDestinationLocalPath('');
+     }
