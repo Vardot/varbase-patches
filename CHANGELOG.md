@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the ImageMagick module on Issue #3543548: Use atomic file system actions: while an image style derivative is generated, the ImageMagick toolkit writes it at its final path, so a request in that moment gets the still-empty file as HTTP 200 with 0 bytes and a one-year cache lifetime, and the image stays blank (40 images on 47 pages on a fresh The Rightup site). `imagemagick--2026-11-21--3543548--mr-54.patch` writes to a temporary file and then moves it into place. From upstream MR [!54](https://git.drupalcode.org/project/imagemagick/-/merge_requests/54), rerolled for 4.0.2, unreleased; the patch test project now requires `drupal/imagemagick` ~4.0 ([#3543548](https://www.drupal.org/i/3543548), [#787](https://github.com/Vardot/varbase-patches/issues/787))
+
 ## [11.0.59] - 2026-11-20
 
 - Add a patch for the Field Validation module on fix: #3634371 Non-canonical (double) casts are deprecated in PHP 8.5 in the legacy Numeric validation rule: Field Validation 3.0.0 still uses three `(double)` casts in the legacy `NumericFieldValidationRule::valid_number_step()`, deprecated on PHP 8.5; Varbase 11.0.x pulls it through the AI module (AI Validations) and Varbase AI Safety. From upstream MR [!34](https://git.drupalcode.org/project/field_validation/-/merge_requests/34), unreleased; the patch test project now requires `drupal/field_validation` ~3.0 ([#3634371](https://git.drupalcode.org/project/field_validation/-/work_items/3634371), [#767](https://github.com/Vardot/varbase-patches/issues/767))

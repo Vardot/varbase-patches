@@ -154,6 +154,9 @@
             },
             "drupal/field_validation": {
                 "fix: #3634371 Non-canonical (double) casts are deprecated in PHP 8.5 in the legacy Numeric validation rule": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/field_validation--2026-11-19--3634371--mr-34.patch"
+            },
+            "drupal/imagemagick": {
+                "Issue #3543548: Use atomic file system actions": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/imagemagick--2026-11-21--3543548--mr-54.patch"
             }
         }
     }
