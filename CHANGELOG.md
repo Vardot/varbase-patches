@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [9.2.110] - 2026-11-24
+
 - Remove a patch for the Varbase Layout Builder module on fix: #3638604 PHP 8.5: Bootstrap layout deriver builds layouts without a provider -- after Varbase Layout Builder 10.0.76 was released: 10.0.76 and 10.2.9 already carry the fix (commit `3f9f643`), so `varbase_layout_builder--2026-11-18--3638604--mr-122.patch` no longer applies forward and stops `composer install`; the patch file stays on the `patches` branch for existing pins. A site locked to 10.0.75 gets the PHP 8.5 deprecation back until it runs `composer update drupal/varbase_layout_builder` ([#3638604](https://www.drupal.org/project/varbase_layout_builder/issues/3638604), [#790](https://github.com/Vardot/varbase-patches/issues/790))
 
 ## [9.2.109] - 2026-11-20
