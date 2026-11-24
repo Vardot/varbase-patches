@@ -69,7 +69,8 @@
         "neilime/php-css-lint": "~3.2",
         "oomphinc/composer-installers-extender": "~2",
         "openai-php/client": "~0.20",
-        "vardot/varbase-patches": "11.0.x-dev"
+        "vardot/varbase-patches": "11.0.x-dev",
+        "drupal/imagemagick": "~4.0"
     },
     "config": {
         "audit": {
