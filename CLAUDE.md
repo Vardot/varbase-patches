@@ -56,7 +56,7 @@ from the Varbase line, one set per Drupal core version.
 
 ### Packages
 - **`vardot/drupal-core-patches`** — Composer `metapackage`, **one git branch per Drupal core
-  MAJOR.MINOR** (`10.4.x`, `10.5.x`, `10.6.x`, `11.1.x`, `11.2.x`, `11.3.x`, `11.4.x`, `12.0.x`, …).
+  MAJOR.MINOR** (`10.4.x`, `10.5.x`, `10.6.x`, `11.1.x`, `11.2.x`, `11.3.x`, `11.4.x`, `11.5.x`, `12.0.x`, …).
   Each branch:
   - `require: { "drupal/core": "~<minor>.0", "cweagans/composer-patches": "~1.7.0 || ~2.0" }`
     — the `require drupal/core ~<minor>.0` binds the release to that core minor (composer selects the
@@ -66,7 +66,7 @@ from the Varbase line, one set per Drupal core version.
   - The **`patches`** branch is a flat `.patch` file store (no per-core composer), referenced by
     `https://raw.githubusercontent.com/Vardot/drupal-core-patches/refs/heads/patches/<file>`.
 - **`vardot/varbase-patches`** — the Composer plugin. **Requires** `vardot/drupal-core-patches`
-  (`~10 || ~11 || ~12` on 9.1.x/9.2.x/10.0.x; `~11 || ~12` on 10.1.x/11.0.x). It no longer carries or
+  (`~10 || ~11 || ~12` on 9.1.x/9.2.x/10.0.x; `~11 || ~12` on 10.1.x; `^11.4 || ^12.0` on 11.0.x). It no longer carries or
   restricts `drupal/core` patches. Its plugin allowlists `vardot/drupal-core-patches` so the core
   patches are applied — in **both** code paths (constant `VarbasePatchesPlugin::DEFAULT_ALLOWED_DEPENDENCY_PATCHES`
   used by the v1 `buildV1PatchesMap` and the v2 `FilteredDependencies` resolver).

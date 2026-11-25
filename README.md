@@ -19,7 +19,7 @@ Plus two Composer commands to convert remote merge-request URLs into local times
 ## Quick start
 
 ```bash
-composer require vardot/varbase-patches:~11.0.0
+composer require vardot/varbase-patches:^11.0
 ```
 
 ```json
@@ -54,7 +54,7 @@ Result: only patches declared by `vardot/varbase-patches` (and your project's ow
 
 | Branch       | Drupal core | Use with                     |
 |--------------|-------------|------------------------------|
-| `11.0.x`     | `~11.3.0`   | Varbase `~11.0.0`, Drupal 11 |
+| `11.0.x`     | `^11.4 \|\| ^12.0` | Varbase `^11.0`, Drupal 11.4 and later, Drupal 12 |
 | `10.1.x`     | `~11.3.0`   | Varbase `~10.1.0`            |
 | `10.0.x`     | `~10.6.0`   | Varbase `~10.0.0`            |
 | `9.2.x`      | `~10.6.0`   | Varbase `~9.2.0`             |
@@ -67,14 +67,14 @@ The `patches` branch carries patch files only — do not require it.
 
 Drupal **core** patches are managed in a dedicated package, [`vardot/drupal-core-patches`](https://github.com/Vardot/drupal-core-patches), so Varbase can always track the latest Drupal core release while keeping core patches separate from contrib patches.
 
-`vardot/varbase-patches` **requires** `vardot/drupal-core-patches`. The core-patches package stores the curated Drupal core patches with **one git branch per Drupal core `major.minor`** — `10.4.x`, `10.5.x`, `10.6.x`, `11.1.x`, `11.2.x`, `11.3.x`, `11.4.x`, `12.0.x` — plus a flat `patches` branch that holds the actual `.patch` files. Each `drupal-core-patches` release `require`s `drupal/core ~<minor>.0`, so Composer automatically selects the patch set that matches the Drupal core version installed in your project.
+`vardot/varbase-patches` **requires** `vardot/drupal-core-patches`. The core-patches package stores the curated Drupal core patches with **one git branch per Drupal core `major.minor`** (`10.4.x`, `10.5.x`, `10.6.x`, `11.1.x`, `11.2.x`, `11.3.x`, `11.4.x`, `11.5.x`, `12.0.x`), plus a flat `patches` branch that holds the actual `.patch` files. Each `drupal-core-patches` release `require`s `drupal/core ~<minor>.0`, so Composer automatically selects the patch set that matches the Drupal core version installed in your project. On this branch that is the `11.4.x`, `11.5.x` or `12.0.x` line.
 
 On this branch `vardot/varbase-patches` requires:
 
 ```json
 {
   "require": {
-    "vardot/drupal-core-patches": "~11 || ~12"
+    "vardot/drupal-core-patches": "^11.4 || ^12.0"
   }
 }
 ```

@@ -3,9 +3,9 @@
 Composer plugin and curated patch list for [Varbase](https://www.drupal.org/project/varbase). Built on top of [`cweagans/composer-patches`](https://github.com/cweagans/composer-patches) v2.
 
 - **Branch:** `11.0.x`
-- **Drupal core:** `~11.3.0`
-- **Use with:** Varbase `~11.0.0`, Drupal 11
-- **Recommended require:** `"vardot/varbase-patches": "~11.0.0"`
+- **Drupal core:** `^11.4 || ^12.0`
+- **Use with:** Varbase `^11.0`, Drupal 11.4 and later, Drupal 12
+- **Recommended require:** `"vardot/varbase-patches": "^11.0"`
 - **External docs:** <https://docs.varbase.vardot.com/11.0.x/developers/varbase-patches>
 
 ## What it does
@@ -57,7 +57,7 @@ Static, timestamped local files give reproducible builds; raw MR URLs change as 
 
 | Branch       | Drupal core | Use with                          | External docs                                                              |
 |--------------|-------------|-----------------------------------|----------------------------------------------------------------------------|
-| `11.0.x`     | `~11.3.0`   | Varbase `~11.0.0`, Drupal 11      | <https://docs.varbase.vardot.com/11.0.x/developers/varbase-patches>        |
+| `11.0.x`     | `^11.4 \|\| ^12.0` | Varbase `^11.0`, Drupal 11.4+ and 12 | <https://docs.varbase.vardot.com/11.0.x/developers/varbase-patches>        |
 | `10.1.x`     | `~11.3.0`   | Varbase `~10.1.0`                 | <https://docs.varbase.vardot.com/10.1.x/developers/varbase-patches>        |
 | `10.0.x`     | `~10.6.0`   | Varbase `~10.0.0`                 | <https://docs.varbase.vardot.com/10.0.x/developers/varbase-patches>        |
 | `9.2.x`      | `~10.6.0`   | Varbase `~9.2.0`                  | <https://docs.varbase.vardot.com/9.2.x/developers/varbase-patches>         |

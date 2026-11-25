@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Use caret constraints and allow Drupal 11.4 and later and Drupal 12 in Varbase Patches: `vardot/drupal-core-patches` is now `^11.4 || ^12.0`, so Composer picks the `11.4.x`, `11.5.x` or `12.0.x` core-patches line for the installed core; `composer/installers` and `oomphinc/composer-installers-extender` are `^2.0` and `cweagans/composer-patches` is `^1.7 || ^2.0`. A site on Drupal core 11.3 or older stays on 11.0.60 ([#794](https://github.com/Vardot/varbase-patches/issues/794))
+
 ## [11.0.60] - 2026-11-24
 
 - Add a patch for the ImageMagick module on Issue #3543548: Use atomic file system actions: while an image style derivative is generated, the ImageMagick toolkit writes it at its final path, so a request in that moment gets the still-empty file as HTTP 200 with 0 bytes and a one-year cache lifetime, and the image stays blank (40 images on 47 pages on a fresh The Rightup site). `imagemagick--2026-11-21--3543548--mr-54.patch` writes to a temporary file and then moves it into place. From upstream MR [!54](https://git.drupalcode.org/project/imagemagick/-/merge_requests/54), rerolled for 4.0.2, unreleased; the patch test project now requires `drupal/imagemagick` ~4.0 ([#3543548](https://www.drupal.org/i/3543548), [#787](https://github.com/Vardot/varbase-patches/issues/787))
