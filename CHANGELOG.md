@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+## [11.0.61] - 2026-11-25
+
 - Use caret constraints and allow Drupal 11.4 and later and Drupal 12 in Varbase Patches: `vardot/drupal-core-patches` is now `^11.4 || ^12.0`, so Composer picks the `11.4.x`, `11.5.x` or `12.0.x` core-patches line for the installed core; `composer/installers` and `oomphinc/composer-installers-extender` are `^2.0` and `cweagans/composer-patches` is `^1.7 || ^2.0`. A site on Drupal core 11.3 or older stays on 11.0.60 ([#794](https://github.com/Vardot/varbase-patches/issues/794))
 
 ## [11.0.60] - 2026-11-24
