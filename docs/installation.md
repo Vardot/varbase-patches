@@ -3,7 +3,7 @@
 ## Require the package
 
 ```bash
-composer require vardot/varbase-patches:~11.0.0
+composer require vardot/varbase-patches:^11.0
 ```
 
 For Varbase `~10.1.0` use `~10.1.0`, etc. See the version table in [index.md](index.md).
