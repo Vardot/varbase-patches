@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Change a patch for the Tagify module on fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable -- re-rolled against Tagify 2.0.6: Tagify 2.0.6 changed the select widget code in `js/tagify.js`, so `tagify--2026-10-08--3555084--mr-270.patch` no longer applies and stops `composer install`. `tagify--2026-11-25--3555084--mr-270.patch` is the same MR [!270](https://git.drupalcode.org/project/tagify/-/merge_requests/270) diff with one line of context, so it applies to Tagify 2.0.5 and 2.0.6 with the same result; the fix is still unreleased upstream ([#3555084](https://www.drupal.org/project/tagify/issues/3555084), [#797](https://github.com/Vardot/varbase-patches/issues/797))
+
 ## [10.1.100] - 2026-11-20
 
 - Add a patch for the Field Validation module on fix: #3634371 Non-canonical (double) casts are deprecated in PHP 8.5 in the legacy Numeric validation rule: Field Validation 3.0.0 still uses three `(double)` casts in the legacy `NumericFieldValidationRule::valid_number_step()`, deprecated on PHP 8.5; Varbase 10.1.x pulls it through the AI module (AI Validations). From upstream MR [!34](https://git.drupalcode.org/project/field_validation/-/merge_requests/34), unreleased; the patch test project now requires `drupal/field_validation` ~3.0 ([#3634371](https://git.drupalcode.org/project/field_validation/-/work_items/3634371), [#767](https://github.com/Vardot/varbase-patches/issues/767))
