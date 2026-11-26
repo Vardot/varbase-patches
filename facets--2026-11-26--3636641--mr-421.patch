@@ -1,0 +1,21 @@
+diff --git a/src/Plugin/facets/facet_source/SearchApiDisplay.php b/src/Plugin/facets/facet_source/SearchApiDisplay.php
+index 4f457cd50c2bb3145406417a6f5060830d9d98f7..c0a079531239619e1250a428c5a98b6cdfb6fe6e 100644
+--- a/src/Plugin/facets/facet_source/SearchApiDisplay.php
++++ b/src/Plugin/facets/facet_source/SearchApiDisplay.php
+@@ -349,6 +349,16 @@ class SearchApiDisplay extends FacetSourcePluginBase implements SearchApiFacetSo
+       }
+     }
+ 
++    // The index may have gained the field since the list was cached, for
++    // example when several recipes are applied in one request. Read the
++    // fields again once before giving up.
++    $fields[$index->id()] = $index->getFields();
++    foreach ($fields[$index->id()] as $field) {
++      if ($field->getFieldIdentifier() == $field_id) {
++        return $this->getQueryTypesForDataType($backend, $field->getType());
++      }
++    }
++
+     throw new InvalidQueryTypeException("No available query types were found for facet {$facet->getName()}");
+   }
+ 
