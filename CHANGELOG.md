@@ -6,6 +6,8 @@ Each release lists the commits — merged pull requests and the drupal.org issue
 
 ## [Unreleased]
 
+- Add a patch for the Facets module on fix: #3636641 Index fields cached for the whole request: a facet on a field added later throws No available query types: Varbase recipes add search index fields and facets across several recipes in one install, and Facets caches the index fields for the whole request, so the Varbase Search Base facet fix throws "No available query types were found for facet Tags". `facets--2026-11-26--3636641--mr-421.patch` reads the fields again once before giving up. From upstream MR [!421](https://git.drupalcode.org/project/facets/-/merge_requests/421), unreleased; the patch test project now requires `drupal/facets` ~3.0 ([#3636641](https://git.drupalcode.org/project/facets/-/work_items/3636641), [#803](https://github.com/Vardot/varbase-patches/issues/803))
+
 ## [11.0.62] - 2026-11-25
 
 - Change a patch for the Tagify module on fix: #3555084 Exposed filter tag input missing label; add aria-labelledby to Tagify input and propagate to contenteditable -- re-rolled against Tagify 2.0.6: Tagify 2.0.6 changed the select widget code in `js/tagify.js`, so `tagify--2026-10-08--3555084--mr-270.patch` no longer applies and stops `composer install`. `tagify--2026-11-25--3555084--mr-270.patch` is the same MR [!270](https://git.drupalcode.org/project/tagify/-/merge_requests/270) diff with one line of context, so it applies to Tagify 2.0.5 and 2.0.6 with the same result; the fix is still unreleased upstream ([#3555084](https://www.drupal.org/project/tagify/issues/3555084), [#797](https://github.com/Vardot/varbase-patches/issues/797))
