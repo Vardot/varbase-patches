@@ -70,7 +70,8 @@
         "oomphinc/composer-installers-extender": "~2",
         "openai-php/client": "~0.20",
         "vardot/varbase-patches": "11.0.x-dev",
-        "drupal/imagemagick": "~4.0"
+        "drupal/imagemagick": "~4.0",
+        "drupal/facets": "~3.0"
     },
     "config": {
         "audit": {

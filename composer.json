@@ -157,6 +157,9 @@
             },
             "drupal/imagemagick": {
                 "Issue #3543548: Use atomic file system actions": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/imagemagick--2026-11-21--3543548--mr-54.patch"
+            },
+            "drupal/facets": {
+                "fix: #3636641 Index fields cached for the whole request: a facet on a field added later throws No available query types": "https://raw.githubusercontent.com/vardot/varbase-patches/refs/heads/patches/facets--2026-11-26--3636641--mr-421.patch"
             }
         }
     }
